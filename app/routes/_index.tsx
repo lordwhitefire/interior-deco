@@ -1,32 +1,49 @@
-import React, { useState } from 'react';
 import type { MetaFunction } from "@remix-run/node";
-import NavigationBar from '../components/NavigationBar';
+import React, { useState } from 'react';
+
+
 import BannerComponent from '../components/BannerComponent';
+import NavigationBar from '../components/NavigationBar';
+import Testimonials from '../components/Testimonials';
+import Logo from '../components/Logo';
+import Article from '../components/Article';
+import Join from '../components/Join';
+import Footer  from "~/components/Footer";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { name: "description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
+    { property: "og:title", content: "Interior Decorators Inc. - Transforming Spaces" },
+    { property: "og:type", content: "website" },
+    { property: "og:image", content: "url-to-interior-decoration-image" },
+    { property: "og:url", content: "url-to-website" },
+    { property: "og:description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
   ];
 };
 
 export default function Index() {
   // State for Exclusive dropdown in Navbar
-  const [isExclusiveOpen, setIsExclusiveOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // State for Exclusive dropdown in Banner
-  const [bannerIsExclusiveOpen, setBannerIsExclusiveOpen] = useState(false);
+ 
 
   // Toggle function for Exclusive dropdown
-  const toggleExclusiveDropdown = () => {
-    setIsExclusiveOpen(!isExclusiveOpen);
-    setBannerIsExclusiveOpen((prevBannerState) => !prevBannerState);
+  const toggleMenuDropdown = () => {
+    setIsMenuOpen(!isMenuOpen);
+   
   };
 
   return (
     <div>
-      <NavigationBar isExclusiveOpen={isExclusiveOpen} toggleExclusiveDropdown={toggleExclusiveDropdown} />
-      <BannerComponent bannerIsExclusiveOpen={bannerIsExclusiveOpen} setBannerIsExclusiveOpen={setBannerIsExclusiveOpen} />
+      <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
+      <BannerComponent />
+     <Testimonials />
+     <Logo />
+     <Article />
+     <Join />
+     <Footer />
 
      {/* <h1 className="text-3xl font-bold underline">
         Hello world!
@@ -39,11 +56,3 @@ export default function Index() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
