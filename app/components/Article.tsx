@@ -87,7 +87,7 @@ const ArticlesAndNews = () => {
     <div className="max-w-[50rem] mx-auto py-8  my-4 sm:mb-8">
        <div className="flex flex-col items-center mb-8">
           <h2 className="text-4xl font-medium font2 mb-4">Articles and News</h2>
-          <p className="text-gray-700 text-center text-[0.67rem] sm:w-1/2">
+          <p className="text-gray-700 text-center mx-2 sm:mx-0 text-[0.8rem] sm:text-[0.67rem] sm:w-1/2">
             It is a long established fact that a reader will be distracted by the of readable content of page looking at its layouts points.
           </p>
         </div>

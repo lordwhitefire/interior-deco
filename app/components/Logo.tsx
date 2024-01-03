@@ -18,7 +18,7 @@ const LogoSection = () => {
         <div className="p-8 mx-auto max-w-[50rem]">
         <div className="flex flex-col items-center mb-8">
           <h2 className="text-4xl font-medium font2 mb-4">Follow Our Projects</h2>
-          <p className="text-gray-700 text-center text-[0.67rem] sm:w-1/2">
+          <p className="text-gray-700 text-center   mx-2 sm:mx-0 text-[0.8rem]  text-[0.67rem] sm:w-1/2">
             It is a long established fact that a reader will be distracted by the of readable content of page looking at its layouts points.
           </p>
         </div>
@@ -130,7 +130,7 @@ const LogoSection = () => {
     );
   return (
     <div >
-    <div className="flex justify-between items-center  mx-auto sm:max-w-[47rem] py-4">
+    <div className="flex justify-between items-center px-4 mx-auto sm:max-w-[47rem] py-4">
       <img src={icon1} alt="Logo 1" className="sm:mx-4 mx-2 w-10 h-10 sm:w-20 sm:h-20" />
       <img src={icon2} alt="Logo 1" className="sm:mx-4 mx-2 w-10 h-10 sm:w-20 sm:w-20" />
       <img src={icon3} alt="Logo 1" className="sm:mx-4 mx-2 w-10 h-10 sm:w-20 sm:h-20" />
