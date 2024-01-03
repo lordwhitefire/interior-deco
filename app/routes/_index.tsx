@@ -16,7 +16,7 @@ export const meta: MetaFunction = () => {
     { property: "og:title", content: "Interior Decorators Inc. - Transforming Spaces" },
     { property: "og:type", content: "website" },
     { property: "og:image", content: "https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy" },
-    { property: "og:url", content: "url-to-website" },
+    { property: "og:url", content: "https://interior-deco-kappa.vercel.app/" },
     { property: "og:description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
     { property: "og:site_name", content: "Interior Decorators Inc." },
   ];
