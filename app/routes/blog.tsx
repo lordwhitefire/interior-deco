@@ -19,7 +19,7 @@ export const meta: MetaFunction = () => {
   };
 
 
-  export default function About() {
+  export default function Blog() {
     // State for Exclusive dropdown in Navbar
     const [isMenuOpen, setIsMenuOpen] = useState(false);
   

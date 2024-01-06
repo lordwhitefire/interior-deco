@@ -3,7 +3,7 @@ import Home from './_index'; // Rename _index to Home or any preferred name
 import Services from './services';
 import About from './about';
 import Blog from './blog';
-/*import Contact from './Contact'; */
+import Contact from './contact'; 
 
 function App() {
   return (
@@ -14,6 +14,7 @@ function App() {
         <Link to="/services">Services</Link>
         <Link to="/about">Services</Link>
         <Link to="/blog">Services</Link>
+        <Link to="/contact">Services</Link>
         {/* Add more navigation links as needed */}
       </nav>
       <hr />
