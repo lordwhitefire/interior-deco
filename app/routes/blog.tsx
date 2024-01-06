@@ -42,22 +42,22 @@ export const meta: MetaFunction = () => {
 
         const LatestPostSection =  (
             <div className="sm:flex sm:justify-center  mx-auto max-w-[50rem] sm:mt-12 sm:items-center">
-              <h2 className="text-2xl sm:hidden font2 font-medium  mb-4 px-6">Latest News</h2>
+              <h2 className="text-2xl sm:hidden font2 font-medium mt-12 mb-4 px-6">Latest News</h2>
         
-              <div className="sm:hidden sm:basis-2/5 sm:mt-32 mb-6">
+              <div className="sm:hidden sm:basis-2/5  mb-6">
                 <div className="container px-6">
-                  <h2 className="text-xl font2 sm:mb-3 font-medium">low cost latest invented interior </h2>
-                  <p className="text-gray-700 font2 text-sm sm:mb-2">
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
+                  <h2 className="text-xl font2 mb-3 font-medium">low cost latest invented interior </h2>
+                  <p className="text-gray-700 font2 text-sm mb-2">
+                  It is a long established fact that a reader will be distracted <br /> by the readable content of a page when looking at its in <br />contrast to it's belief layout.
                   </p>
-                  <p className="text-sm font2">The point of using that it has a more-or-less normal.</p>
-                  <div className="flex text-gray-800 justify-between">
-                    <p className="mt-4">
+                  <p className="text-gray-700 text-sm font2">The point of using that it has a more-or-less normal <br /> in a piece of classica.</p>
+                  <div className="flex text-gray-800  mt-4 items-center w-[20rem] justify-between">
+                    <p className="">
                       <span className="text-sm text-gray-800">3rd October, 2023</span>
                     </p>
                     <a href="blogdetails.html">
-                      <div className="mt-1 h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center">
-                        <span className="icon-[ooui--next-ltr] w-4 h-4"></span>
+                      <div className=" h-8 w-8 rounded-full bg-customColor  flex items-center justify-center">
+                        <span className="icon-[ooui--next-ltr] w-3 h-3"></span>
                       </div>
                     </a>
                   </div>
@@ -68,7 +68,7 @@ export const meta: MetaFunction = () => {
                 <h2 className="hidden sm:block text-3xl pl-2 font-medium font2 mb-8 ">Latest News</h2>
                 <img
                   src={blogImage}
-                  className="h-[18rem] sm:h-[18rem] rounded-[1.5rem] sm:rounded-[3rem] min-w-[18rem] max-w-[19rem] mx-auto sm:min-w-[28rem] sm:max-[28.5rem] sm:m-0"
+                  className="h-[18rem] sm:h-[18rem] rounded-[1.5rem] sm:rounded-[3rem] object-cover w-[80vw] mx-auto sm:min-w-[28rem] sm:max-[28.5rem] sm:m-0"
                 />
               </div>
         
