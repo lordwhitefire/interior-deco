@@ -72,11 +72,11 @@ export const meta: MetaFunction = () => {
 const WhatWeDoSection =  (
     <>
       {/* What We Do Section */}
-      <div className="sm:flex  mx-auto gap-x-2 sm:justify-between items-center max-w-[43rem] sm:mt-12">
+      <div className="sm:flex  mx-auto gap-x-2 w-[90vw] sm:justify-between mt-6 items-center sm:max-w-[43rem] sm:mt-12">
         <div className=" ">
           <div className="">
             <h2 className="text-2xl sm:w-4/5 mb-2 sm:text-4xl font2">What we do</h2>
-            <p className="text-gray-500 text-xs font2 sm:w-[17rem] mb-2">
+            <p className="text-gray-500 sm:text-xs text-sm font2  w-[20rem] sm:w-[17rem] mb-2">
               It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using that it has a more-or-less normal.
             </p>
 
@@ -86,20 +86,20 @@ const WhatWeDoSection =  (
             </button>
           </div>
         </div>
-        <div className="mb-4   sm:mt-4 ">
-          <img src={oldImage} alt="Old" className=" h-[13rem]  w-[23rem] object-cover rounded-[3rem] sm:rounded-[3rem]" />
+        <div className="mb-4   mt-4 ">
+          <img src={oldImage} alt="Old" className=" h-[13rem]  w-[80vw] sm:w-[23rem] object-cover rounded-[3rem] sm:rounded-[3rem]" />
         </div>
       </div>
 
       {/* The End Result Section */}
-      <div className="sm:flex sm:justify-between items-center   mx-auto max-w-[43.5rem]  sm:mt-12 mb-12">
-        <div className="hidden sm:block mb-4 sm:mt-4   max-w-[24rem] ">
+      <div className="sm:flex sm:justify-between items-center w-[90vw]  mx-auto sm:max-w-[43.5rem]  sm:mt-12 mb-12">
+        <div className="hidden sm:block mb-4 sm:mt-4   sm:max-w-[24rem] ">
           <img src={finishedImage} alt="Finished" className="h-[13rem]  w-[23rem] object-cover rounded-[3rem] sm:rounded-[3rem]" />
         </div>
         <div className="">
           <div className="">
             <h2 className="text-2xl mb-2 sm:text-4xl font2">The end result</h2>
-            <p className="text-gray-500 text-xs font2 sm:w-[17rem] mb-4">
+            <p className="text-gray-500 sm:text-xs text-sm font2  w-[20rem] sm:w-[17rem] mb-2">
               It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using that it has a more-or-less normal.
             </p>
 
@@ -109,8 +109,8 @@ const WhatWeDoSection =  (
             </button>
           </div>
         </div>
-        <div className="sm:hidden mb-4 sm:mt-4">
-          <img src={finishedImage} alt="Finished" className="h-[13rem]  w-[23rem] object-cover rounded-[3rem] sm:rounded-[5rem]" />
+        <div className="sm:hidden mb-4 mt-4">
+          <img src={finishedImage} alt="Finished" className="h-[13rem]  w-[80vw] object-cover rounded-[3rem] sm:rounded-[5rem]" />
         </div>
       </div>
     </>
@@ -166,10 +166,10 @@ const FormSection =  (
           Creative Project? Let's have  <br /> a productive talk
         </legend>
 
-        <div className="flex flex-col sm:flex-row  justify-between sm:gap-x-4 gap-y-4 w-[30rem] mb-2">
-          <div className="mb-4">
+        <div className="flex flex-col sm:flex-row  justify-between sm:gap-x-4 gap-y-4 w-full sm:w-[30rem] mb-2">
+          <div className="mb-4  ">
             <input
-              className="border-b bg-transparent sm:w-[15rem]  w-full py-2  border-black border-b focus:outline-none focus:shadow-outline font-bold text-xs"
+              className="border-b bg-transparent sm:w-[15rem]  w-[80vw] py-2  border-black border-b focus:outline-none focus:shadow-outline font-bold text-xs"
               id="name"
               type="text"
               placeholder="Name"
@@ -177,7 +177,7 @@ const FormSection =  (
           </div>
           <div className="mb-4">
             <input
-              className="border-b bg-transparent w-full sm:w-[15rem] py-2 border-black focus:outline-none focus:shadow-outline  font-bold text-xs"
+              className="border-b bg-transparent w-[80vw] sm:w-[15rem] py-2 border-black focus:outline-none focus:shadow-outline  font-bold text-xs"
               id="email"
               type="email"
               placeholder="Email"
@@ -186,7 +186,7 @@ const FormSection =  (
         </div>
 
         <textarea
-          className="border-b bg-transparent w-full py-2   sm:w-[30rem] border-b border-black focus:outline-none focus:shadow-outline font-bold text-xs sm:h-20 h-20"
+          className="border-b bg-transparent w-[80vw] py-2   sm:w-[30rem] border-b border-black focus:outline-none focus:shadow-outline font-bold text-xs sm:h-20 h-20"
           id="message"
           placeholder="Hello! I am interested in..."
         ></textarea>
