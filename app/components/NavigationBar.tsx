@@ -60,7 +60,7 @@ const NavigationBar = () => {
             <div className="hidden sm:mt-2 sm:ml-[14.5rem] sm:block">
               <div className="flex space-x-4">
                 <Link to="/" className="hover:bg-gray-900 text-black rounded-md px-3 py-2 text-sm font-medium hover:text-white" aria-current="page">Home</Link>
-                <Link to="/services" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Services</Link>
+                <Link to="/service" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Services</Link>
                 <Link to="/about" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">About us</Link>
                 <Link to="/blog" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Blog</Link>
                 <Link to="/contact" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">Contact us</Link>
@@ -117,7 +117,7 @@ const NavigationBar = () => {
         <animated.div className={`bg-white/50 backdrop-blur-md mt-6 right-4 rounded-lg absolute sm:hidden`} ref={dropdownRef} style={menuAnimation}>
           <div className="space-y-1 pl-2 pr-40 pb-3 pt-2">
             <Link to="/" className="text-black hover:text-white hover:bg-gray-700 block rounded-md px-3 py-2 text-base font-medium" aria-current="page">Home</Link>
-            <Link to="/services" className="text-black hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Services</Link>
+            <Link to="/service" className="text-black hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Services</Link>
             <Link to="/about" className="text-black hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">About us</Link>
             <Link to="/blog" className="text-black hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Blog</Link>
             <Link to="/contact" className="text-black hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium">Contact us</Link>

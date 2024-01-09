@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@remix-run/react';
 import logoImage from '../assets/logo/Logo.png';
 
 const LastSection = (
@@ -22,17 +23,25 @@ const LastSection = (
       <div className="mb-8 hidden sm:block text-[0.8rem] sm:mb-0">
         <ul className="flex flex-col ">
           <li className=" sm:ml-3 font-medium font2 text-sm ">page links</li>
-          <a href="about.html" className="hover:bg-gray-900 text-black rounded-md px-3 py-2 font-medium mt-2 hover:text-white" aria-current="page">about us</a>
-          <a href="project.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2  font-medium">projects</a>
-          <a href="team.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2  font-medium">our team</a>
-          <a href="faq.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">faq's</a>
+          <Link to="/about" className="hover:bg-gray-900 text-black rounded-md px-3 py-2 font-medium mt-2 hover:text-white" aria-current="page">
+        about us
+      </Link>
+      <Link to="/projects" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
+        projects
+      </Link>
+      <Link to="team.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
+        our team
+      </Link>
+      <Link to="faq.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
+        faq's
+      </Link>
         </ul>
       </div>
 
       {/* Third Division */}
       <div className="mb-8   hidden sm:block text-[0.8rem] sm:mb-0">
         <ul className="flex flex-col gap-y-2">
-          <li className="     font2 text-sm">services</li>
+          <li className="  font2 text-sm">services</li>
           <li>Kitchen</li>
           <li>living room</li>
           <li>bathroom</li>
@@ -45,10 +54,18 @@ const LastSection = (
       <div className="sm:hidden  text-[1rem] sm:mb-0">
         <ul className="flex flex-col  items-start gap-y-2">
           <li className=" ml-3 text-[1.3rem] font-semibold font2  ">page links</li>
-          <a href="about.html" className="hover:bg-gray-900 text-black rounded-md px-3 py-2 font-medium mt-2 hover:text-white" aria-current="page">about us</a>
-          <a href="project.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2  font-medium">projects</a>
-          <a href="team.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2  font-medium">our team</a>
-          <a href="faq.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">faq's</a>
+          <Link to="/about" className="hover:bg-gray-900 text-black rounded-md px-3 py-2 font-medium mt-2 hover:text-white" aria-current="page">
+        about us
+      </Link>
+      <Link to="/projects" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
+        projects
+      </Link>
+      <Link to="team.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
+        our team
+      </Link>
+      <Link to="faq.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
+        faq's
+      </Link>
         </ul>
       </div>
 

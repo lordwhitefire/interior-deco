@@ -42,7 +42,7 @@
     @apply bg-[url('./assets/images/blog-3.jpeg')] bg-cover bg-no-repeat bg-center
   }
   .blog4 {
-    @apply bg-[url('./assets/images/blog-4.jpeg')] bg-cover bg-no-repeat bg-center
+    @apply bg-[url('./assets/images/blog-2.jpeg')] bg-cover bg-no-repeat bg-center
   }
   .blog5 {
     @apply bg-[url('./assets/images/blog-5.jpeg')] bg-cover bg-no-repeat bg-center
@@ -60,7 +60,7 @@
     @apply bg-[url('./assets/images/banner3.jpg')] bg-cover bg-no-repeat 
   }
   .background6 {
-    @apply bg-[url('./assets/images/banner4.jpg')] bg-cover bg-no-repeat
+    @apply bg-[url('./assets/images/banner4.jpg')] bg-cover bg-no-repeat bg-center
   }
   .background7 {
     @apply bg-[url('./assets/images/interior_design.jpg')] bg-cover bg-no-repeat

@@ -1,15 +1,23 @@
+// interior-deco/app/routes/app/services/[serviceId].tsx
 import type { MetaFunction } from "@remix-run/node";
 import React, { useState } from 'react';
+import { useParams } from '@remix-run/react';
 
-
-import BannerComponent from '../components/BannerComponent';
 import NavigationBar from '../components/NavigationBar';
-import Testimonials from '../components/Testimonials';
-import Logo from '../components/Logo';
-import Article from '../components/Article';
-import Join from '../components/Join';
-import Footer  from "~/components/Footer";
-import DescriptionSection from '../components/DescriptionSection';
+import ServiceSingleBanner from '../components/ServiceSingleBanner';
+import SetTheTrendSection from '../components/SetTheTrendSection';
+import LogoSection from '../components/LogoSection';
+import InteriorSection from '../components/InteriorSection';
+import LoveDesignSection from '../components/LoveDesignSection';
+import MapSection from '../components/MapSection';
+import ExperienceSection from '../components/ExperienceSection';
+import Footer from "~/components/Footer";
+
+import oldImage from '../assets/images/about-old.jpg';
+import finishedImage from '../assets/images/project7.jpeg';
+import guyImage from '../assets/images/team-guy.jpg';
+import lady3Image from '../assets/images/team-lady3.jpg';
+import lady2Image from '../assets/images/team-lady2.jpg';
 
 export const meta: MetaFunction = () => {
   return [
@@ -23,37 +31,30 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
+export default function Servisesingle() {
   // State for Exclusive dropdown in Navbar
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // State for Exclusive dropdown in Banner
- 
 
   // Toggle function for Exclusive dropdown
   const toggleMenuDropdown = () => {
     setIsMenuOpen(!isMenuOpen);
-   
   };
+
+  // Use useParams() to get the dynamic parameter
+  const { serviceid } = useParams();
 
   return (
     <div>
       <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
-      <BannerComponent />
-     <Testimonials />
-     <Logo />
-     <Article />
-     <Join />
-     <Footer />
-
-     {/* <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-      <img
-        src="https://drive.google.com/uc?export=view&id=1C3oSuF-HK9IlyTlo4gLYGym1LuejiFRS"
-        alt="Description of the image"
-        className="rounded-lg shadow-lg mt-4"
-      />*/}
+      <ServiceSingleBanner />
+      <SetTheTrendSection />
+      <LogoSection />
+      {/* Pass serviceId as a prop to MapSection */}
+      <MapSection serviceId={serviceid} />
+      <InteriorSection />
+      <LoveDesignSection />
+      <ExperienceSection />
+      <Footer />
     </div>
   );
 }

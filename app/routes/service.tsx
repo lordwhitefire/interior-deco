@@ -1,15 +1,12 @@
 import type { MetaFunction } from "@remix-run/node";
 import React, { useState } from 'react';
+import { Link, Outlet } from '@remix-run/react';
 
-
-import BannerComponent from '../components/BannerComponent';
 import NavigationBar from '../components/NavigationBar';
-import Testimonials from '../components/Testimonials';
-import Logo from '../components/Logo';
-import Article from '../components/Article';
-import Join from '../components/Join';
-import Footer  from "~/components/Footer";
 import DescriptionSection from '../components/DescriptionSection';
+import HowWeWorkSection from '../components/HowWeWorkSection';
+import Join from '../components/Join';
+import Footer from '~/components/Footer';
 
 export const meta: MetaFunction = () => {
   return [
@@ -23,37 +20,37 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
-  // State for Exclusive dropdown in Navbar
+// Rename the function to Services
+export default function Services() {
+  // State for Exclusive dropdown in Navbar    
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // State for Exclusive dropdown in Banner
- 
 
   // Toggle function for Exclusive dropdown
   const toggleMenuDropdown = () => {
     setIsMenuOpen(!isMenuOpen);
-   
   };
+
+  const BannerSection =  (
+      <div className="relative">
+        <div className="h-60 bg-cover bg-center background6"></div>
+        <div className="absolute inset-0 flex justify-center items-end">
+          <div className="bg-white py-8 px-16 rounded-t-[1rem] shadow-lg flex flex-col items-center">
+            <h2 className="text-3xl font-bold font1">services</h2>
+            <p className="text-center text-gray-700">home/services</p>
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <div>
       <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
-      <BannerComponent />
-     <Testimonials />
-     <Logo />
-     <Article />
-     <Join />
-     <Footer />
-
-     {/* <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-      <img
-        src="https://drive.google.com/uc?export=view&id=1C3oSuF-HK9IlyTlo4gLYGym1LuejiFRS"
-        alt="Description of the image"
-        className="rounded-lg shadow-lg mt-4"
-      />*/}
+      {BannerSection}
+      <DescriptionSection />
+      
+      <HowWeWorkSection />
+      <Join />
+      <Footer />
     </div>
   );
 }

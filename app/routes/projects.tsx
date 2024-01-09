@@ -2,9 +2,9 @@ import type { MetaFunction } from "@remix-run/node";
 import React, { useState } from 'react';
 
 
-import BannerComponent from '../components/BannerComponent';
+import ProjectBannerSection from '../components/ProjectBannerSection';
 import NavigationBar from '../components/NavigationBar';
-import Testimonials from '../components/Testimonials';
+import ProjectSection  from '../components/ProjectSection';
 import Logo from '../components/Logo';
 import Article from '../components/Article';
 import Join from '../components/Join';
@@ -23,7 +23,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
+export default function Project() {
   // State for Exclusive dropdown in Navbar
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -39,11 +39,8 @@ export default function Index() {
   return (
     <div>
       <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
-      <BannerComponent />
-     <Testimonials />
-     <Logo />
-     <Article />
-     <Join />
+      <ProjectBannerSection />
+      <ProjectSection />
      <Footer />
 
      {/* <h1 className="text-3xl font-bold underline">
