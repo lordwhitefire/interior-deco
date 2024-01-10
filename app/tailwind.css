@@ -14,8 +14,32 @@
   .project-banner {
     @apply bg-[url('./assets/images/other4.jpeg')] bg-cover bg-no-repeat 
   }
-  .project-search {
+  .project-search-default {
     @apply bg-[url('./assets/images/other5.jpg')] bg-cover bg-no-repeat 
+  }
+  .project-search8 {
+    @apply bg-[url('./assets/images/other.jpeg')] bg-cover bg-no-repeat 
+  }
+  .project-search1 {
+    @apply bg-[url('./assets/images/project1.jpg')] bg-cover bg-no-repeat 
+  }
+  .project-search2 {
+    @apply bg-[url('./assets/images/other2.jpeg')] bg-cover bg-no-repeat 
+  }
+  .project-search3 {
+    @apply bg-[url('./assets/images/project3.jpeg')] bg-cover bg-no-repeat 
+  }
+  .project-search5 {
+    @apply bg-[url('./assets/images/progect5.jpg')] bg-cover bg-no-repeat 
+  }
+  .project-search4 {
+    @apply bg-[url('./assets/images/project4.jpeg')] bg-cover bg-no-repeat 
+  }
+  .project-search6 {
+    @apply bg-[url('./assets/images/project6.jpeg')] bg-cover bg-no-repeat 
+  }
+  .project-search7 {
+    @apply bg-[url('./assets/images/project7.jpeg')] bg-cover bg-no-repeat 
   }
   .contact {
     @apply bg-[url('./assets/images/contact.jpg')] bg-cover bg-no-repeat 

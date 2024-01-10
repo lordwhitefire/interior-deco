@@ -59,7 +59,7 @@ const ProjectSection = () => {
       <div className="sm:w-[44rem]  grid grid-cols-1  sm:grid-cols-2 ">
         {projects.map((project) => (
           <figure key={project.id} className="sm:w-[22rem] p-4">
-            <Link to={`/projectdetails/${project.id}`}>
+            <Link to={`/projects/${project.id}`}>
               <img src={project.imagePath} alt={`Project ${project.id}`} className="w-full h-auto mb-4" />
             </Link>
             <figcaption className="flex text-gray-800 justify-between p-2">
