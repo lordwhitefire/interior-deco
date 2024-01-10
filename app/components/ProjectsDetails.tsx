@@ -36,11 +36,11 @@ const ProjectDetails = () => {
             Date 23,07,2023
           </span>
         </p>
-        <p className="flex gap-x-12 items-center">
+        <p className="flex gap-x-8 items-center">
           <span className="font-medium w-[3rem]">
             Link
           </span>
-          <span className="w-[12rem]">
+          <span className="w-[8rem]">
             link example.com
           </span>
         </p>
