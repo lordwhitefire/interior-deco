@@ -45,7 +45,7 @@ export const meta: MetaFunction = () => {
         );
 
     const NewsletterSignup =  (
-              <div className="bg-gray-100 max-w-[50rem] py-12 rounded-xl mx-auto my-[4.2rem]">
+              <div className="bg-gray-100 max-w-[50rem] py-12 sm:rounded-xl mx-auto my-[4.2rem]">
                 <div className="container mx-auto px-4">
                   <div className="max-w-3xl mx-auto text-center mb-8">
                     <h2 className="text-3xl font-bold text-gray-800 mb-4">Subscribe to Our Newsletter</h2>
