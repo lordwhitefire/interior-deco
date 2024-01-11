@@ -27,6 +27,7 @@ const BlogPost = ({ articleId }) => {
     // Add other projects with their details
   ];
 
+  const tags = ['kitchen', 'Bedroom', 'Building', 'Architecture', 'kitchen planning'];
   const article = articlesData.find((s) => s.id === articleId);
 
   if (!article) {
@@ -38,7 +39,7 @@ const BlogPost = ({ articleId }) => {
 
 
   return (
-    <div className="max-w-[50rem] mx-auto bg-white p-16  mt-8 rounded-lg flex justify-between shadow-lg">
+    <div className="max-w-[50rem] mx-auto bg-white sm:p-16 px-6 mt-8 rounded-lg flex sm:flex-row flex-col justify-between shadow-lg">
     <div className="mb-8">
       <header className="text-2xl pl-1 font-medium font2 mb-4">
         Let's Get Solutions for Building <br /> Construction Work
@@ -152,52 +153,109 @@ const BlogPost = ({ articleId }) => {
         </form>
 
     </div>
-    <div className=" mt-[5rem] sm:mt-0 ">
+    <div className=" mt-[5rem] sm:mt-0 sm:w-[13rem] ">
       {/* Core Division 1 */}
-      <div className="flex justify-between items-center p-4 bg-[f4f0ec] rounded-[1rem] mb-4">
+      <div className="flex justify-between mx-1 sm:mx-0 items-center p-4 bg-customColor rounded-[0.5rem] mb-4">
         {/* Content for Core Division 1 */}
-        <span className="text-[cda274]">
+        <span className="text-customColor2 sm:text-xs">
           search
         </span>
-        <span className="icon-[ion--search] w-4 h-4 text-[cda274]"></span>
+        <span className="icon-[ion--search] w-4 h-4 text-customColor2"></span>
       </div>
       {/* Core Division 2 */}
-      <div className="sm:w-[12rem] mb-8">
+      <div className="sm:w-[13rem] mb-8">
         {/* Content for Core Division 2 */}
-        <h2 className="text-lg font1 mb-4">
+        <h2 className="text-lg font2 mb-4">
           latest news
         </h2>
-        <div className="sm:w-[12rem] mb-4">
+        <div className="sm:w-[13rem] mb-4">
           <p className="flex justify-between items-end px-2 sm:px-0">
-            <span className="font-medium font1 mb-2 text-xs sm:min-w-[8rem] w-full">
+            <span className="font-medium font2 mb-2 text-xs sm:min-w-[8.5rem] w-full">
               We focus on comfort <br /> and gorgeous
             </span>
-            <span className="text-[292f36] text-[0.5rem]">
+            <span className="text-customColor3 text-[0.6rem]">
               06/07/2023
             </span>
           </p>
-          <span className="icon-[pepicons-pencil--line-x] sm:w-[13rem] w-full h-[0.1rem] text-[cda274] sm:-ml-2"></span>
+          <hr className=" bg-customColor2 w-full sm:w-[13rem] h-[0.1rem] rounded-4"/>
+        </div>
+        <div className="sm:w-[13rem] mb-4">
+          <p className="flex justify-between items-end px-2 sm:px-0">
+            <span className="font-medium font2 mb-2 text-xs sm:min-w-[8.5rem] w-full">
+              We focus on comfort <br /> and gorgeous
+            </span>
+            <span className="text-customColor3 text-[0.6rem] ">
+              06/07/2023
+            </span>
+          </p>
+          <hr className=" bg-customColor2 w-full sm:w-[13rem] h-[0.15rem] rounded-4"/>
+        </div>
+        <div className="sm:w-[13rem] mb-4">
+          <p className="flex justify-between items-end px-2 sm:px-0">
+            <span className="font-medium font2 mb-2 text-xs sm:min-w-[8.5rem] w-full">
+              We focus on comfort <br /> and gorgeous
+            </span>
+            <span className="text-customColor3 text-[0.6rem] ">
+              06/07/2023
+            </span>
+          </p>
+          <hr className=" bg-customColor2 w-full sm:w-[13rem] h-[0.1rem] rounded-4"/>
         </div>
         {/* Additional content for Core Division 2 */}
       </div>
       {/* Core Division 3 */}
-      <div className="sm:w-[12rem] w-full mb-4 bg-[f4f0ec] rounded-[1rem] sm:px-2 py-8 flex flex-col items-center">
-        {/* Content for Core Division 3 */}
-        <h2 className="text-lg sm:-ml-[2.5rem] font1 mb-4">
-          Categories
-        </h2>
-        {/* Additional content for Core Division 3 */}
+      <div className="sm:w-[13rem] w-full mb-4 bg-customColor rounded-[0.6rem]  py-8  flex flex-col items-start px-4">
+      <h2 className="text-lg  font2 mb-4">
+        Categories
+      </h2>
+      <div className="w-[13rem] sm:w-[13rem] mb-4">
+        <p className="mb-2">
+          <span className="font-medium font2  sm:text-xs text-sm">
+            Decoration
+          </span>
+        </p>
+        <hr className=" bg-customColor2 w-full sm:w-[11rem] h-[0.15rem] rounded-4"/>
       </div>
+      <div className="w-[13rem] sm:w-[13rem] mb-4">
+        <p className="flex sm:justify-between sm:items-end justify-start">
+          <span className="font-medium font1 mb-2 sm:text-xs text-sm">
+            Door windows
+          </span>
+        </p>
+        <hr className=" bg-customColor2 w-full sm:w-[11rem] h-[0.1rem] rounded-4"/>
+      </div>
+      <div className="w-[13rem] sm:w-[13rem] mb-4">
+        <p className="flex sm:justify-between sm:items-end justify-start">
+          <span className="font-medium font1 mb-2 sm:text-xs text-sm">
+            Homeland
+          </span>
+        </p>
+        <hr className=" bg-customColor2 w-full sm:w-[11rem] h-[0.15rem] rounded-4"/>
+      </div>
+      <div className="w-[13rem] sm:w-[13rem]">
+        <p className="flex sm:justify-between sm:items-end justify-start">
+          <span className="font-medium font1 mb-2 sm:text-xs text-sm">
+            Roof installation
+          </span>
+        </p>
+       
+      </div>
+       {/* Additional content for Core Division 3 */}
+    </div>
+       
       {/* Core Division 4 */}
-      <div className="w-[12rem] mb-8">
-        {/* Content for Core Division 4 */}
-        <h2 className="text-lg font1 mb-4">
-          Tags
-        </h2>
-        <div className="max-w-[18rem] min-w-[17rem] flex flex-wrap gap-x-2 gap-y-2">
-          {/* Tags buttons go here */}
-        </div>
+      <div className="w-[13rem] mb-8">
+      <h2 className="text-lg font2 mb-4">
+        Tags
+      </h2>
+      <div className="max-w-[18rem] min-w-[17rem] flex flex-wrap gap-x-2 gap-y-2">
+        {tags.map((tag, index) => (
+          <button key={index} className="text-[0.8rem] sm:text-sm flex hover:bg-customColor bg-gray-800 text-white hover:text-black font-bold py-2 sm:py-2 px-6 rounded-md sm:rounded-md">
+            {tag}
+          </button>
+        ))}
       </div>
+    </div>
     </div>
     </div >
   );
