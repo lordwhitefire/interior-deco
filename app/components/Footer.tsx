@@ -29,7 +29,7 @@ const LastSection = (
       <Link to="/project" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
         projects
       </Link>
-      <Link to="team.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
+      <Link to="/team" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
         our team
       </Link>
       <Link to="faq.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
@@ -60,7 +60,7 @@ const LastSection = (
       <Link to="/project" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
         projects
       </Link>
-      <Link to="team.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
+      <Link to="/team" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
         our team
       </Link>
       <Link to="faq.html" className="text-black hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 font-medium">
