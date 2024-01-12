@@ -35,13 +35,14 @@ export default function Index() {
     setIsMenuOpen(!isMenuOpen);
    
   };
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const handleLoad = () => {
-      // Once the entire page has finished loading, set loading to false
-      setLoading(false);
+      // Simulate a delay of 3 seconds before hiding the loading component
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
     };
 
     // Attach the event listener to the window's load event
