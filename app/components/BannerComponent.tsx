@@ -74,10 +74,12 @@ const YourComponent = () => {
             123-456-7890<span className="text-gray-700">Call us anytime</span>
           </p>
         </div>
+        <Link to={`/contact`}>
         <button className="-ml-2 sm:ml-0 mt-2 w-[11rem] sm:w-[11rem] text-[0.8rem] sm:text-sm flex gap-x-2 bg-gray-800 hover:bg-blue-700 text-white font-bold py-3 sm:py-4 sm:pl-4 pl-4 rounded-md sm:rounded-md">
           Get free estimate
           <span className="mt-[0.1rem] sm:mt-[0.1rem] icon-[solar--arrow-right-linear] w-4 h-4 text-customColor2"></span>
         </button>
+        </Link >
       </div>
     </div>
     <div className="hidden sm:block mb-4 sm:mt-12 p-4 sm:w-1/2">

@@ -20,6 +20,10 @@ const SearchBanner = ({ projectId }) => {
         { id: '6', imageClass: 'project-search6' },
         { id: '7', imageClass: 'project-search7' },
         { id: '8', imageClass: 'project-search8' },
+        { id: '9', imageClass: 'project-search9' },
+        { id: '10', imageClass: 'project-search10' },
+        { id: '11', imageClass: 'project-search11' },
+        { id: '12', imageClass: 'project-search12' },
       ];
     
       // Find the corresponding service data based on the serviceId

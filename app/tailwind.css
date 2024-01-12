@@ -53,6 +53,18 @@
   .project-search7 {
     @apply bg-[url('./assets/images/project7.jpeg')] bg-cover bg-no-repeat 
   }
+  .project-search9 {
+    @apply bg-[url('./assets/images/Modern_kitchen.jpg')] bg-cover bg-no-repeat 
+  }
+  .project-search10 {
+    @apply bg-[url('./assets/images/modern_cupboard.jpg')] bg-cover bg-no-repeat 
+  }
+  .project-search11 {
+    @apply bg-[url('./assets/images/modern_dining.jpg')] bg-cover bg-no-repeat 
+  }
+  .project-search12 {
+    @apply bg-[url('./assets/images/modern_reading.jpg')] bg-cover bg-no-repeat 
+  }
   .contact {
     @apply bg-[url('./assets/images/contact.jpg')] bg-cover bg-no-repeat 
   }

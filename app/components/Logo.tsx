@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from '@remix-run/react';
+
 
 import icon1 from '../assets/icon/01.svg';
 import icon2 from '../assets/icon/02.svg';
@@ -22,8 +24,9 @@ const LogoSection = () => {
             It is a long established fact that a reader will be distracted by the of readable content of page looking at its layouts points.
           </p>
         </div>
-        <div className="flex flex-wrap justify-center -mx-4">
-          <figure className="sm:w-1/2 w-full p-4">
+        <div className="grid grid-cols sm:grid-cols-2 -mx-4">
+        <Link to= {`/projects/9`}>
+          <figure className=" p-4">
             <img src={project1Image} alt="Project 1" className="w-full h-auto mb-4 rounded-tr-[2rem] sm:rounded-tr-[4rem]" />
             <figcaption className="flex text-gray-800 justify-between p-2">
               <p>
@@ -35,7 +38,9 @@ const LogoSection = () => {
               </div>
             </figcaption>
           </figure>
-          <figure className="sm:w-1/2 w-full p-4">
+          </Link>
+          <Link to= {`/projects/10`}>
+          <figure className=" p-4">
             <img src={project2Image} alt="Project 2" className="w-full h-auto mb-4 rounded-tl-[2rem] sm:rounded-tl-[4rem]" />
             <figcaption className="flex text-gray-800 justify-between p-2">
               <p>
@@ -47,7 +52,9 @@ const LogoSection = () => {
               </div>
             </figcaption>
           </figure>
-          <figure className="sm:w-1/2 w-full p-4">
+          </Link>
+          <Link to= {`/projects/11`}>
+          <figure className="p-4">
             <img src={project3Image} alt="Project 3" className="w-full h-auto mb-4 rounded-br-[2rem] sm:rounded-br-[4rem]" />
             <figcaption className="flex text-gray-800 justify-between p-2">
               <p>
@@ -59,7 +66,9 @@ const LogoSection = () => {
               </div>
             </figcaption>
           </figure>
-          <figure className="sm:w-1/2 w-full p-4">
+          </Link>
+          <Link to= {`/projects/12`}>
+          <figure className="p-4">
             <img src={project4Image} alt="Project 4" className="w-full h-auto mb-4 rounded-bl-[2rem] sm:rounded-bl-[4rem]" />
             <figcaption className="flex text-gray-800 justify-between p-2">
               <p>
@@ -71,6 +80,7 @@ const LogoSection = () => {
               </div>
             </figcaption>
           </figure>
+          </Link>
         </div>
       </div>
     );
