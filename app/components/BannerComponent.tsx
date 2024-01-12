@@ -12,7 +12,7 @@ import "../tailwind.css?__remix_sideEffect__";
  
 
 const YourComponent = () => {
-  const backgrounds = ['background', 'blog4', 'blog3', 'background3', 'blog6','blog1','background6','background7','background8'];
+  const backgrounds = ['f1', 'f2', 'f3', 'f4'];
   const [currentBackground, setCurrentBackground] = useState('background');
   
   useEffect(() => {

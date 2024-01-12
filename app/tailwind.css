@@ -14,6 +14,18 @@
   .project-banner {
     @apply bg-[url('./assets/images/other4.jpeg')] bg-cover bg-no-repeat 
   }
+  .f1 {
+    @apply bg-[url('./assets/images/f1.jpg')] bg-cover bg-no-repeat bg-center
+  }
+  .f2 {
+    @apply bg-[url('./assets/images/f3.jpg')] bg-cover bg-no-repeat bg-center
+  }
+  .f3 {
+    @apply bg-[url('./assets/images/f3.jpg')] bg-cover bg-no-repeat bg-center
+  }
+  .f4 {
+    @apply bg-[url('./assets/images/f4.jpg')] bg-cover bg-no-repeat bg-center
+  }
   .project-search-default {
     @apply bg-[url('./assets/images/other5.jpg')] bg-cover bg-no-repeat 
   }
