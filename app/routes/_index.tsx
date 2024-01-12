@@ -1,5 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 
 
 import BannerComponent from '../components/BannerComponent';
@@ -9,7 +9,7 @@ import Logo from '../components/Logo';
 import Article from '../components/Article';
 import Join from '../components/Join';
 import Footer  from "~/components/Footer";
-import DescriptionSection from '../components/DescriptionSection';
+import Preloader from '../components/Preloader';
 
 export const meta: MetaFunction = () => {
   return [
@@ -35,6 +35,23 @@ export default function Index() {
     setIsMenuOpen(!isMenuOpen);
    
   };
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const handleLoad = () => {
+      // Once the entire page has finished loading, set loading to false
+      setLoading(false);
+    };
+
+    // Attach the event listener to the window's load event
+    window.addEventListener('load', handleLoad);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('load', handleLoad);
+    };
+  }, []);
 
   return (
     <div>

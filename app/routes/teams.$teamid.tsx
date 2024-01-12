@@ -236,7 +236,7 @@ const FormSection =  (
       </div>
 
       <textarea
-        className="border-b bg-transparent w-[80vw] py-2   sm:w-[30rem] border-b border-black focus:outline-none focus:shadow-outline font-bold text-xs sm:h-20 h-20"
+        className="border-b bg-transparent w-full py-2   sm:w-[30rem] border-b border-black focus:outline-none focus:shadow-outline font-bold text-xs sm:h-20 h-20"
         id="message"
         placeholder="Hello! I am interested in..."
       ></textarea>
