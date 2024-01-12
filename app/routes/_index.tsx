@@ -1,5 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
-import React, { useState, useEffect  } from 'react';
+import React, { useState } from 'react';
 
 
 import BannerComponent from '../components/BannerComponent';
@@ -9,7 +9,7 @@ import Logo from '../components/Logo';
 import Article from '../components/Article';
 import Join from '../components/Join';
 import Footer  from "~/components/Footer";
-import Preloader from '../components/Preloader';
+import DescriptionSection from '../components/DescriptionSection';
 
 export const meta: MetaFunction = () => {
   return [
@@ -35,25 +35,8 @@ export default function Index() {
     setIsMenuOpen(!isMenuOpen);
    
   };
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const handleLoad = () => {
-      // Simulate a delay of 3 seconds before hiding the loading component
-      setTimeout(() => {
-        setLoading(false);
-      }, 3000);
-    };
-
-    // Attach the event listener to the window's load event
-    window.addEventListener('load', handleLoad);
-
-    // Cleanup the event listener on component unmount
-    return () => {
-      window.removeEventListener('load', handleLoad);
-    };
-  }, []);
-
+  
   return (
     <div>
       <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
