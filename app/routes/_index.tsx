@@ -11,6 +11,7 @@ import Join from '../components/Join';
 import Footer  from "~/components/Footer";
 import DescriptionSection from '../components/DescriptionSection';
 
+
 export const meta: MetaFunction = () => {
   return [
     { name: "description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
