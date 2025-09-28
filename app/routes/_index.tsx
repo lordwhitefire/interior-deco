@@ -1,5 +1,9 @@
 import type { MetaFunction } from "@remix-run/node";
 import React from 'react'; // Remove useState import too
+import { useLoaderData } from '@remix-run/react';
+import { sanityServerClient } from '~/lib/sanity.server';
+import { BANNER_DATA_QUERY } from '~/queries/bannerData';
+import { json } from '@remix-run/node'; 
 
 import BannerComponent from '../components/BannerComponent';
 import NavigationBar from '../components/NavigationBar';
@@ -11,6 +15,17 @@ import DescriptionSection from '../components/DescriptionSection';
 import ClientShowcase from '../components/ClientShowcase';
 import FeaturedProjectsB from '../components/FeaturedProjectsB';
 import SuccessStats from '../components/SuccessStats';
+
+export async function loader() {
+  try {
+    const data = await sanityServerClient.fetch(BANNER_DATA_QUERY);
+    return json(data);
+  } catch (error) {
+    console.error('Error fetching banner data:', error);
+    return json({ bannerData: null });
+  }
+}
+
 
 export const meta: MetaFunction = () => {
   return [
@@ -25,10 +40,13 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+
+   const data = useLoaderData<typeof loader>();
   return (
     <div>
       <NavigationBar /> {/* Clean and simple! */}
-      <BannerComponent />
+        {/* Dynamic Banner Component */}
+       <BannerComponent bannerData={data?.bannerData} />
       <Testimonials />
       <ClientShowcase />
       <FeaturedProjectsB />
