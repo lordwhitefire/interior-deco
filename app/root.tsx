@@ -1,4 +1,3 @@
-
 import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
@@ -9,11 +8,14 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-
 import stylesheet from "~/tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
+  { 
+    rel: "stylesheet", 
+    href: "https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" 
+  },
 ];
 
 export default function App() {

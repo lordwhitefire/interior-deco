@@ -16,11 +16,13 @@
     "@remix-run/react": "^2.4.1",
     "@remix-run/serve": "^2.4.1",
     "isbot": "^3.6.8",
+    "lucide-react": "^0.544.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intersection-observer": "^9.5.3",
     "react-router-dom": "^5.3.4",
-    "react-spring": "^9.7.3"
+    "react-spring": "^9.7.3",
+    "swiper": "^12.0.2"
   },
   "devDependencies": {
     "@iconify/json": "^2.2.163",
