@@ -1,274 +1,246 @@
-// components/Article.tsx
-import React, { useState, useEffect, useRef } from 'react';
+// app/components/Article.tsx
+import React, { useState, useEffect } from 'react';
 import { Link } from '@remix-run/react';
-import { Calendar, Clock, User, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, User, ArrowRight } from 'lucide-react';
 
-
-import blog1 from '../assets/images/Blog-1.jpeg';
-import blog2 from '../assets/images/blog-2.jpeg';
-import blog3 from '../assets/images/blog-3.jpeg';
-import blog4 from '../assets/images/blog-4.jpeg';
-
-
-// Static blog articles with specific categories
-const articles = [
+/* ---------- 1.  hosted images ---------- */
+const fallbackArticles = [
   {
-    id: 1,
+    id: '1',
     title: 'Modern Kitchen Design Trends 2024',
     excerpt: 'Discover the latest innovations in kitchen design, from smart appliances to sustainable materials that are transforming culinary spaces.',
     category: 'Kitchen Design',
     author: 'Sarah Mitchell',
     date: '2024-01-15',
     readTime: '5 min read',
-    image: blog1,
+    image: 'https://lordwhitefire.github.io/interior-deco-assets/images/article-1.jpg',
     featured: true,
-    tags: ['Kitchen', 'Modern', 'Trends']
+    tags: ['Kitchen', 'Modern', 'Trends'],
+    slug: '/blog/modern-kitchen-trends-2024'
   },
   {
-    id: 2,
-    title: 'Creating Serene Bedroom Retreats',
+    id: '2',
+    title: 'Creating Serene Bedroom Retreats 2025',
     excerpt: 'Learn how to transform your bedroom into a peaceful sanctuary with the right color palettes, lighting, and storage solutions.',
     category: 'Bedroom Design',
     author: 'James Chen',
     date: '2024-01-12',
     readTime: '4 min read',
-    image: blog2,
+    image: 'https://lordwhitefire.github.io/interior-deco-assets/images/article-2.jpg',
     featured: false,
-    tags: ['Bedroom', 'Serene', 'Lighting']
+    tags: ['Bedroom', 'Serene', 'Lighting'],
+    slug: '/blog/serene-bedroom-retreats'
   },
   {
-    id: 3,
-    title: 'Sustainable Living Room Makeovers',
+    id: '3',
+    title: 'Sustainable Living Room Makeovers 2022',
     excerpt: 'Eco-friendly design solutions that don\'t compromise on style. Discover sustainable materials and energy-efficient lighting options.',
     category: 'Living Room',
     author: 'Emma Thompson',
     date: '2024-01-10',
     readTime: '6 min read',
-    image: blog3,
+    image: 'https://lordwhitefire.github.io/interior-deco-assets/images/article-3.jpg',
     featured: false,
-    tags: ['Sustainable', 'Eco-friendly', 'Living Room']
+    tags: ['Sustainable', 'Eco-friendly', 'Living Room'],
+    slug: '/blog/sustainable-living-room-makeovers'
   },
   {
-    id: 4,
-    title: 'Luxury Bathroom Design Essentials',
+    id: '4',
+    title: 'Luxury Bathroom Design Essentials 2021',
     excerpt: 'Transform your bathroom into a spa-like retreat with premium fixtures, smart storage, and luxurious materials that create wow factor.',
     category: 'Bathroom Design',
-    author: 'Michael Rodriguez',
+    author: 'Michael Rodri',
     date: '2024-01-08',
     readTime: '7 min read',
-    image: blog4,
+    image: 'https://lordwhitefire.github.io/interior-deco-assets/images/article-4.jpg',
     featured: true,
-    tags: ['Bathroom', 'Luxury', 'Spa']
+    tags: ['Bathroom', 'Luxury', 'Spa'],
+    slug: '/blog/luxury-bathroom-essentials'
   }
 ];
 
-const Article = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+/* ---------- 2.  types ---------- */
+type Article = typeof fallbackArticles[0];
+type ArticleProps = { data?: Article[] };
+
+export default function Article({ data }: ArticleProps) {
+  const articles = data && data.length ? data : fallbackArticles;
+
+  const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const carouselRef = useRef(null);
 
-  // Auto-advance carousel
+  /* preload images */
   useEffect(() => {
-    if (!isPaused) {
-      const interval = setInterval(() => {
-        handleNext();
-      }, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [isPaused, currentSlide]);
-
-  const handleNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % articles.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentSlide((prev) => (prev - 1 + articles.length) % articles.length);
-  };
-
-  const handleDotClick = (index) => {
-    setCurrentSlide(index);
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    articles.forEach((a) => {
+      const img = new Image();
+      img.src = a.image;
     });
-  };
+  }, [articles]);
 
-  return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 font2">
-            Latest Design Insights
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Stay updated with the latest trends, tips, and inspiration from our design experts
-          </p>
+  /* autoplay */
+  useEffect(() => {
+    if (isPaused) return;
+    const t = setInterval(() => setCurrent((c) => (c + 1) % articles.length), 5000);
+    return () => clearInterval(t);
+  }, [isPaused, articles.length]);
+
+  const formatDate = (d: string) =>
+    new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  /* ---------- 3.  SMALL card → details on hover ---------- */
+  const Card = ({ a }: { a: Article }) => (
+    <article
+      className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col h-full"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* image */}
+      <div className="relative h-48 overflow-hidden">
+        <img
+          src={a.image}
+          alt={a.title}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        {/* category + featured badge */}
+        <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
+          <span className="bg-gray-900 text-white text-xs px-2.5 py-1 rounded-full font-medium">{a.category}</span>
+          {a.featured && (
+            <span className="bg-yellow-500 text-gray-900 text-xs px-2.5 py-1 rounded-full font-medium">Featured</span>
+          )}
+        </div>
+      </div>
+
+      {/* visible base – title + author / read-time */}
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors line-clamp-2">{a.title}</h3>
+
+        <div className="flex items-center gap-3 text-lg text-gray-500 mt-2 sm:mb-6">
+          <div className="flex items-center gap-1"><User className="w-4 h-4" /><span>{a.author}</span></div>
+          <div className="flex items-center gap-1"><Clock className="w-4 h-4" /><span>{a.readTime}</span></div>
         </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {['All Articles', 'Kitchen Design', 'Bedroom Design', 'Living Room', 'Bathroom Design'].map((category) => (
-            <button
-              key={category}
-              className="px-6 py-2 text-sm font-medium text-gray-700 bg-white rounded-full border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300"
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* Carousel Container */}
-        <div className="relative">
-          <div ref={carouselRef} className="overflow-hidden">
-            
-            {/* Articles Track */}
-            <div 
-              className="flex transition-transform duration-500 ease-out"
-              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-            >
-              {articles.map((article, index) => (
-                <div key={article.id} className="w-full flex-shrink-0 px-4">
-                  
-                  {/* Article Card */}
-                  <article className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                    <Link to={`/blog/${article.id}`}>
-                      
-                      {/* Image Container with Hover Effect */}
-                      <div className="relative h-64 overflow-hidden">
-                        <img
-                          src={article.image}
-                          alt={article.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                        />
-                        
-                        {/* Category Badge */}
-                        <div className="absolute top-4 left-4">
-                          <span className="bg-gray-900 text-white text-xs px-3 py-1 rounded-full font-medium">
-                            {article.category}
-                          </span>
-                        </div>
-                        
-                        {/* Featured Badge */}
-                        {article.featured && (
-                          <div className="absolute top-4 right-4">
-                            <span className="bg-yellow-500 text-gray-900 text-xs px-3 py-1 rounded-full font-medium">
-                              Featured
-                            </span>
-                          </div>
-                        )}
-                        
-                        {/* Gradient Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="p-6">
-                        {/* Meta Info */}
-                        <div className="flex items-center justify-between mb-3 text-sm text-gray-500">
-                          <div className="flex items-center">
-                            <User className="w-4 h-4 mr-1" />
-                            <span>{article.author}</span>
-                          </div>
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center">
-                              <Calendar className="w-4 h-4 mr-1" />
-                              <span>{formatDate(article.date)}</span>
-                            </div>
-                            <div className="flex items-center">
-                              <Clock className="w-4 h-4 mr-1" />
-                              <span>{article.readTime}</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Title */}
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-700 transition-colors">
-                          {article.title}
-                        </h3>
-                        
-                        {/* Excerpt */}
-                        <p className="text-gray-600 mb-4 leading-relaxed">
-                          {article.excerpt}
-                        </p>
-                        
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {article.tags.map((tag, index) => (
-                            <span
-                              key={index}
-                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                        
-                        {/* Read More CTA */}
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-900 font-medium group-hover:text-gray-700 transition-colors">
-                            Read More
-                          </span>
-                          <ArrowRight className="w-5 h-5 text-gray-900 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                      </div>
-                    </Link>
-                  </article>
-                </div>
+        {/* HOVER overlay – shows excerpt, date, tags, CTA */}
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="text-white text-center max-w-full">
+            <div className="flex items-center justify-center gap-3 text-xs mb-2">
+              <div className="flex items-center gap-1"><Calendar className="w-3 h-3" /><span>{formatDate(a.date)}</span></div>
+            </div>
+            <p className="text-gray-200 mb-3 text-sm leading-snug">{a.excerpt}</p>
+            <div className="flex flex-wrap gap-1 justify-center mb-3">
+              {a.tags.map((t) => (
+                <span key={t} className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded">{t}</span>
               ))}
             </div>
+            <Link to={`/blog/${a.id}`} className="contents">
+              <span className="inline-flex items-center gap-1 text-amber-400 font-medium text-sm">
+                Read More <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+
+  /* ---------- 4.  RENDER – desktop 3 / 4  |  mobile 1 / 4 ---------- */
+  return (
+    <section
+      className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 font2">Latest Design Insights</h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">Stay updated with trends, tips & inspiration from our experts</p>
+        </div>
+
+        {/* desktop – seamless loop */}
+        <div className="hidden lg:block">
+          <div className="relative">
+            <div className="overflow-hidden rounded-2xl sm:rounded-xl">
+              <div
+                className="flex transition-transform duration-500 ease-out"
+                style={{ transform: `translateX(-${(current * 100) / 3}%)` }}
+                onTransitionEnd={() => {
+                  if (current >= articles.length) setCurrent(current - articles.length);
+                }}
+              >
+                {[...articles, ...articles.slice(0, 3)].map((a, idx) => (
+                  <div key={idx} className="w-1/3 flex-shrink-0 px-2">
+                    <Card a={a} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* arrows */}
+            <button
+              onClick={() => setCurrent((c) => (c - 1 + articles.length) % articles.length)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 p-3 mr-4 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110"
+              aria-label="Previous"
+            >
+              <ArrowRight className="w-6 h-6 text-gray-600 rotate-180" />
+            </button>
+            <button
+              onClick={() => setCurrent((c) => (c + 1) % articles.length)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 p-3 ml-4 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110"
+              aria-label="Next"
+            >
+              <ArrowRight className="w-6 h-6 text-gray-600" />
+            </button>
           </div>
 
-          {/* Navigation Controls */}
-          <div className="flex justify-center items-center mt-8 space-x-4">
-            <button
-              onClick={handlePrev}
-              className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-              aria-label="Previous article"
-            >
-              <ChevronLeft className="w-6 h-6 text-gray-600" />
-            </button>
+          {/* dots */}
+          <div className="flex justify-center mt-6 space-x-2">
+            {articles.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`w-2 h-2 rounded-full transition-all ${i === current ? 'bg-gray-800 w-8' : 'bg-gray-300 hover:bg-gray-400'}`}
+                aria-label={`Go to article ${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
 
-            {/* Dot Indicators */}
-            <div className="flex space-x-2">
-              {articles.map((_, index) => (
+        {/* mobile / tablet – 1 card in view, swipe or dots */}
+        <div className="lg:hidden">
+          <div className="relative max-w-sm mx-auto md:max-w-2xl md:grid-cols-2 md:grid md:gap-4">
+            <div className="overflow-hidden rounded-2xl">
+              <div
+                className="flex transition-transform duration-500 ease-out"
+                style={{ transform: `translateX(-${current * 100}%)` }}
+              >
+                {articles.map((a) => (
+                  <div key={a.id} className="w-full flex-shrink-0 px-2">
+                    <Card a={a} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* dots */}
+            <div className="flex justify-center mt-6 space-x-2">
+              {articles.map((_, i) => (
                 <button
-                  key={index}
-                  onClick={() => handleDotClick(index)}
-                  className={`
-                    w-2 h-2 rounded-full transition-all duration-300
-                    ${index === currentSlide 
-                      ? 'bg-gray-800 w-8' 
-                      : 'bg-gray-300 hover:bg-gray-400'
-                    }
-                  `}
-                  aria-label={`Go to article ${index + 1}`}
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  className={`w-2 h-2 rounded-full transition-all ${i === current ? 'bg-gray-800 w-8' : 'bg-gray-300 hover:bg-gray-400'}`}
+                  aria-label={`Go to article ${i + 1}`}
                 />
               ))}
             </div>
-
-            <button
-              onClick={handleNext}
-              className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-              aria-label="Next article"
-            >
-              <ChevronRight className="w-6 h-6 text-gray-600" />
-            </button>
           </div>
         </div>
 
-        {/* Call to Action */}
+        {/* CTA */}
         <div className="text-center mt-12">
-          <Link
-            to="/blog"
-            className="inline-flex items-center px-8 py-4 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-300 hover:scale-105 hover:shadow-lg font2 text-lg"
-          >
+          <Link to="/blog" className="inline-flex items-center px-8 py-4 bg-gray-900 text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-300 hover:scale-105 hover:shadow-lg font2 text-lg">
             View All Articles
             <ArrowRight className="w-6 h-6 ml-2" />
           </Link>
@@ -276,6 +248,4 @@ const Article = () => {
       </div>
     </section>
   );
-};
-
-export default Article;
+}

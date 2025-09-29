@@ -219,7 +219,7 @@ export default function Testimonials({ data }: TestimonialsProps) {
                     key={testimonial.id}
                     className={`
                       relative transition-all duration-500 ease-out
-                      ${isActive ? 'w-96 scale-100 opacity-100 z-20' : 'w-80 scale-90 opacity-60 z-10'}
+                      ${isActive ? 'w-96 scale-100 opacity-100 z-2' : 'w-80 scale-90 opacity-60 z-1'}
                       ${position === 0 ? 'transform -translate-x-8' : ''}
                       ${position === 2 ? 'transform translate-x-8' : ''}
                     `}
