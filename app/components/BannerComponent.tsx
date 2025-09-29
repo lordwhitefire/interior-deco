@@ -66,7 +66,7 @@ const BannerComponent = () => {
       </div>
 
       {/* Services Section with Modern Card Animations */}
-      <div className="mt-2 sm:mt-16 grid grid-cols-1 mx-auto max-w-[50rem] md:grid-cols-3 gap-8 p-8 text-center">
+      <div className="mt-2 sm:mt-16 grid grid-cols-1 mx-auto max-w-[50rem]md:grid-cols-3 gap-8 p-8 text-center">
         {servicesData.map((service, index) => (
           <div
             key={service.id}

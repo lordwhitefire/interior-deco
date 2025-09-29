@@ -1,8 +1,7 @@
-// components/Testimonials.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
 
-// Fixed image imports (you had typos)
+// ⚠️  KEEP your local images as a LAST-RESORT fallback only
 import person1Image from '../assets/images/person1.jpg';
 import person2Image from '../assets/images/person2.jpg';
 import person3Image from '../assets/images/person3.jpg';
@@ -10,7 +9,8 @@ import person4Image from '../assets/images/lady3.jpg';
 import person5Image from '../assets/images/guy3.jpg';
 import person6Image from '../assets/images/lady4.jpg';
 
-const testimonials = [
+/* ---------------  HARD-CODED FALLBACK (your design untouched) --------------- */
+const fallbackTestimonials = [
   {
     id: 1,
     img: person1Image,
@@ -73,36 +73,40 @@ const testimonials = [
   }
 ];
 
-const Testimonials = () => {
+/* ---------------  COMPONENT (DESIGN 100 % IDENTICAL) --------------- */
+type Testimonial = typeof fallbackTestimonials[0];
+
+type TestimonialsProps = {
+  data?: Testimonial[]; // << dynamic prop from loader
+};
+
+export default function Testimonials({ data }: TestimonialsProps) {
+  /* use server data if provided, else fall back to local copy */
+  const testimonials = data && data.length ? data : fallbackTestimonials;
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const intervalRef = useRef(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
-  const testimonialContainerRef = useRef(null);
+  const touchEndX   = useRef(0);
+  const testimonialContainerRef = useRef<HTMLDivElement>(null);
 
-  // Auto-play with pause on hover
+  /* ----------  AUTO-PLAY  ---------- */
   useEffect(() => {
-    if (!isPaused) {
-      intervalRef.current = setInterval(() => {
-        handleNext();
-      }, 5000);
-    }
-
+    if (isPaused) return;
+    intervalRef.current = setInterval(() => handleNext(), 5000);
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isPaused, currentIndex]);
+  }, [isPaused, currentIndex, testimonials.length]);
 
+  /* ----------  NAVIGATION  ---------- */
   const handleNext = () => {
     if (isAnimating) return;
     setIsAnimating(true);
-    
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+      setCurrentIndex((p) => (p + 1) % testimonials.length);
       setIsAnimating(false);
     }, 300);
   };
@@ -110,21 +114,15 @@ const Testimonials = () => {
   const handlePrev = () => {
     if (isAnimating) return;
     setIsAnimating(true);
-    
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+      setCurrentIndex((p) => (p - 1 + testimonials.length) % testimonials.length);
       setIsAnimating(false);
     }, 300);
   };
 
-  const handleDotClick = (index) => {
+  const handleDotClick = (index: number) => {
     if (isAnimating || index === currentIndex) return;
-    
-    // Add haptic feedback if available
-    if (navigator.vibrate) {
-      navigator.vibrate(10);
-    }
-    
+    if (navigator.vibrate) navigator.vibrate(10);
     setIsAnimating(true);
     setTimeout(() => {
       setCurrentIndex(index);
@@ -132,81 +130,48 @@ const Testimonials = () => {
     }, 300);
   };
 
-  // Touch swipe handlers
-  const handleTouchStart = (e) => {
+  /* ----------  TOUCH  ---------- */
+  const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
-
-  const handleTouchMove = (e) => {
+  const handleTouchMove = (e: React.TouchEvent) => {
     touchEndX.current = e.touches[0].clientX;
   };
-
   const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return;
-    
-    const distance = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 50;
-
-    if (distance > minSwipeDistance) {
-      handleNext();
-    } else if (distance < -minSwipeDistance) {
-      handlePrev();
-    }
-    
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 50) diff > 0 ? handleNext() : handlePrev();
     touchStartX.current = 0;
-    touchEndX.current = 0;
+    touchEndX.current   = 0;
   };
 
-  // Setup touch event listeners
-  useEffect(() => {
-    const container = testimonialContainerRef.current;
-    if (container) {
-      container.addEventListener('touchstart', handleTouchStart, { passive: true });
-      container.addEventListener('touchmove', handleTouchMove, { passive: true });
-      container.addEventListener('touchend', handleTouchEnd, { passive: true });
-    }
-
-    return () => {
-      if (container) {
-        container.removeEventListener('touchstart', handleTouchStart);
-        container.removeEventListener('touchmove', handleTouchMove);
-        container.removeEventListener('touchend', handleTouchEnd);
-      }
-    };
-  }, []);
-
-  // Get visible testimonials for desktop carousel
+  /* ----------  DESKTOP 3-CARD HELPERS  ---------- */
   const getVisibleTestimonials = () => {
-    const prev = (currentIndex - 1 + testimonials.length) % testimonials.length;
-    const next = (currentIndex + 1) % testimonials.length;
+    const len = testimonials.length;
+    const prev = (currentIndex - 1 + len) % len;
+    const next = (currentIndex + 1) % len;
     return [prev, currentIndex, next];
   };
 
-  // Single testimonial component (used in mobile view)
-  const TestimonialCard = ({ testimonial, isSingle = false }) => (
-    <div className={`
-      bg-white rounded-2xl shadow-xl p-6 flex flex-col
-      ${isSingle ? 'max-w-md mx-auto' : 'h-full'}
-      transform transition-all duration-300 hover:shadow-2xl
-    `}>
-      {/* Quote Icon */}
+  /* ----------  CARD UI (UNCHANGED)  ---------- */
+  const TestimonialCard = ({ testimonial, isSingle = false }: { testimonial: Testimonial; isSingle?: boolean }) => (
+    <div
+      className={`
+        bg-white rounded-2xl shadow-xl p-6 flex flex-col
+        ${isSingle ? 'max-w-md mx-auto' : 'h-full'}
+        transform transition-all duration-300 hover:shadow-2xl
+      `}
+    >
       <div className="mb-4">
         <Quote className="w-6 h-6 text-gray-300" />
       </div>
-
-      {/* Stars */}
       <div className="flex mb-4">
         {[...Array(testimonial.rating)].map((_, i) => (
           <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
         ))}
       </div>
-
-      {/* Testimonial Text */}
       <p className="text-gray-700 mb-6 leading-relaxed flex-grow">
         {testimonial.text}
       </p>
-
-      {/* Author Info */}
       <div className="flex items-center">
         <img
           src={testimonial.img}
@@ -227,32 +192,28 @@ const Testimonials = () => {
     </div>
   );
 
+  /* ----------  RENDER (IDENTICAL MARKUP)  ---------- */
   return (
-    <section 
+    <section
       className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-gray-100"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
       <div className="max-w-7xl mx-auto">
-        
-        {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            What Our Clients Say
-          </h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">What Our Clients Say</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Don't just take our word for it - hear from homeowners who've transformed their spaces with us
           </p>
         </div>
 
-        {/* Desktop Carousel - 3 cards */}
+        {/* Desktop 3-card carousel */}
         <div className="hidden lg:block">
           <div className="relative">
             <div className="flex items-center justify-center space-x-8">
               {getVisibleTestimonials().map((testimonialIndex, position) => {
                 const testimonial = testimonials[testimonialIndex];
                 const isActive = position === 1;
-                
                 return (
                   <div
                     key={testimonial.id}
@@ -269,7 +230,6 @@ const Testimonials = () => {
               })}
             </div>
 
-            {/* Navigation Arrows */}
             <button
               onClick={handlePrev}
               className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-12 bg-white shadow-lg rounded-full p-3 hover:shadow-xl transition-all duration-300 hover:scale-110"
@@ -287,23 +247,24 @@ const Testimonials = () => {
           </div>
         </div>
 
-        {/* Mobile/Tablet - Single card with swipe */}
+        {/* Mobile / tablet single card with swipe */}
         <div className="lg:hidden">
-          <div 
+          <div
             ref={testimonialContainerRef}
             className="relative"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            <div className={`
-              mx-auto max-w-md transition-all duration-300 ease-out
-              ${isAnimating ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}
-            `}>
-              <TestimonialCard testimonial={testimonials[currentIndex]} isSingle={true} />
+            <div
+              className={`
+                mx-auto max-w-md transition-all duration-300 ease-out
+                ${isAnimating ? 'opacity-50 scale-95' : 'opacity-100 scale-100'}
+              `}
+            >
+              <TestimonialCard testimonial={testimonials[currentIndex]} isSingle />
             </div>
 
-            {/* Dot Indicators */}
             <div className="flex justify-center mt-6 space-x-2">
               {testimonials.map((_, index) => (
                 <button
@@ -311,43 +272,31 @@ const Testimonials = () => {
                   onClick={() => handleDotClick(index)}
                   className={`
                     rounded-full transition-all duration-300 ease-out
-                    ${index === currentIndex 
-                      ? 'bg-gray-800 w-10 h-3' 
-                      : 'bg-gray-300 hover:bg-gray-400 w-3 h-3'
-                    }
+                    ${index === currentIndex ? 'bg-gray-800 w-10 h-3' : 'bg-gray-300 hover:bg-gray-400 w-3 h-3'}
                   `}
                   aria-label={`Go to testimonial ${index + 1}`}
                 />
               ))}
             </div>
 
-            {/* Mobile Instructions */}
             <div className="text-center mt-4">
-              <p className="text-sm text-gray-500">
-                Tap dots to navigate or swipe left/right
-              </p>
+              <p className="text-sm text-gray-500">Tap dots to navigate or swipe left/right</p>
             </div>
           </div>
         </div>
 
-        {/* Trust Indicators */}
+        {/* Trust indicators */}
         <div className="mt-16 text-center">
           <div className="flex justify-center items-center space-x-8 text-gray-600">
             <div className="flex items-center">
               <Star className="w-5 h-5 text-yellow-400 mr-2" />
               <span className="text-sm">4.9/5 Average Rating</span>
             </div>
-            <div className="text-sm">
-              500+ Happy Clients
-            </div>
-            <div className="text-sm">
-              100% Satisfaction Guaranteed
-            </div>
+            <div className="text-sm">500+ Happy Clients</div>
+            <div className="text-sm">100% Satisfaction Guaranteed</div>
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default Testimonials;
+}

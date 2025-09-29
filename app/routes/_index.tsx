@@ -1,59 +1,122 @@
 import type { MetaFunction } from "@remix-run/node";
-import React from 'react'; // Remove useState import too
-import { useLoaderData } from '@remix-run/react';
-import { sanityServerClient } from '~/lib/sanity.server';
-import { BANNER_DATA_QUERY } from '~/queries/bannerData';
-import { json } from '@remix-run/node'; 
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 
-import BannerComponent from '../components/BannerComponent';
-import NavigationBar from '../components/NavigationBar';
-import Testimonials from '../components/Testimonials';
-import Article from '../components/Article';
-import Join from '../components/Join';
-import Footer from "~/components/Footer";
-import DescriptionSection from '../components/DescriptionSection';
-import ClientShowcase from '../components/ClientShowcase';
-import FeaturedProjectsB from '../components/FeaturedProjectsB';
-import SuccessStats from '../components/SuccessStats';
+import Hero from "~/components/Hero";
+import Services from "~/components/Services";
+import Stylish from "~/components/Stylish";
+import Testimonials from "~/components/Testimonials";
+import ClientShowcase from "~/components/ClientShowcase";
+import FeaturedProjectsB from "~/components/FeaturedProjectsB";
+import SuccessStats from "~/components/SuccessStats";
+import Article from "~/components/Article";
+import Join from "~/components/Join";
 
+// Static fallback data (TODO: Replace with Sanity fetch later, e.g., await sanityServerClient.fetch(TESTIMONIALS_QUERY))
 export async function loader() {
-  try {
-    const data = await sanityServerClient.fetch(BANNER_DATA_QUERY);
-    return json(data);
-  } catch (error) {
-    console.error('Error fetching banner data:', error);
-    return json({ bannerData: null });
-  }
+  // TODO: Replace with Sanity fetch later (e.g., await sanityServerClient.fetch(BANNER_DATA_QUERY))
+  // For now, use static fallback data
+ const heroData = {
+    title: "Transform Your Space with Elegance",
+    subtitle: "Discover innovative designs tailored to your style",
+    // image no longer required – supplied in Hero.tsx
+    };
+
+  const servicesData = [
+    { id: "1", name: "Project Plan", description: "Strategic planning for your dream space" },
+    { id: "2", name: "Sketch of Project", description: "Detailed sketches bringing ideas to life" },
+    { id: "3", name: "Final Design", description: "Polished designs ready for implementation" },
+  ];
+
+  const stylishData = {
+    title: "Stylish Living Designs",
+    description: "Elevate your home with our expert touch in modern interiors",
+  };
+
+  // Static testimonials data (matches your hard-coded array; used as fallback in component)
+ const testimonialsData = [
+    {
+      id: 1,
+      img: "https://lordwhitefire.github.io/interior-deco-assets/images/person1.jpg ",
+      name: "Sarah Mitchell",
+      location: "Manhattan, New York",
+      rating: 5,
+      text: "Transformed our living space beyond imagination. The attention to detail and creative vision made our house feel like a luxury hotel. Absolutely thrilled with the results!",
+      verified: true,
+      project: "Living Room Design",
+    },
+    {
+      id: 2,
+      img: "https://lordwhitefire.github.io/interior-deco-assets/images/person2.jpg ",
+      name: "James Chen",
+      location: "San Francisco, CA",
+      rating: 5,
+      text: "Professional, creative, and delivered exactly what we envisioned. The 3D renderings helped us see the final result before committing. Worth every penny!",
+      verified: true,
+      project: "Kitchen Remodel",
+    },
+    {
+      id: 3,
+      img: "https://lordwhitefire.github.io/interior-deco-assets/images/person3.jpg ",
+      name: "Emma Thompson",
+      location: "Austin, Texas",
+      rating: 5,
+      text: "Outstanding service from start to finish. They listened to our needs and created a space that perfectly reflects our personality. Highly recommend!",
+      verified: true,
+      project: "Bedroom Design",
+    },
+    {
+      id: 4,
+      img: "https://lordwhitefire.github.io/interior-deco-assets/images/lady3.jpg ",
+      name: "Michael Rodriguez",
+      location: "Miami, FL",
+      rating: 5,
+      text: "The team exceeded all expectations. Their ability to blend modern aesthetics with comfort is remarkable. Our home feels like a designer showcase!",
+      verified: true,
+      project: "Complete Home Design",
+    },
+    {
+      id: 5,
+      img: "https://lordwhitefire.github.io/interior-deco-assets/images/guy3.jpg ",
+      name: "Lisa Park",
+      location: "Seattle, WA",
+      rating: 5,
+      text: "Incredible transformation! They maximized our small space and made it feel twice as big. The storage solutions are both beautiful and functional.",
+      verified: true,
+      project: "Small Space Design",
+    },
+    {
+      id: 6,
+      img: "https://lordwhitefire.github.io/interior-deco-assets/images/lady4.jpg ",
+      name: "David Kim",
+      location: "Los Angeles, CA",
+      rating: 5,
+      text: "Professional, punctual, and passionate about design. They transformed our outdated office into a modern, inspiring workspace. Our team loves it!",
+      verified: true,
+      project: "Office Design",
+    },
+  ];
+
+  
+  return json({ heroData, servicesData, stylishData, testimonialsData });
 }
 
 
-export const meta: MetaFunction = () => {
-  return [
-    { name: "description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
-    { property: "og:title", content: "Interior Decorators Inc. - Transforming Spaces" },
-    { property: "og:type", content: "website" },
-    { property: "og:image", content: "https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy" },
-    { property: "og:url", content: "https://interior-deco-kappa.vercel.app/" },
-    { property: "og:description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
-  ];
-};
-
 export default function Index() {
+  const { heroData, servicesData, stylishData, testimonialsData } = useLoaderData<typeof loader>();
 
-   const data = useLoaderData<typeof loader>();
   return (
     <div>
-      <NavigationBar /> {/* Clean and simple! */}
-        {/* Dynamic Banner Component */}
-       <BannerComponent bannerData={data?.bannerData} />
-      <Testimonials />
+      <Hero data={heroData} />
+      <Services data={servicesData} />
+      <Stylish data={stylishData} />
+      <Testimonials data={testimonialsData} /> {/* Passes data for dynamic prep; falls back to hard-coded */}
       <ClientShowcase />
       <FeaturedProjectsB />
       <SuccessStats />
       <Article />
       <Join />
-      <Footer />
+    
     </div>
   );
 }
