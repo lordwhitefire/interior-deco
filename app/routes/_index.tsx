@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { urlFor } from '~/lib/sanity'   // we’ll create this helper in Step 3
 import { sanityClient } from '~/lib/sanity' // Add this
-import groq from 'groq' // Fix this import
+import groq  from 'groq'; // Fix this import
 
 
 import Hero from "~/components/Hero";

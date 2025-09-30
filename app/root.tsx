@@ -9,7 +9,7 @@ import {
 } from '@remix-run/react';
 import type { MetaFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import groq from 'groq';
+import groq  from 'groq';
 
 import NavigationBar from '~/components/NavigationBar';
 import Footer from '~/components/Footer';
