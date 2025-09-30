@@ -12,7 +12,7 @@ const ICON_MAP = {
 
 /* ----------  fallback data  ---------- */
 const fallbackFooter: FooterData = {
-  logo: 'https://lordwhitefire.github.io/interior-deco-assets/images/logo-white.png',
+  logo: 'https://lordwhitefire.github.io/interior-deco-assets/logo/Logo.png',
   description: 'Transforming spaces into stunning, functional environments that reflect your unique style and personality.',
   social: [
     { name: 'Facebook',  url: 'https://facebook.com' },
@@ -105,7 +105,7 @@ export default function Footer({ data }: { data?: FooterData }) {
           {/* Sections */}
           {sections.map((section) => (
             <div key={section.title}>
-              <h3 className="text-sm font-semibold text-gray-100 tracking-wider uppercase">{section.title}</h3>
+              <h3 className="text-sm font-medium text-gray-100 tracking-wider uppercase">{section.title}</h3>
               <ul className="mt-4 space-y-2">
                 {section.links.map((link) => {
                   const Icon = link.icon ? ICON_MAP[link.icon] : null;

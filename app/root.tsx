@@ -36,7 +36,7 @@ export const links = () => [
 export const loader: LoaderFunction = () => {
   /* centralised fallback data – matches components exactly */
 const footerData = {
-  logo: 'https://lordwhitefire.github.io/interior-deco-assets/images/logo/Logo.png',
+  logo: 'https://lordwhitefire.github.io/interior-deco-assets/logo/Logo.png',
   description: 'Transforming spaces into stunning, functional environments that reflect your unique style and personality.',
   social: [
     { name: 'Facebook',  url: 'https://facebook.com' },

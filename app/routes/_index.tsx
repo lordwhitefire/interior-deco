@@ -200,7 +200,7 @@ export async function loader() {
       author: 'Sarah Mitchell',
       date: '2024-01-15',
       readTime: '5 min read',
-      image: 'https://lordwhitefire.github.io/interior-deco-assets/images/article-1.jpg',
+      image: 'https://lordwhitefire.github.io/interior-deco-assets/images/Modern_kitchen.jpg',
       featured: true,
       tags: ['Kitchen', 'Modern', 'Trends'],
       slug: '/blog/modern-kitchen-trends-2024'
@@ -213,7 +213,7 @@ export async function loader() {
       author: 'James Chen',
       date: '2024-01-12',
       readTime: '4 min read',
-      image: 'https://lordwhitefire.github.io/interior-deco-assets/images/article-2.jpg',
+      image: 'https://lordwhitefire.github.io/interior-deco-assets/images/blog-4.jpeg',
       featured: false,
       tags: ['Bedroom', 'Serene', 'Lighting'],
       slug: '/blog/serene-bedroom-retreats'
@@ -226,7 +226,7 @@ export async function loader() {
       author: 'Emma Thompson',
       date: '2024-01-10',
       readTime: '6 min read',
-      image: 'https://lordwhitefire.github.io/interior-deco-assets/images/article-3.jpg',
+      image: 'https://lordwhitefire.github.io/interior-deco-assets/images/blog-5.jpeg',
       featured: false,
       tags: ['Sustainable', 'Eco-friendly', 'Living Room'],
       slug: '/blog/sustainable-living-room-makeovers'
@@ -239,7 +239,7 @@ export async function loader() {
       author: 'Michael Rodri',
       date: '2024-01-08',
       readTime: '7 min read',
-      image: 'https://lordwhitefire.github.io/interior-deco-assets/images/article-4.jpg',
+      image: 'https://lordwhitefire.github.io/interior-deco-assets/images/Perfect.jpg',
       featured: true,
       tags: ['Bathroom', 'Luxury', 'Spa'],
       slug: '/blog/luxury-bathroom-essentials'
