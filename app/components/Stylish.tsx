@@ -3,14 +3,13 @@ import { useInView } from "react-intersection-observer";
 import { CSSProperties } from "react";
 
 type StylishProps = {
-  data: { title: string; description: string };
+  data: { 
+    title: string; 
+    description: string;
+    images: string[]; // Add this
+  };
 };
 
-const IMAGES = [
-  "https://lordwhitefire.github.io/interior-deco-assets/images/sylish_kitchen.jpg",
-  "https://lordwhitefire.github.io/interior-deco-assets/images/living_design.jpg",
- 
-];
 
 export default function Stylish({ data }: StylishProps) {
   const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true });
@@ -79,7 +78,7 @@ export default function Stylish({ data }: StylishProps) {
         
           <div className="hidden sm:block sm:w-1/2 mt-8 sm:mt-0 p-4">
             <div className="relative h-[24rem] rounded-tr-[6rem] rounded-bl-[4rem] overflow-hidden shadow-2xl">
-              {IMAGES.map((src, i) => (
+              {data.images.map((src, i) => (
                 <img
                   key={src}
                   src={src}

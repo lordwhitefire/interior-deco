@@ -12,7 +12,8 @@ const fallbackProjects = [
     category: 'kitchen',
     features: ['Custom Cabinetry', 'Quartz Countertops', 'Premium Appliances'],
     budget: '$$$',
-    timeline: '6 weeks'
+    timeline: '6 weeks',
+    link:  `/projects/1`
   },
   {
     id: '2',
@@ -23,7 +24,8 @@ const fallbackProjects = [
     category: 'living-room',
     features: ['Open Concept', 'Custom Built-ins', 'Natural Lighting'],
     budget: '$$',
-    timeline: '4 weeks'
+    timeline: '4 weeks',
+    link:  `/projects/2`
   },
   {
     id: '3',
@@ -34,7 +36,8 @@ const fallbackProjects = [
     category: 'bedroom',
     features: ['Custom Storage', 'Ambient Lighting', 'Calming Palette'],
     budget: '$$',
-    timeline: '3 weeks'
+    timeline: '3 weeks',
+    link:  `/projects/3`
   },
   {
     id: '4',
@@ -45,7 +48,8 @@ const fallbackProjects = [
     category: 'dining-room',
     features: ['Statement Lighting', 'Custom Furniture', 'Sophisticated Palette'],
     budget: '$$$',
-    timeline: '5 weeks'
+    timeline: '5 weeks',
+    link:  `/projects/4`
   },
   {
     id: '5',
@@ -56,7 +60,8 @@ const fallbackProjects = [
     category: 'office',
     features: ['Ergonomic Design', 'Optimal Lighting', 'Organized Storage'],
     budget: '$',
-    timeline: '2 weeks'
+    timeline: '2 weeks',
+    link:  `/projects/5`
   },
   {
     id: '6',
@@ -67,7 +72,8 @@ const fallbackProjects = [
     category: 'bathroom',
     features: ['Premium Fixtures', 'Custom Vanities', 'Luxury Materials'],
     budget: '$$$$',
-    timeline: '8 weeks'
+    timeline: '8 weeks',
+    link:  `/projects/6`
   }
 ];
 
@@ -143,7 +149,7 @@ export default function FeaturedProjectsB({ data }: FeaturedProjectsBProps) {
                       ))}
                     </div>
                   </div>
-                  <Link to={`/projects/${p.id}`}>
+                    <Link to={p.link}>
                     <span className="inline-flex items-center text-yellow-400 font-medium">
                       View Project Details
                       <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

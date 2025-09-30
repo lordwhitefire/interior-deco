@@ -1,24 +1,20 @@
 // app/components/Hero.tsx
 import { useEffect, useState } from "react";
 
+// app/components/Hero.tsx
 type HeroData = {
   title: string;
   subtitle: string;
-  image?: string; // now optional – we supply 4 internally
+  images: string[]; // ← 4 URLs from loader
 };
 
 type HeroProps = { data: HeroData };
 
-const IMAGES = [
-  "https://lordwhitefire.github.io/interior-deco-assets/images/f1.jpg",
-  "https://lordwhitefire.github.io/interior-deco-assets/images/f2.jpg",
-  "https://lordwhitefire.github.io/interior-deco-assets/images/f3.jpg",
-  "https://lordwhitefire.github.io/interior-deco-assets/images/f4.jpg",
-];
+/* no local fallback – loader always supplies 4 strings */
 
 export default function Hero({ data }: HeroProps) {
   const [index, setIndex] = useState(0);
-
+  const IMAGES = data.images; // ← Move this INSIDE the component!
   useEffect(() => {
     const id = setInterval(() => setIndex((i) => (i + 1) % IMAGES.length), 6000);
     return () => clearInterval(id);

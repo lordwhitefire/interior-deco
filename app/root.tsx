@@ -9,9 +9,12 @@ import {
 } from '@remix-run/react';
 import type { MetaFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
+import groq from 'groq';
 
 import NavigationBar from '~/components/NavigationBar';
 import Footer from '~/components/Footer';
+import { sanityClient } from '~/lib/sanity';
+import { urlFor } from '~/lib/sanity';
 import tailwindStyles from '~/tailwind.css';
 
 export const meta: MetaFunction = () => {
@@ -33,35 +36,33 @@ export const links = () => [
   { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css' },
 ];
 
-export const loader: LoaderFunction = () => {
-  /* centralised fallback data – matches components exactly */
-const footerData = {
+/* ---------- fallback data (unchanged) ---------- */
+const fallbackFooterData = {
   logo: 'https://lordwhitefire.github.io/interior-deco-assets/logo/Logo.png',
   description: 'Transforming spaces into stunning, functional environments that reflect your unique style and personality.',
   social: [
-    { name: 'Facebook',  url: 'https://facebook.com' },
-    { name: 'Twitter',   url: 'https://twitter.com' },
+    { name: 'Facebook', url: 'https://facebook.com' },
+    { name: 'Twitter', url: 'https://twitter.com' },
     { name: 'Instagram', url: 'https://instagram.com' },
-    { name: 'LinkedIn',  url: 'https://linkedin.com' }
+    { name: 'LinkedIn', url: 'https://linkedin.com' }
   ],
   sections: [
-  
     {
       title: 'Company',
       links: [
-        { label: 'Our Team',      url: '/team' },
-        { label: 'FAQ',           url: '/faq' },
-        { label: 'Testimonials',  url: '/testimonials' },
-        { label: 'Projects',      url: '/projects' },
-        { label: 'Blog',          url: '/blog' }
+        { label: 'Our Team', url: '/team' },
+        { label: 'FAQ', url: '/faq' },
+        { label: 'Testimonials', url: '/testimonials' },
+        { label: 'Projects', url: '/projects' },
+        { label: 'Blog', url: '/blog' }
       ]
     },
     {
       title: 'Services',
       links: [
         { label: 'Interior Design', url: '/services/interior-design' },
-        { label: 'Home Staging',    url: '/services/home-staging' },
-        { label: 'Consultation',    url: '/services/consultation' },
+        { label: 'Home Staging', url: '/services/home-staging' },
+        { label: 'Consultation', url: '/services/consultation' },
         { label: 'Project Management', url: '/services/project-management' }
       ]
     },
@@ -69,8 +70,8 @@ const footerData = {
       title: 'Contact Info',
       links: [
         { label: 'info@interiordecorators.com', url: 'mailto:info@interiordecorators.com', icon: 'Mail' },
-        { label: '+1 (555) 123-4567',           url: 'tel:+15551234567',                 icon: 'Phone' },
-        { label: '123 Design Street, Creative City', url: '#',                           icon: 'MapPin' }
+        { label: '+1 (555) 123-4567', url: 'tel:+15551234567', icon: 'Phone' },
+        { label: '123 Design Street, Creative City', url: '#', icon: 'MapPin' }
       ]
     }
   ],
@@ -80,6 +81,43 @@ const footerData = {
     { label: 'Terms of Service', url: '/terms' }
   ]
 };
+
+export const loader: LoaderFunction = async () => {
+  /* Fetch footer data from Sanity */
+  const footerDoc = await sanityClient.fetch(
+    groq`*[_type == "siteSettings"][0]{
+      logo,
+      description,
+      social,
+      copyright,
+      legal,
+      companyLinks,
+      servicesLinks,
+      contactLinks
+    }`
+  ).catch(() => null); // Gracefully handle fetch errors
+
+  const footerData = footerDoc ? {
+    logo: footerDoc.logo ? urlFor(footerDoc.logo).url() : fallbackFooterData.logo,
+    description: footerDoc.description || fallbackFooterData.description,
+    social: footerDoc.social?.length ? footerDoc.social : fallbackFooterData.social,
+    sections: [
+      {
+        title: 'Company',
+        links: footerDoc.companyLinks?.length ? footerDoc.companyLinks : fallbackFooterData.sections[0].links
+      },
+      {
+        title: 'Services', 
+        links: footerDoc.servicesLinks?.length ? footerDoc.servicesLinks : fallbackFooterData.sections[1].links
+      },
+      {
+        title: 'Contact Info',
+        links: footerDoc.contactLinks?.length ? footerDoc.contactLinks : fallbackFooterData.sections[2].links
+      }
+    ],
+    copyright: footerDoc.copyright || fallbackFooterData.copyright,
+    legal: footerDoc.legal?.length ? footerDoc.legal : fallbackFooterData.legal
+  } : fallbackFooterData;
 
   return json({ footerData });
 };
@@ -132,7 +170,7 @@ export function ErrorBoundary() {
           </div>
         </main>
         <footer role="contentinfo">
-          <Footer />   {/* no prop needed – component has fallback */}
+          <Footer data={fallbackFooterData} />
         </footer>
         <ScrollRestoration />
         <Scripts />

@@ -84,8 +84,8 @@ export default function Article({ data }: ArticleProps) {
     return () => clearInterval(t);
   }, [isPaused, articles.length]);
 
-  const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const formatDate = (d: string) =>
+  new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
   /* ---------- 3.  SMALL card → details on hover ---------- */
   const Card = ({ a }: { a: Article }) => (
@@ -134,7 +134,7 @@ export default function Article({ data }: ArticleProps) {
                 <span key={t} className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded">{t}</span>
               ))}
             </div>
-            <Link to={`/blog/${a.id}`} className="contents">
+            <Link to={a.slug} className="contents">
               <span className="inline-flex items-center gap-1 text-amber-400 font-medium text-sm">
                 Read More <ArrowRight className="w-4 h-4" />
               </span>
