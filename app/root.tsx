@@ -97,15 +97,6 @@ const fallbackFooterData = {
 };
 
 export const loader: LoaderFunction = async () => {
-  // 🔍 BYPASS TEST - Before fetch:
-  console.log('🔍 BYPASS TEST - Before fetch:');
-  console.log('sanityClient exists:', !!sanityClient);
-  console.log('sanityClient type:', typeof sanityClient);
-  console.log('sanityClient.fetch:', typeof sanityClient.fetch);
-
-  // 🔍 ABOUT TO TRY BYPASS FETCH:
-  console.log('🔍 ABOUT TO TRY BYPASS FETCH:');
-  console.log('About to call: sanityClient.fetch(...)');
 
   const footerDoc = await sanityClient.fetch(
     groq`*[_type == "siteSettings"][0]{
@@ -120,9 +111,6 @@ export const loader: LoaderFunction = async () => {
     }`
   ).catch(() => null); // Gracefully handle fetch errors
 
-  // ✅ BYPASS FETCH COMPLETED!
-  console.log('✅ BYPASS FETCH COMPLETED!');
-  console.log('footerDoc exists:', !!footerDoc);
 
   const footerData = footerDoc ? {
   // ✅ FIXED - Now uses builder directly

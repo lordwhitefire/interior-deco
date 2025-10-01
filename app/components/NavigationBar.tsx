@@ -106,7 +106,7 @@ const NavigationBar = () => {
                     console.log("🚀 Submitting search:", searchQuery);
                     e.preventDefault();
                     navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-                     handleSearchClose();
+                    
                   }
                 }}
               />
