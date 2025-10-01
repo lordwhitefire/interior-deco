@@ -1,4 +1,4 @@
-// app/root.tsx
+// app/root.tsx - COMPLETE BYPASS VERSION
 import {
   Links,
   Meta,
@@ -9,21 +9,35 @@ import {
 } from '@remix-run/react';
 import type { MetaFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import groq  from 'groq';
+import groq from 'groq';
 
 import NavigationBar from '~/components/NavigationBar';
 import Footer from '~/components/Footer';
-import { sanityClient } from '~/lib/sanity';
-import { urlFor } from '~/lib/sanity';
+
+import { urlFor } from './lib/sanity';
 import tailwindStyles from '~/tailwind.css';
+
+import { createClient } from '@sanity/client';
+import imageUrlBuilder from '@sanity/image-url';
+
+// Create directly in root.tsx - BYPASS THE BROKEN CHAIN
+const sanityClient = createClient({
+  projectId: 'pzhistba',
+  dataset: 'production',
+  apiVersion: '2023-12-01',
+  useCdn: true,
+});
+
+const builder = imageUrlBuilder(sanityClient);
+export { sanityClient, builder };
 
 export const meta: MetaFunction = () => {
   return [
     { name: 'description', content: 'Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style.' },
     { property: 'og:title', content: 'Interior Decorators Inc. - Transforming Spaces' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:image', content: 'https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy' },
-    { property: 'og:url', content: 'https://interior-deco-kappa.vercel.app' },
+    { property: 'og:image', content: 'https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy ' },
+    { property: 'og:url', content: 'https://interior-deco-kappa.vercel.app ' },
     { property: 'og:description', content: 'Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style.' },
     { property: 'og:site_name', content: 'Interior Decorators Inc.' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -32,19 +46,19 @@ export const meta: MetaFunction = () => {
 
 export const links = () => [
   { rel: 'stylesheet', href: tailwindStyles },
-  { rel: 'icon', href: 'https://lordwhitefire.github.io/interior-deco-assets/logo/favicon.ico', type: 'image/x-icon' },
-  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css' },
+  { rel: 'icon', href: 'https://lordwhitefire.github.io/interior-deco-assets/logo/favicon.ico ', type: 'image/x-icon' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css ' },
 ];
 
 /* ---------- fallback data (unchanged) ---------- */
 const fallbackFooterData = {
-  logo: 'https://lordwhitefire.github.io/interior-deco-assets/logo/Logo.png',
+  logo: 'https://lordwhitefire.github.io/interior-deco-assets/logo/Logo.png ',
   description: 'Transforming spaces into stunning, functional environments that reflect your unique style and personality.',
   social: [
-    { name: 'Facebook', url: 'https://facebook.com' },
-    { name: 'Twitter', url: 'https://twitter.com' },
-    { name: 'Instagram', url: 'https://instagram.com' },
-    { name: 'LinkedIn', url: 'https://linkedin.com' }
+    { name: 'Facebook', url: 'https://facebook.com ' },
+    { name: 'Twitter', url: 'https://twitter.com ' },
+    { name: 'Instagram', url: 'https://instagram.com ' },
+    { name: 'LinkedIn', url: 'https://linkedin.com ' }
   ],
   sections: [
     {
@@ -83,7 +97,16 @@ const fallbackFooterData = {
 };
 
 export const loader: LoaderFunction = async () => {
-  /* Fetch footer data from Sanity */
+  // 🔍 BYPASS TEST - Before fetch:
+  console.log('🔍 BYPASS TEST - Before fetch:');
+  console.log('sanityClient exists:', !!sanityClient);
+  console.log('sanityClient type:', typeof sanityClient);
+  console.log('sanityClient.fetch:', typeof sanityClient.fetch);
+
+  // 🔍 ABOUT TO TRY BYPASS FETCH:
+  console.log('🔍 ABOUT TO TRY BYPASS FETCH:');
+  console.log('About to call: sanityClient.fetch(...)');
+
   const footerDoc = await sanityClient.fetch(
     groq`*[_type == "siteSettings"][0]{
       logo,
@@ -97,8 +120,13 @@ export const loader: LoaderFunction = async () => {
     }`
   ).catch(() => null); // Gracefully handle fetch errors
 
+  // ✅ BYPASS FETCH COMPLETED!
+  console.log('✅ BYPASS FETCH COMPLETED!');
+  console.log('footerDoc exists:', !!footerDoc);
+
   const footerData = footerDoc ? {
-    logo: footerDoc.logo ? urlFor(footerDoc.logo).url() : fallbackFooterData.logo,
+  // ✅ FIXED - Now uses builder directly
+    logo: footerDoc.logo ? builder.image(footerDoc.logo).url() : fallbackFooterData.logo,
     description: footerDoc.description || fallbackFooterData.description,
     social: footerDoc.social?.length ? footerDoc.social : fallbackFooterData.social,
     sections: [
