@@ -2,6 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from '@remix-run/react';
 import logoImage from '../assets/logo/Logo.png';
+import SearchResults from '~/components/SearchResults';
+import { useNavigate } from '@remix-run/react';
+
 
 const NavigationBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,6 +42,8 @@ const NavigationBar = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMenuOpen, isSearchActive]);
 
+  const navigate = useNavigate();
+  
   return (
     <nav className="bg-white/90 backdrop-blur-sm fixed z-10 w-full shadow-sm transition-all duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -84,9 +89,34 @@ const NavigationBar = () => {
             {/* Desktop Search */}
             <div className="relative">
               <input
-                type="text"
-                placeholder="Search..."
-                className="w-48 pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all duration-300 hover:border-gray-300"
+              ref={searchInputRef}
+                onClick={handleSearchClick}
+                onFocus={handleSearchClick}
+               type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  console.log("✏️ Search query:", e.target.value);
+                  setSearchQuery(e.target.value);
+                }}
+                placeholder="Ask Whitefire about interior design..."
+                className="w-[20rem] pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 focus:border-transparent transition-all duration-300 hover:border-gray-300"
+               onKeyPress={(e) => {
+                  console.log("⌨️ Key pressed:", e.key, "Query:", searchQuery);
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    console.log("🚀 Submitting search:", searchQuery);
+                    e.preventDefault();
+                    navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                     handleSearchClose();
+                  }
+                }}
+              />
+             <SearchResults 
+                query={searchQuery} 
+                isVisible={isSearchActive && searchQuery.length > 2}
+                onClose={() => {
+                  console.log("✅ SearchResults closed");
+                  
+                }}
               />
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,6 +147,7 @@ const NavigationBar = () => {
               <div className={`transition-all duration-300 ${isSearchActive ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
                 <button
                   onClick={handleSearchClick}
+                onFocus={handleSearchClick}
                   className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-300"
                   aria-label="Open search"
                 >
@@ -130,12 +161,34 @@ const NavigationBar = () => {
               <div className={`absolute left-4 right-16 transition-all duration-300 ${isSearchActive ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
                 <div className="relative">
                   <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search services..."
+                  ref={searchInputRef}
+                onClick={handleSearchClick}
+                onFocus={handleSearchClick}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                  console.log("✏️ Search query:", e.target.value);
+                      setSearchQuery(e.target.value);
+                    }}
+                  
+                    placeholder="Ask Whitefire about design..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-300 bg-white/90 backdrop-blur-sm"
+                    onKeyPress={(e) => {
+                      console.log("⌨️ Key pressed:", e.key, "Query:", searchQuery);
+                      if (e.key === "Enter" && searchQuery.trim()) {
+                        console.log("🚀 Submitting search:", searchQuery);
+                        e.preventDefault();
+                        navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+                      }
+                    }}
+                  />
+                <SearchResults 
+                    query={searchQuery} 
+                    isVisible={isSearchActive && searchQuery.length > 2}
+                    onClose={() => {
+                      console.log("✅ SearchResults closed");
+                      handleSearchClose();
+                    }}
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

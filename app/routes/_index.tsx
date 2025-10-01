@@ -42,11 +42,18 @@ export async function loader() {
     images: heroImages
   }
 
-  const servicesData = [
-    { id: "1", name: "Project Plan", description: "Strategic planning for your dream space" },
-    { id: "2", name: "Sketch of Project", description: "Detailed sketches bringing ideas to life" },
-    { id: "3", name: "Final Design", description: "Polished designs ready for implementation" },
-  ];
+// Replace the ENTIRE static block with this:
+const servicesData = await sanityClient.fetch(
+  groq`*[_type == "service"] | order(id asc) {
+    id,
+    name,
+    description
+  }`
+).catch(() => [
+  { id: "1", name: "Project Plan", description: "Strategic planning for your dream space" },
+  { id: "2", name: "Sketch of Project", description: "Detailed sketches bringing ideas to life" },
+  { id: "3", name: "Final Design", description: "Polished designs ready for implementation" }
+]);
 
   // Fetch stylish data from Sanity
   const stylishDoc = await sanityClient.fetch(
