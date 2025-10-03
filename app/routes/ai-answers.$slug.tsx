@@ -21,6 +21,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return [
     { title: data?.question || "AI answer" },
     { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width,initial-scale=1" },
   ];
 };
 

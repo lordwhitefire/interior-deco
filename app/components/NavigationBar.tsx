@@ -56,7 +56,7 @@ const NavigationBar = () => {
     } finally {
       setIsThinking(false);
     }
-  }, 4000);
+  }, 1000);
 
   return () => {
     clearTimeout(timer);

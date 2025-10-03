@@ -43,7 +43,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => [
-  { title: `"${data.query}" – Search results` },
+  { title: `"${data.query || "Search"}" – Search results` },
+  { name: "viewport", content: "width=device-width,initial-scale=1" },
 ];
 
 export default function SearchPage() {
