@@ -1,22 +1,30 @@
+// components/PageSearchResults.tsx
 import { Link } from '@remix-run/react';
 import { useAISearch } from '~/hooks/useAISearch';
+import { useSearchCache } from '~/hooks/useSearchCache';
 
-interface SearchResultsProps {
+interface PageSearchResultsProps {
   query: string;
   isVisible: boolean;
   onClose: () => void;
 }
 
-export default function SearchResults({ query, isVisible, onClose }: SearchResultsProps) {
+export default function PageSearchResults({ query, isVisible, onClose }: PageSearchResultsProps) {
   const { results, loading, error } = useAISearch(query, isVisible);
+  const { getCachedResult } = useSearchCache();
+  
   const shouldShow = isVisible && (results.length > 0 || loading || error);
   if (!shouldShow) return null;
 
-  const first = results[0]; // only 1 card
+  const first = results[0];
   if (!first) return null;
 
+  const cachedData = getCachedResult(first.slug);
+
   return (
-    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
+    // REMOVE absolute positioning - use normal flow
+    <div className="bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto">
+      {/* Keep the same content but without absolute positioning */}
       {loading && (
         <div className="p-4 text-center text-gray-500">
           <div className="animate-spin inline-block w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full"></div>
@@ -35,7 +43,7 @@ export default function SearchResults({ query, isVisible, onClose }: SearchResul
         >
           <div className="font-medium text-gray-900">{first.question}</div>
           <div className="text-sm text-gray-600 mt-1 line-clamp-2">
-            {first.answer.slice(0, 100)}{(first.answer.length > 100 ? "…" : "")}
+            {cachedData?.answer.slice(0, 100) || first.answer.slice(0, 100)}{(first.answer.length > 100 ? "…" : "")}
           </div>
         </Link>
         <div className="px-4 py-2 border-t border-gray-100">
@@ -52,4 +60,4 @@ export default function SearchResults({ query, isVisible, onClose }: SearchResul
       </div>
     </div>
   );
-};
+}

@@ -46,8 +46,11 @@ export const action: ActionFunction = async ({ request }) => {
 
     /* ----------  store & return by unique slug  ---------- */
     const results = answers.map((a, i) => {
-      const slug = `ai-${Date.now()}-${i}`;
-      CACHE.set(slug, { question, answer: a });               // ← STORE BY SLUG
+     const slug = `ai-${Date.now()}-${i}`;
+    // Store by BOTH slug AND query-index
+    CACHE.set(slug, { question, answer: a });  // Keep for slug lookup
+    CACHE.set(`${question}-${i}`, { question, answer: a, slug });  // Add for query lookup  
+      // localStorage removed - it was causing server errors
       console.log(`[api-ai-search] stored answer #${i + 1} under slug: ${slug}`);
       return { question, answer: a, slug, confidence: 0.9 };
     });

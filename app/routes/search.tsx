@@ -49,23 +49,27 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => [
 export default function SearchPage() {
   const { query, results } = useLoaderData<typeof loader>();
   return (
-    <main className="max-w-5xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-semibold mb-4">
-        {results.length} result{results.length === 1 ? "" : "s"} for “{query}”
-      </h1>
-      {results.length === 0 && query && (
-        <p className="text-slate-600">No answers yet – try another term.</p>
-      )}
-      <ul className="divide-y divide-slate-200">
-        {results.map((r) => (
-          <li key={r._id} className="py-4">
-            <Link to={`/ai-answers/${r.slug}`} target="_blank" className="block group hover:bg-slate-50 -mx-2 px-2 py-2 rounded">
-              <h2 className="text-lg font-medium text-indigo-700 group-hover:underline">{r.question}</h2>
-              <p className="mt-1 text-slate-600 line-clamp-2">{r.answerPreview}</p>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
+    <div className="min-h-screen flex flex-col bg-neutral-100 text-gray-800">
+      <main className="flex-grow pt-20"> {/* Add pt-20 to account for fixed navbar */}
+        <div className="max-w-5xl mx-auto px-4 py-10">
+          <h1 className="text-2xl font-semibold mb-4">
+            {results.length} result{results.length === 1 ? "" : "s"} for "{query}"
+          </h1>
+          {results.length === 0 && query && (
+            <p className="text-slate-600">No answers yet – try another term.</p>
+          )}
+          <ul className="divide-y divide-slate-200">
+            {results.map((r) => (
+              <li key={r._id} className="py-4">
+                <Link to={`/ai-answers/${r.slug}`} target="_blank" className="block group hover:bg-slate-50 -mx-2 px-2 py-2 rounded">
+                  <h2 className="text-lg font-medium text-indigo-700 group-hover:underline">{r.question}</h2>
+                  <p className="mt-1 text-slate-600 line-clamp-2">{r.answerPreview}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </main>
+    </div>
   );
-};
+}
