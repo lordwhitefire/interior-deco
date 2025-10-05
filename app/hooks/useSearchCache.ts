@@ -1,34 +1,88 @@
-// ~/hooks/useSearchCache.ts
+// app/hooks/useSearchCache.ts
+// The archivist: keeps the last 20 queries in localStorage under key "whitefireSearch"
+
 import { useState, useEffect } from 'react';
 
+const STORAGE_KEY = 'whitefireSearch';
+const MAX_ENTRIES  = 20;
+const TTL_MS       = 24 * 60 * 60 * 1000; // 24 h
+
+type CachedQuery = {
+  question: string;
+  answers: Array<{
+    answer: string;
+    slug: string;
+  }>;
+  cachedAt: number;
+};
+
 export function useSearchCache() {
-  const [cache, setCache] = useState<Map<string, { question: string; answer: string }>>(new Map());
+  // client-only mount guard (avoid SSR mismatch)
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => setIsClient(true), []);
 
-  // Load from localStorage on mount
+  // in-memory mirror for instant reads
+  const [cache, setCache] = useState<Map<string, CachedQuery>>(new Map());
+
+  // initial load from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("whitefireSearch");
-    if (stored) {
-      try {
-        const entries = JSON.parse(stored);
-        setCache(new Map(entries));
-      } catch (error) {
-        console.error('Failed to parse cache from localStorage:', error);
+    if (!isClient) return;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = new Map<string, CachedQuery>(JSON.parse(raw));
+        pruneAndSet(parsed);
       }
+    } catch {
+      // corrupted → start fresh
     }
-  }, []);
+  }, [isClient]);
 
-  // Save to localStorage whenever cache changes
+  // persist on every change
   useEffect(() => {
-    localStorage.setItem("whitefireSearch", JSON.stringify(Array.from(cache.entries())));
-  }, [cache]);
+    if (!isClient) return;
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(Array.from(cache.entries()))
+      );
+    } catch {
+      // quota exceeded → silent fail
+    }
+  }, [cache, isClient]);
 
-  const setCachedResult = (slug: string, data: { question: string; answer: string }) => {
-    setCache(prev => new Map(prev).set(slug, data));
+  // helper: remove expired & keep newest MAX_ENTRIES
+  const pruneAndSet = (m: Map<string, CachedQuery>) => {
+    const now = Date.now();
+    const valid: Array<[string, CachedQuery]> = [];
+    for (const [k, v] of m.entries()) {
+      if (now - v.cachedAt < TTL_MS) valid.push([k, v]);
+    }
+    valid.sort((a, b) => b[1].cachedAt - a[1].cachedAt);
+    const trimmed = new Map(valid.slice(0, MAX_ENTRIES));
+    setCache(trimmed);
   };
 
-  const getCachedResult = (slug: string) => {
-    return cache.get(slug);
+  // public API
+  const getCached = (question: string): CachedQuery | undefined =>
+    cache.get(question.trim().toLowerCase());
+
+  const setCached = (
+    question: string,
+    answers: Array<{ answer: string; slug: string }>
+  ) => {
+    const key = question.trim().toLowerCase();
+    const next = new Map(cache);
+    next.set(key, { question, answers, cachedAt: Date.now() });
+    pruneAndSet(next);
   };
 
-  return { setCachedResult, getCachedResult };
+  const clearCache = () => {
+    setCache(new Map());
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+  };
+
+  return { getCached, setCached, clearCache };
 }

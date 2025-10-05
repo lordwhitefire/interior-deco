@@ -1,48 +1,46 @@
-import { json, type LoaderFunctionArgs, type MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { CACHE } from "~/routes/api.ai-search";
+// app/routes/ai-answers.$slug.tsx
+import { useEffect, useState } from 'react';
+import { useParams } from '@remix-run/react';
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const { slug } = params;
-  if (!slug) throw new Response("Slug missing", { status: 400 });
-
-  const cached = CACHE.get(slug);
-  if (!cached) {
-    console.log(`[answer loader] ❌ cache miss for slug: ${slug}`);
-    throw new Response("Answer not found", { status: 404 });
-  }
-  console.log(`[answer loader] ✅ cache hit for slug: ${slug}`);
-
-  return json({ question: cached.question, answer: cached.answer, slug });
-};
-
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  const desc = data?.answer ? data.answer.substring(0, 160) : "";
-  return [
-    { title: data?.question || "AI answer" },
-    { name: "description", content: desc },
-    { name: "viewport", content: "width=device-width,initial-scale=1" },
-  ];
-};
+type Answer = { question: string; answer: string };
 
 export default function AnswerPage() {
-  const { question, answer } = useLoaderData<typeof loader>();
+  const { slug } = useParams() as { slug: string };
+  const [answer, setAnswer] = useState<Answer | null>(null);
 
-  // optional: convert **bold** to <strong> if you want HTML bolding
-  const html = answer
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/^(\d+\.)\s+/gm, "<br /><strong>$1</strong> ");
+  useEffect(() => {
+    // client-side only
+    const all = Object.entries(window.localStorage)   // ← change here
+      .filter(([k]) => k.startsWith('whitefireSearch'))
+      .flatMap(([, v]) => {
+        try {
+          return Array.from(new Map(JSON.parse(v)).values()) as CachedQuery[];
+        } catch {
+          return [];
+        }
+      });
+
+    const hit = all
+      .flatMap((q) => q.answers.map((a) => ({ question: q.question, ...a })))
+      .find((a) => a.slug === slug);
+
+    if (!hit) window.location.replace('/404'); // or show a message
+    else setAnswer(hit);
+  }, [slug]);
+
+  if (!answer) return null; // or a loading skeleton
+
+  const html = answer.answer
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^(\d+\.)\s+/gm, '<br /><strong>$1</strong> ');
 
   return (
     <article className="max-w-3xl mx-auto mt-12 px-4 py-10">
-      <h1 className="text-3xl font-bold text-slate-900">{question}</h1>
-
-      {/* pre-wrap keeps line-breaks; dangerouslySetInnerHTML only if you ran the regex above */}
+      <h1 className="text-3xl font-bold text-slate-900">{answer.question}</h1>
       <div
         className="prose prose-slate max-w-none mt-6 whitespace-pre-wrap"
         dangerouslySetInnerHTML={{ __html: html }}
       />
-
       <div className="mt-12 p-6 rounded-lg bg-indigo-50">
         <h3 className="text-lg font-semibold text-indigo-900">Still need help?</h3>
         <p className="mt-1 text-indigo-800">Book a free consultation and we’ll bring these ideas to life in your home.</p>
@@ -50,4 +48,4 @@ export default function AnswerPage() {
       </div>
     </article>
   );
-};
+}
