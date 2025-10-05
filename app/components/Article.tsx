@@ -223,18 +223,6 @@ const formatDate = (d: string) =>
                 ))}
               </div>
             </div>
-
-            {/* dots */}
-            <div className="flex justify-center mt-6 space-x-2">
-              {articles.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrent(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${i === current ? 'bg-gray-800 w-8' : 'bg-gray-300 hover:bg-gray-400'}`}
-                  aria-label={`Go to article ${i + 1}`}
-                />
-              ))}
-            </div>
           </div>
         </div>
 

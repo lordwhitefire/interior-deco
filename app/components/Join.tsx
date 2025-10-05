@@ -24,22 +24,45 @@ export default function Join({ data }: JoinProps) {
   const [loading, setLoading] = useState(false);
 
   const validate = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
+  if (!validate(email)) {
+    setError('Please enter a valid email address.');
+    return;
+  }
+  setLoading(true);
+  console.log('[Join] submitting email:', email);   // ← start
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    if (!validate(email)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
-    setLoading(true);
-    // simulate API call
-    setTimeout(() => {
-      setLoading(false);
+  try {
+    const res = await fetch("/api/newsletter", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    console.log('[Join] response status:', res.status); // ← got reply
+
+    const data = await res.json();
+    console.log('[Join] response body:', data);         // ← payload
+
+    if (res.ok && data.ok) {
+      console.log('[Join] success');
       setSuccess(true);
-    }, 800);
-  };
-
+      setEmail('');
+    } else {
+      console.warn('[Join] server error:', data.error);
+      setError(data.error || 'Please try again');
+    }
+  } catch (err) {
+    console.error('[Join] network failure:', err);
+    setError('Network error');
+  } finally {
+    setLoading(false);
+    console.log('[Join] loading finished');
+  }
+};
+  
+  
   if (success) {
     return (
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-amber-50">
