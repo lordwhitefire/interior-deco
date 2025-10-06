@@ -48,6 +48,7 @@ export const links = () => [
   { rel: 'stylesheet', href: tailwindStyles },
   { rel: 'icon', href: 'https://lordwhitefire.github.io/interior-deco-assets/logo/favicon.ico ', type: 'image/x-icon' },
   { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css ' },
+
 ];
 
 /* ---------- fallback data (unchanged) ---------- */

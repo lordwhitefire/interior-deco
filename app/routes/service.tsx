@@ -1,56 +1,97 @@
+// app/routes/service.tsx
 import type { MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import React, { useState } from 'react';
-import { Link, Outlet } from '@remix-run/react';
+import { Link } from '@remix-run/react';
+import NavigationBar from '~/components/NavigationBar';
+import DescriptionSection from '~/components/DescriptionSection';
+import HowWeWorkSection from '~/components/HowWeWorkSection';
+import Join from '~/components/Join';
 
-import NavigationBar from '../components/NavigationBar';
-import DescriptionSection from '../components/DescriptionSection';
-import HowWeWorkSection from '../components/HowWeWorkSection';
-import Join from '../components/Join';
-import Footer from '~/components/Footer';
+/* ----------  Sanity fetch  ---------- */
+import { createClient } from '@sanity/client';
+import imageUrlBuilder from '@sanity/image-url';
+import groq from 'groq';
+
+const sanityClient = createClient({
+  projectId: 'pzhistba',
+  dataset: 'production',
+  apiVersion: '2023-12-01',
+  useCdn: true,
+});
+const builder = imageUrlBuilder(sanityClient);
+
+export async function loader() {
+  const services = await sanityClient.fetch(
+    groq`*[_type == "serviceCard"] | order(displayOrder asc) {
+      title,
+      slug,
+      shortDesc
+    }`
+  );
+
+  const howWeWork = await sanityClient.fetch(
+    groq`*[_type == "howWeWork"][0] {
+      title,
+      intro,
+      steps[] {
+        number,
+        icon,
+        title,
+        intro,
+        image
+      }
+    }`
+  );
+
+  // build step-image urls
+  howWeWork.steps.forEach((s: any) => {
+    if (s.image) s.imageUrl = builder.image(s.image).url();
+  });
+
+  return json({ services, howWeWork });
+}
 
 export const meta: MetaFunction = () => {
   return [
-    { name: "description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
-    { property: "og:title", content: "Interior Decorators Inc. - Transforming Spaces" },
-    { property: "og:type", content: "website" },
-    { property: "og:image", content: "https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy" },
-    { property: "og:url", content: "https://interior-deco-kappa.vercel.app/" },
-    { property: "og:description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
+    { title: "Services | Interior Decorators Inc." },
+    { name: "description", content: "Explore our interior decoration services and see how we work." },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
   ];
 };
 
-// Rename the function to Services
 export default function Services() {
-  // State for Exclusive dropdown in Navbar    
+  const { services, howWeWork } = useLoaderData<typeof loader>();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const toggleMenuDropdown = () => setIsMenuOpen((v) => !v);
 
-  // Toggle function for Exclusive dropdown
-  const toggleMenuDropdown = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const BannerSection =  (
-      <div className="relative">
-        <div className="h-60 bg-cover bg-center background6"></div>
-        <div className="absolute inset-0 flex justify-center items-end">
-          <div className="bg-white py-8 px-16 rounded-t-[1rem] shadow-lg flex flex-col items-center">
-            <h2 className="text-3xl font-bold font1">services</h2>
-            <p className="text-center text-gray-700">home/services</p>
-          </div>
+  const BannerSection = (
+    <div className="relative">
+      <div className="h-60 bg-cover bg-center background6" />
+      <div className="absolute inset-0 flex justify-center items-end">
+        <div className="bg-white py-8 px-16 rounded-t-[1rem] shadow-lg flex flex-col items-center">
+          <h2 className="text-3xl font-bold font1">services</h2>
+          <p className="text-center text-gray-700">
+            <Link to="/" className="hover:underline">home</Link> / services
+          </p>
         </div>
       </div>
-    );
+    </div>
+  );
 
   return (
     <div>
       <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
       {BannerSection}
-      <DescriptionSection />
-      
-      <HowWeWorkSection />
+      <DescriptionSection services={services} />
+      <HowWeWorkSection
+        title={howWeWork.title}
+        intro={howWeWork.intro}
+        steps={howWeWork.steps}
+      />
       <Join />
-      <Footer />
     </div>
   );
 }
