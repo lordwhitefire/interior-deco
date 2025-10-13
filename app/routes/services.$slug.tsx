@@ -41,23 +41,6 @@ export async function loader() {
     alt: client.name
   }))
 
-  // Fetch projects from Sanity
-  const projectsDoc = await sanityClient.fetch(
-    groq`*[_type == "project"] | order(id asc){id, title, type, description, image, category, features, budget, timeline, link}`
-  )
-
-  const featuredProjectsData = projectsDoc.map((project: any) => ({
-    id: project.id,
-    title: project.title,
-    type: project.type,
-    description: project.description,
-    image: builder.image(project.image).url(),
-    category: project.category,
-    features: project.features || [],
-    budget: project.budget,
-    timeline: project.timeline,
-    link: project.link || `/projects/${project.id}`
-  }))
 
   // Fetch success stats from Sanity
   const successStatsDoc = await sanityClient.fetch(
@@ -73,24 +56,7 @@ export async function loader() {
     color: stat.color
   })) || []
 
-  // Fetch articles from Sanity
-  const articlesDoc = await sanityClient.fetch(
-    groq`*[_type == "article"] | order(date desc){id, title, slug, excerpt, category, author, date, readTime, image, featured, tags}`
-  )
 
-  const articleData = articlesDoc.map((article: any) => ({
-    id: article._id,
-    title: article.title,
-    excerpt: article.excerpt,
-    category: article.category,
-    author: article.author,
-    date: article.date,
-    readTime: article.readTime,
-    image: builder.image(article.image).url(),
-    featured: article.featured,
-    tags: article.tags || [],
-    slug: article.slug.current
-  }))
 
   // Fetch join section data from Sanity
   const joinDoc = await sanityClient.fetch(
@@ -106,11 +72,11 @@ export async function loader() {
     successMsg: 'Welcome! Check your inbox for confirmation.'
   }
 
-  return json({ clientShowcaseData, featuredProjectsData, successStatsData, articleData, joinData });
+  return json({ clientShowcaseData, successStatsData, joinData });
 };
 
 export default function Index() {
-  const {  clientShowcaseData, featuredProjectsData, successStatsData, articleData, joinData } = useLoaderData<typeof loader>();
+  const {  clientShowcaseData,  successStatsData,  joinData } = useLoaderData<typeof loader>();
     // Use useParams() to get the dynamic parameter
   const { serviceid } = useParams();
   return (
