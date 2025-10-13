@@ -4,7 +4,6 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import React, { useState } from 'react';
 import { Link } from '@remix-run/react';
-import NavigationBar from '~/components/NavigationBar';
 import DescriptionSection from '~/components/DescriptionSection';
 import HowWeWorkSection from '~/components/HowWeWorkSection';
 import Join from '~/components/Join';
@@ -83,7 +82,7 @@ export default function Services() {
 
   return (
     <div>
-      <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
+      
       {BannerSection}
       <DescriptionSection services={services} />
       <HowWeWorkSection
