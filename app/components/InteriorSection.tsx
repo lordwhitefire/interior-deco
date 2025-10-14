@@ -1,13 +1,7 @@
 // app/components/InteriorSection.tsx
 import React, { useEffect, useRef, useState } from "react";
 
-type Props = {
-  data: {
-    interiorHeadline: string;
-    interiorText: string;
-    interiorGallery: string[]; // URLs
-  };
-};
+type Props = { data: { interiorHeadline: string; interiorText: string; interiorGallery: string[] } };
 
 const InteriorSection: React.FC<Props> = ({ data }) => {
   const { interiorHeadline, interiorText, interiorGallery } = data;
@@ -15,102 +9,68 @@ const InteriorSection: React.FC<Props> = ({ data }) => {
   const [idx, setIdx] = useState(0);
   const timerRef = useRef<number | null>(null);
 
-  const log = (msg: string) => console.log(`[Interior] ${msg}`);
-
-  // 1. keep every image (cap at sane max)
-  const MAX = 12;
-  const srcImages = interiorGallery.slice(0, MAX);
-  const count = srcImages.length;
+  const images = interiorGallery.slice(0, 12); // keep all
+  const count = images.length;
   if (!count) return null;
 
-  // 2. clone first image → gives us spare width to scroll
-  const images = [...srcImages, srcImages[0]];
-
-  /* ---- advance by one snap (infinite) ---- */
+  /* ---- scroll 1 slide forward ---- */
   const next = () => {
     const el = stripRef.current;
     if (!el) return;
-    const slideW = el.scrollWidth / count; // width of one real slide
-    const current = Math.round(el.scrollLeft / slideW);
-    const isClone = current === count - 1; // last item is clone
+    const slideW = el.scrollWidth / count;
+    const atEnd = Math.round(el.scrollLeft + el.clientWidth) >= el.scrollWidth - 2;
 
-    if (isClone) {
-      el.scrollTo({ left: 0 }); // instant reset to real first
+    if (atEnd) {
+      el.scrollTo({ left: 0 }); // instant warp to start
       setIdx(0);
-      log("wrapped to 0");
     } else {
       el.scrollBy({ left: slideW, behavior: "smooth" });
-      log("scrolled +1 snap");
     }
   };
 
-  /* ---- auto timer ---- */
-  const startTimer = () => {
-    stopTimer();
+  /* ---- auto advance ---- */
+  useEffect(() => {
     timerRef.current = window.setInterval(next, 3000);
-    log("timer started");
-  };
-  const stopTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = null;
-    log("timer stopped");
-  };
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
 
-  /* ---- scroll spy: update idx after user swipe or auto scroll ---- */
+  /* ---- spy: keep dot in sync ---- */
   useEffect(() => {
     const el = stripRef.current;
     if (!el) return;
     const onScroll = () => {
       const slideW = el.scrollWidth / count;
-      let newIdx = Math.round(el.scrollLeft / slideW);
-      if (newIdx >= count) newIdx = 0; // clamp clone index
-      if (newIdx !== idx) {
-        setIdx(newIdx);
-        log(`scroll spy → ${newIdx}`);
-      }
+      const newIdx = Math.round(el.scrollLeft / slideW) % count;
+      if (newIdx !== idx) setIdx(newIdx);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
   }, [idx, count]);
 
-  /* ---- pause on drag / touch ---- */
+  /* ---- pause while dragging ---- */
   useEffect(() => {
     const el = stripRef.current;
     if (!el) return;
-    const onStart = () => stopTimer();
-    const onEnd = () => window.setTimeout(startTimer, 1000);
-    el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchend", onEnd, { passive: true });
-    el.addEventListener("mousedown", onStart);
-    el.addEventListener("mouseup", onEnd);
+    const stop = () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      timerRef.current = null;
+    };
+    const start = () => {
+      stop();
+      timerRef.current = window.setInterval(next, 3000);
+    };
+    el.addEventListener("touchstart", stop, { passive: true });
+    el.addEventListener("touchend", () => setTimeout(start, 1000), { passive: true });
+    el.addEventListener("mousedown", stop);
+    el.addEventListener("mouseup", () => setTimeout(start, 1000));
     return () => {
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchend", onEnd);
-      el.removeEventListener("mousedown", onStart);
-      el.removeEventListener("mouseup", onEnd);
+      el.removeEventListener("touchstart", stop);
+      el.removeEventListener("touchend", start);
+      el.removeEventListener("mousedown", stop);
+      el.removeEventListener("mouseup", start);
     };
-  }, []);
-
-  /* ---- start on mount ---- */
-  useEffect(() => {
-    log("mounted – starting timer");
-    startTimer();
-    return () => {
-      stopTimer();
-      log("unmounted – timer cleared");
-    };
-  }, []);
-
-  /* ---- client-side width label (optional debug) ---- */
-  const [widthLabel, setWidthLabel] = useState("");
-  useEffect(() => {
-    const update = () => {
-      const w = window.innerWidth;
-      setWidthLabel(w >= 1024 ? "desktop-3" : w >= 768 ? "tablet-2" : "mobile-1");
-    };
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
   }, []);
 
   return (
@@ -121,38 +81,20 @@ const InteriorSection: React.FC<Props> = ({ data }) => {
           {interiorText && <p className="mt-3 max-w-2xl text-gray-600 leading-relaxed">{interiorText}</p>}
         </div>
 
-        {/* debug bar */}
-        <div className="mb-4 text-xs bg-gray-100 text-gray-700 p-2 rounded">
-          Images: {count} | Index: {idx} | {widthLabel}
-        </div>
-
-        {/* scroll strip with clone for infinite loop */}
         <div className="relative w-full">
-          <div
-            ref={stripRef}
-            className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth"
-          >
+          {/* scrollable strip */}
+          <div ref={stripRef} className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth scrollbar-hide">
             {images.map((url, i) => (
-              <div
-                key={i}
-                className="snap-start w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-2"
-              >
-                <img
-                  src={url}
-                  alt={`Interior ${i + 1}`}
-                  className="w-full h-72 object-cover rounded-2xl shadow"
-                />
+              <div key={i} className="snap-start w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-2">
+                <img src={url} alt={`Interior ${i + 1}`} className="w-full h-72 object-cover rounded-2xl shadow" />
               </div>
             ))}
           </div>
 
-          {/* dots (real slides only) */}
+          {/* dots */}
           <div className="mt-6 flex justify-center gap-2">
-            {srcImages.map((_, i) => (
-              <span
-                key={i}
-                className={`h-2 w-2 rounded-full ${i === idx ? "bg-customColor2" : "bg-gray-300"}`}
-              />
+            {images.map((_, i) => (
+              <span key={i} className={`h-2 w-2 rounded-full ${i === idx ? "bg-customColor2" : "bg-gray-300"}`} />
             ))}
           </div>
         </div>

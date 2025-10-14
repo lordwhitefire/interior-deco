@@ -77,7 +77,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
   service.videoPoster = urlFor(service.videoPoster);
   service.interiorGallery = service.interiorGallery.map(urlFor);
   service.loveDesignImages = service.loveDesignImages.map(urlFor);
-
+  /* 👇 pick 2 at random 👇 */
+  service.loveDesignImages = service.loveDesignImages
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 2);
   const clientShowcaseData = clients.map((c: any) => ({
     id: parseInt(c.id),
     name: c.name,
@@ -85,18 +88,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
     alt: c.name,
   }));
 
-  const featuredProjectsData = projects.map((p: any) => ({
-    id: p.id,
-    title: p.title,
-    type: p.type,
-    description: p.description,
-    image: urlFor(p.image),
-    category: p.category,
-    features: p.features || [],
-    budget: p.budget,
-    timeline: p.timeline,
-    link: p.link || `/projects/${p.id}`,
-  }));
 
   const successStatsData = stats?.stats?.map((s: any) => ({
     id: s.id,
@@ -133,9 +124,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   return json({
     service,
     clientShowcaseData,
-    featuredProjectsData,
     successStatsData,
-    articleData,
     joinData,
   });
 }
@@ -145,9 +134,7 @@ export default function ServiceSingleRoute() {
   const {
     service,
     clientShowcaseData,
-    featuredProjectsData,
     successStatsData,
-    articleData,
     joinData,
   } = useLoaderData<typeof loader>();
 

@@ -5,6 +5,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE / Edge */
+    scrollbar-width: none;    /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;            /* Chrome / Safari */
+  }
+}
+
+
 .background {
     @apply bg-[url('./assets/images/banner.jpg')] bg-cover bg-no-repeat lg:bg-center
   }
