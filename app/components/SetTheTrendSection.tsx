@@ -1,23 +1,32 @@
-import React from 'react';
+// app/components/SetTheTrendSection.tsx
+import React from "react";
 
-const SetTheTrendSection = () => {
+type Props = {
+  data: {
+    trendHeader: string;
+    trendParagraphs: string[];
+  };
+};
+
+const SetTheTrendSection: React.FC<Props> = ({ data }) => {
+  const { trendHeader, trendParagraphs } = data;
+
   return (
-    <div className="sm:mx-auto  justify-between mt-32 px-6 max-w-[45rem] sm-mx-0 sm:flex mx-1.5rem">
-      <div className="font2 text-3xl  mb-5 sm:mb-0">
-        We set the trends of <br /> modern living <br /> services
+    <section className="w-full bg-white px-6 py-16 md:py-24">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+        {/* Left headline */}
+        <h2 className="text-3xl md:text-4xl font-bold font1 text-gray-900 leading-tight">
+          {trendHeader}
+        </h2>
+
+        {/* Right paragraphs */}
+        <div className="flex flex-col gap-4 text-gray-700 text-base md:text-sm leading-relaxed">
+          {trendParagraphs.map((para, idx) => (
+            <p key={idx}>{para}</p>
+          ))}
+        </div>
       </div>
-      <div className="sm:text-xs  text-sm sm:w-[25rem]">
-        <p className="mb-4 text-cda274">
-          Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer sed tincidunt justo.
-        </p>
-        <p className="mb-4">
-          Sed euismod metus et vestibulum lacinia. Integer volutpat odio et lacus auctor, at hendrerit lectus cursus. Vestibulum hendrerit justo nec eleifend varius. Suspendisse potenti.tortor urna luctus lectus, eu hendrerit felis arcu non ante.
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque efficitur nisl a metus lacinia, et ultrices purus finibus. Nulla facilisi. Phasellus bibendum, mi non tincidunt cursus, tortor urna luctus lectus, eu hendrerit felis arcu non ante.
-        </p>
-      </div>
-    </div>
+    </section>
   );
 };
 

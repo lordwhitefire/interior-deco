@@ -25,10 +25,16 @@ export async function loader() {
   const services = await sanityClient.fetch(
     groq`*[_type == "serviceCard"] | order(displayOrder asc) {
       title,
-      slug,
+      slug,                 // <- still the object { current: string }
       shortDesc
     }`
   );
+
+  // flatten slug -> string
+  const flatServices = services.map((s: any) => ({
+    ...s,
+    slug: s.slug.current
+  }));
 
   const howWeWork = await sanityClient.fetch(
     groq`*[_type == "howWeWork"][0] {
@@ -44,12 +50,11 @@ export async function loader() {
     }`
   );
 
-  // build step-image urls
   howWeWork.steps.forEach((s: any) => {
     if (s.image) s.imageUrl = builder.image(s.image).url();
   });
 
-  return json({ services, howWeWork });
+  return json({ services: flatServices, howWeWork });
 }
 
 export const meta: MetaFunction = () => {

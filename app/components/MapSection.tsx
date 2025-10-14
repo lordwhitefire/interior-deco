@@ -1,31 +1,71 @@
-import React from 'react';
+// app/components/MapSection.tsx
+import React, { useRef, useState } from "react";
 
-const MapSection = ({ serviceId }) => {
-  // Array of service data
-  // Your servicesData array (make sure it's defined)
-  const servicesData = [
-    { id: '1', imageClass: 'background' },
-    { id: '2', imageClass: 'background3' },
-    { id: '3', imageClass: 'background6' },
-    { id: '4', imageClass: 'background7' },
-    { id: '5', imageClass: 'background8' },
-    { id: '6', imageClass: 'blog3' },
-  ];
+type Props = { videoUrl: string; poster: string };
 
-  // Find the corresponding service data based on the serviceId
-  const service = servicesData.find((s) => s.id === serviceId);
+const MapSection: React.FC<Props> = ({ videoUrl, poster }) => {
+  const [showPlayer, setShowPlayer] = useState(false);
+  const [debugSrc, setDebugSrc] = useState(""); // what we inject
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  if (!service) {
-    // Handle the case where the service is not found
-    return <div>Service not found</div>;
-  }
-  // Destructure data from the service object
-  const { imageClass } = service;
+  const startVideo = () => {
+    if (!videoUrl) return; // blank ID guard
+    const src = `https://www.youtube.com/embed/${videoUrl}?autoplay=1&rel=0&modestbranding=1`;
+    setDebugSrc(src);
+    setShowPlayer(true);
+    // push src after render so ref is attached
+    setTimeout(() => {
+      if (iframeRef.current) iframeRef.current.src = src;
+    }, 0);
+  };
 
   return (
-    <div className={`sm:h-[15rem] h-[13rem] bg-cover bg-center max-w-[48rem] sm:rounded-[3rem] rounded-[1.2rem] mx-[1.5rem]  sm:mx-auto mt-[3rem] mb-5rem flex justify-center items-center ${imageClass}`}>
-      <div className="mt-1 sm:h-20 h-12 w-12 sm:w-20 rounded-full bg-white flex items-center justify-center">
-        <span className="icon-[solar--play-bold] sm:w-5 sm:h-5 text-customColor2 h-4 w-4"></span>
+    <div className="w-full  max-w-5xl mx-auto px-4 py-10">
+      {/* ----  DEBUG STRIP  ---- */}
+      <div className="mb-2 text-xs font-mono text-gray-600 bg-gray-100 p-2 rounded">
+        {videoUrl ? `ID: ${videoUrl}` : "❌  videoUrl is empty"}
+      </div>
+
+      <div className="relative w-full aspect-video rounded-3xl overflow-hidden shadow-lg">
+        {/* Poster */}
+        {!showPlayer && (
+          <>
+            <img
+              src={poster}
+              alt="Video poster"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/30" />
+            <button
+              onClick={startVideo}
+              aria-label="Play video"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+                         w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/90
+                         flex items-center justify-center
+                         hover:scale-110 transition-transform"
+            >
+              <span className="icon-[solar--play-bold] w-6 h-6 sm:w-8 sm:h-8 text-customColor2" />
+            </button>
+          </>
+        )}
+
+        {/* Iframe + second debug badge */}
+        {showPlayer && (
+          <>
+            <div className="absolute top-2 left-2 z-10 px-2 py-1 text-xs bg-black/70 text-white rounded">
+              {debugSrc ? `src set → ${videoUrl}` : "src not set"}
+            </div>
+            <iframe
+              ref={iframeRef}
+              className="w-full h-full"
+              src=""
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </>
+        )}
       </div>
     </div>
   );
