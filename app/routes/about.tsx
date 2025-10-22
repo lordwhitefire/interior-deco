@@ -1,8 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import React, { useState } from 'react';
 
-import NavigationBar from '../components/NavigationBar';
-import Footer  from "~/components/Footer";
 
 
 import oldImage from '../assets/images/about-old.jpg';
@@ -203,13 +201,11 @@ const FormSection =  (
 
     return (
       <div>
-        <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
         {BannerSection}
         {QuoteSection}
         {WhatWeDoSection}
         {TestimonialSection}
         {FormSection}
-        <Footer />
       </div>
     );
   }
