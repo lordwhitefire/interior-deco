@@ -2,10 +2,10 @@ import type { MetaFunction } from "@remix-run/node";
 import React, { useState } from 'react';
 import { Link } from '@remix-run/react';
 
-import NavigationBar from '../components/NavigationBar';
+
 import BlogArticles from '../components/blogsss';
 
-import Footer  from "~/components/Footer";
+
 
 import blogImage from '../assets/images/Blog-1.jpeg';
 
@@ -126,12 +126,12 @@ export const meta: MetaFunction = () => {
 
     return (
       <div>
-        <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
+      
         {BannerSection}
         {LatestPostSection}
         <BlogArticles />
         {NumberedButtons}
-        <Footer />
+       
       </div>
     );
   }
