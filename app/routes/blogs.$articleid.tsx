@@ -40,11 +40,11 @@ export default function BlogSingle() {
 
     return (
       <div>
-        <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
+      
         {BannerSection}
         <BlogPost  articleId={articleid} />
         
-        <Footer />
+     
       </div>
     );
   }
