@@ -11,7 +11,6 @@ import CommentThread from "~/components/CommentThread";
 const projectId = "pzhistba";
 const dataset = "production";
 const apiVersion = "2023-12-01";
-
 const sanity = createClient({ projectId, dataset, apiVersion, useCdn: true });
 const builder = imageUrlBuilder(sanity);
 
@@ -32,6 +31,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
       "tags": tags[]->{title, "slug": slug.current},
       coverImage,
       heroBackgroundImage,
+      ogImage,
       quoteText,
       sections,
       excerpt,
@@ -62,10 +62,21 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 /* ------------  meta  ------------ */
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const post = data?.post;
+  const ogImage = post?.ogImage ? builder.image(post.ogImage).width(1200).height(630).url() : null;
+
   return [
     { title: post?.metaTitle || post?.title || "Blog" },
     { name: "description", content: post?.metaDescription || post?.excerpt || "" },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ...(ogImage
+      ? [
+          { property: "og:image", content: ogImage },
+          { property: "og:image:width", content: "1200" },
+          { property: "og:image:height", content: "630" },
+          { name: "twitter:card", content: "summary_large_image" },
+          { name: "twitter:image", content: ogImage },
+        ]
+      : []),
   ];
 };
 
