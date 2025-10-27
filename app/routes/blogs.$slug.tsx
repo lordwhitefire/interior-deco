@@ -4,15 +4,36 @@ import { useLoaderData, useActionData, Link, Form } from "@remix-run/react";
 import groq from "groq";
 import { createClient } from "@sanity/client";
 import imageUrlBuilder from "@sanity/image-url";
-import { getClient } from "~/lib/sanity";
 import CommentForm from "~/components/CommentForm";
 import CommentThread from "~/components/CommentThread";
 
 const projectId = "pzhistba";
 const dataset = "production";
 const apiVersion = "2023-12-01";
-const sanity = createClient({ projectId, dataset, apiVersion, useCdn: true });
+
+// Read-only client (for data fetching)
+const sanity = createClient({ 
+  projectId, 
+  dataset, 
+  apiVersion, 
+  useCdn: true 
+});
+
+// Write client (for mutations) - uses your token
+const writeClient = createClient({ 
+  projectId, 
+  dataset, 
+  apiVersion, 
+  useCdn: false,
+  token: process.env.SANITY_API_WRITE_TOKEN
+});
+
 const builder = imageUrlBuilder(sanity);
+
+// Helper function to get the right client
+function getClient(write: boolean = false) {
+  return write ? writeClient : sanity;
+}
 
 /* ------------  loader  ------------ */
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -117,6 +138,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   return json({ error: "Unknown intent" }, 400);
 }
+
+// Rest of your component code stays the same...
 
 /* ------------  section renderer  ------------ */
 function Section({ block }: { block: any }) {

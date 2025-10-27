@@ -1,21 +1,31 @@
-import { createClient } from "@sanity/client";
+// app/lib/sanity.ts
+import { createClient } from '@sanity/client';
+import imageUrlBuilder from '@sanity/image-url';
 
-const projectId = "pzhistba";
-const dataset = "production";
-const apiVersion = "2023-12-01";
-
-export const readClient = createClient({
-  projectId,
-  dataset,
-  apiVersion,
+// Read-only client (for data fetching)
+export const sanityClient = createClient({
+  projectId: 'pzhistba',
+  dataset: 'production',
+  apiVersion: '2023-12-01',
   useCdn: true,
 });
 
-export const getClient = (write = false) =>
-  createClient({
-    projectId,
-    dataset,
-    apiVersion,
-    useCdn: !write,
-    token: write ? process.env.SANITY_API_WRITE_TOKEN : undefined,
-  });
+// Write client (for mutations) - uses your token
+export const writeClient = createClient({
+  projectId: 'pzhistba',
+  dataset: 'production',
+  apiVersion: '2023-12-01',
+  useCdn: false,
+  token: process.env.SANITY_API_WRITE_TOKEN,
+});
+
+const builder = imageUrlBuilder(sanityClient);
+
+export function urlFor(source: any) {
+  return builder.image(source);
+}
+
+// Helper function to get the right client
+export function getClient(write: boolean = false) {
+  return write ? writeClient : sanityClient;
+}

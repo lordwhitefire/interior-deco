@@ -2,7 +2,7 @@
 import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 
-// Create client immediately
+// Read-only client (for data fetching)
 export const sanityClient = createClient({
   projectId: 'pzhistba',
   dataset: 'production',
@@ -10,14 +10,17 @@ export const sanityClient = createClient({
   useCdn: true,
 });
 
-// Create builder immediately
-export const builder = imageUrlBuilder(sanityClient);
+// Write client (for mutations) - uses your token
+export const writeClient = createClient({
+  projectId: 'pzhistba',
+  dataset: 'production',
+  apiVersion: '2023-12-01',
+  useCdn: false, // Never use CDN for writes
+  token: process.env.SANITY_API_WRITE_TOKEN,
+});
 
-// Export urlFor function
+const builder = imageUrlBuilder(sanityClient);
+
 export function urlFor(source: any) {
   return builder.image(source);
 }
-
-// Test that it worked
-console.log('✅ SANITY CLIENT CREATED:', typeof sanityClient);
-console.log('✅ SANITY CLIENT FETCH:', typeof sanityClient.fetch);
