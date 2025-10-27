@@ -4,7 +4,7 @@ import { Link } from '@remix-run/react';
 
 import NavigationBar from '../components/NavigationBar';
 import TeamSection from '../components/TeamSection';
-import BlogArticles from '../components/blogsss';
+import BlogArticles from '../components/BlogCard';
 
 import Footer  from "~/components/Footer";
 
