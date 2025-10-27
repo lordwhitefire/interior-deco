@@ -1,63 +1,203 @@
 import { useFetcher } from "@remix-run/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { SerializeFrom } from "@remix-run/node";
+import CommentForm from "./CommentForm";
 
-type Comment = SerializeFrom<typeof loader>["topLevel"][number];
+type Comment = {
+  _id: string;
+  name: string;
+  email: string;
+  website?: string;
+  message: string;
+  likes: number;
+  _createdAt: string;
+  parent?: { _id: string };
+};
 
-export default function CommentThread({ comments, postId }: { comments: Comment[]; postId: string }) {
-  return (
-    <div className="space-y-6">
-      {comments.map((c) => (
-        <CommentItem key={c._id} c={c} postId={postId} />
-      ))}
-    </div>
-  );
+type CommentThreadProps = {
+  comments: Comment[];
+  postId: string;
+  onRevalidate: () => void; // Add this prop
+};
+
+export default function CommentThread({ comments, postId, onRevalidate }: CommentThreadProps) {
+  // Group comments by parent to build thread structure
+  const commentMap = new Map<string, Comment[]>();
+  const rootComments: Comment[] = [];
+
+  comments.forEach(comment => {
+    if (comment.parent?._id) {
+      const parentId = comment.parent._id;
+      if (!commentMap.has(parentId)) {
+        commentMap.set(parentId, []);
+      }
+      commentMap.get(parentId)!.push(comment);
+    } else {
+      rootComments.push(comment);
+    }
+  });
+
+  const renderComments = (commentList: Comment[], depth = 0) => {
+    return commentList.map(comment => (
+      <CommentItem
+        key={comment._id}
+        comment={comment}
+        depth={depth}
+        postId={postId}
+        replies={commentMap.get(comment._id) || []}
+        renderComments={renderComments}
+        onRevalidate={onRevalidate} // Pass it down
+      />
+    ));
+  };
+
+  if (comments.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        No comments yet. Be the first to comment!
+      </div>
+    );
+  }
+
+  return <div className="space-y-6">{renderComments(rootComments)}</div>;
 }
 
-function CommentItem({ c, postId }: { c: Comment; postId: string }) {
-  const fetcher = useFetcher();
-  const [showReply, setShowReply] = useState(false);
+type CommentItemProps = {
+  comment: Comment;
+  depth: number;
+  postId: string;
+  replies: Comment[];
+  renderComments: (comments: Comment[], depth: number) => JSX.Element[];
+  onRevalidate: () => void; // Add this prop
+};
 
-  const like = () => fetcher.submit({ intent: "like", commentId: c._id }, { method: "post" });
+function CommentItem({ comment, depth, postId, replies, renderComments, onRevalidate }: CommentItemProps) {
+  const likeFetcher = useFetcher();
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const isLiking = likeFetcher.state === "submitting";
+
+  // Add this useEffect to monitor fetcher changes
+  useEffect(() => {
+    console.log("🔄 Fetcher state changed:", {
+      state: likeFetcher.state,
+      data: likeFetcher.data,
+      formData: likeFetcher.formData
+    });
+
+    // Revalidate when like action completes successfully
+    if (likeFetcher.state === 'idle' && likeFetcher.data?.success) {
+      console.log("✅ Like action completed, triggering revalidation");
+      onRevalidate();
+    }
+  }, [likeFetcher.state, likeFetcher.data, likeFetcher.formData, onRevalidate]);
+
+  const handleLike = () => {
+    console.log("🔴 LIKE BUTTON CLICKED - START");
+    console.log("🔴 Comment ID:", comment._id);
+    console.log("🔴 Current likes:", comment.likes);
+    console.log("🔴 isLiking state:", isLiking);
+    
+    if (!isLiking) {
+      console.log("🟡 Submitting like request...");
+      likeFetcher.submit(
+        { 
+          _action: "likeComment", 
+          commentId: comment._id 
+        }, 
+        { method: "post" }
+      );
+      console.log("🟢 Like request submitted");
+    } else {
+      console.log("🟠 Like already in progress, ignoring click");
+    }
+    
+    console.log("🔴 LIKE BUTTON CLICKED - END");
+  };
+
+  const handleCancelReply = () => {
+    setShowReplyForm(false);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
-    <div className="border-l-2 border-gray-200 pl-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="font-semibold">{c.name}</span>
-          <span className="text-xs text-gray-500 ml-2">{new Date(c._createdAt).toLocaleDateString()}</span>
-        </div>
-        <button onClick={like} className="text-xs text-gray-600 hover:text-black">❤ {c.likes}</button>
-      </div>
-      <p className="mt-2 text-gray-800">{c.message}</p>
-      <button onClick={() => setShowReply((s) => !s)} className="text-xs text-blue-600 mt-2">Reply</button>
-
-      {showReply && (
-        <fetcher.Form method="post" className="mt-3 space-y-2">
-          <input type="hidden" name="intent" value="reply" />
-          <input type="hidden" name="parentId" value={c._id} />
-          <input type="hidden" name="postId" value={postId} />
-          <div className="flex gap-2">
-            <input name="name" required placeholder="Name" className="input w-32" />
-            <input name="email" type="email" required placeholder="Email" className="input w-40" />
-            <input name="website" placeholder="Website" className="input w-40" />
-          </div>
-          <textarea name="message" required rows={2} placeholder="Write a reply…" className="input" />
-          <button type="submit" className="text-sm px-3 py-1 bg-black text-white rounded">Reply</button>
-        </fetcher.Form>
-      )}
-
-      {c.replies.length > 0 && (
-        <div className="mt-4 space-y-3">
-          {c.replies.map((r) => (
-            <div key={r._id} className="text-sm bg-gray-50 p-3 rounded">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{r.name}</span>
-                <span className="text-xs text-gray-500">{new Date(r._createdAt).toLocaleDateString()}</span>
-              </div>
-              <p className="mt-1">{r.message}</p>
+    <div 
+      className={`border-l-2 border-gray-200 pl-4 ${
+        depth > 0 ? 'ml-6' : ''
+      }`}
+      style={{ marginLeft: depth > 0 ? `${depth * 1.5}rem` : '0' }}
+    >
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-semibold text-gray-600">
+              {comment.name.charAt(0).toUpperCase()}
             </div>
-          ))}
+            <div>
+              <h4 className="font-semibold text-gray-900">{comment.name}</h4>
+              <p className="text-sm text-gray-500">
+                {formatDate(comment._createdAt)}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <p className="text-gray-700 mb-4 whitespace-pre-wrap">{comment.message}</p>
+        
+        <div className="flex items-center space-x-4 text-sm">
+          <button
+            onClick={handleLike}
+            disabled={isLiking}
+            className="flex items-center space-x-1 text-gray-500 hover:text-red-500 disabled:opacity-50 transition-colors"
+          >
+            <svg 
+              className="w-4 h-4" 
+              fill={comment.likes > 0 ? "currentColor" : "none"} 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" 
+              />
+            </svg>
+            <span>{comment.likes || 0}</span>
+          </button>
+          
+          <button
+            onClick={() => setShowReplyForm(!showReplyForm)}
+            className="text-gray-500 hover:text-blue-500 transition-colors"
+          >
+            {showReplyForm ? "Cancel Reply" : "Reply"}
+          </button>
+        </div>
+
+        {/* Reply Form */}
+        {showReplyForm && (
+          <div className="mt-4">
+            <CommentForm 
+              postId={postId} 
+              parentId={comment._id}
+              onCancelReply={handleCancelReply}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Nested Replies */}
+      {replies.length > 0 && (
+        <div className="mt-4">
+          {renderComments(replies, depth + 1)}
         </div>
       )}
     </div>

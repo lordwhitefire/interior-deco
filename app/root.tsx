@@ -1,4 +1,4 @@
-// app/root.tsx - COMPLETE BYPASS VERSION
+// app/root.tsx - CORRECTED VERSION
 import {
   Links,
   Meta,
@@ -10,34 +10,26 @@ import {
 import type { MetaFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import groq from 'groq';
+import imageUrlBuilder from '@sanity/image-url';
 
 import NavigationBar from '~/components/NavigationBar';
 import Footer from '~/components/Footer';
 
-import { urlFor } from './lib/sanity';
 import tailwindStyles from '~/tailwind.css';
 
-import { createClient } from '@sanity/client';
-import imageUrlBuilder from '@sanity/image-url';
+// Import from the new server file
+import { sanity } from '~/sanity/write-client.server';
 
-// Create directly in root.tsx - BYPASS THE BROKEN CHAIN
-const sanityClient = createClient({
-  projectId: 'pzhistba',
-  dataset: 'production',
-  apiVersion: '2023-12-01',
-  useCdn: true,
-});
-
-const builder = imageUrlBuilder(sanityClient);
-export { sanityClient, builder };
+// Create builder using the imported sanity client
+const builder = imageUrlBuilder(sanity);
 
 export const meta: MetaFunction = () => {
   return [
     { name: 'description', content: 'Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style.' },
     { property: 'og:title', content: 'Interior Decorators Inc. - Transforming Spaces' },
     { property: 'og:type', content: 'website' },
-    { property: 'og:image', content: 'https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy ' },
-    { property: 'og:url', content: 'https://interior-deco-kappa.vercel.app ' },
+    { property: 'og:image', content: 'https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy' },
+    { property: 'og:url', content: 'https://interior-deco-kappa.vercel.app' },
     { property: 'og:description', content: 'Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style.' },
     { property: 'og:site_name', content: 'Interior Decorators Inc.' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -46,20 +38,19 @@ export const meta: MetaFunction = () => {
 
 export const links = () => [
   { rel: 'stylesheet', href: tailwindStyles },
-  { rel: 'icon', href: 'https://lordwhitefire.github.io/interior-deco-assets/logo/favicon.ico ', type: 'image/x-icon' },
-  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css ' },
-
+  { rel: 'icon', href: 'https://lordwhitefire.github.io/interior-deco-assets/logo/favicon.ico', type: 'image/x-icon' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css' },
 ];
 
 /* ---------- fallback data (unchanged) ---------- */
 const fallbackFooterData = {
-  logo: 'https://lordwhitefire.github.io/interior-deco-assets/logo/Logo.png ',
+  logo: 'https://lordwhitefire.github.io/interior-deco-assets/logo/Logo.png',
   description: 'Transforming spaces into stunning, functional environments that reflect your unique style and personality.',
   social: [
-    { name: 'Facebook', url: 'https://facebook.com ' },
-    { name: 'Twitter', url: 'https://twitter.com ' },
-    { name: 'Instagram', url: 'https://instagram.com ' },
-    { name: 'LinkedIn', url: 'https://linkedin.com ' }
+    { name: 'Facebook', url: 'https://facebook.com' },
+    { name: 'Twitter', url: 'https://twitter.com' },
+    { name: 'Instagram', url: 'https://instagram.com' },
+    { name: 'LinkedIn', url: 'https://linkedin.com' }
   ],
   sections: [
     {
@@ -98,8 +89,7 @@ const fallbackFooterData = {
 };
 
 export const loader: LoaderFunction = async () => {
-
-  const footerDoc = await sanityClient.fetch(
+  const footerDoc = await sanity.fetch(
     groq`*[_type == "siteSettings"][0]{
       logo,
       description,
@@ -112,9 +102,7 @@ export const loader: LoaderFunction = async () => {
     }`
   ).catch(() => null); // Gracefully handle fetch errors
 
-
   const footerData = footerDoc ? {
-  // ✅ FIXED - Now uses builder directly
     logo: footerDoc.logo ? builder.image(footerDoc.logo).url() : fallbackFooterData.logo,
     description: footerDoc.description || fallbackFooterData.description,
     social: footerDoc.social?.length ? footerDoc.social : fallbackFooterData.social,

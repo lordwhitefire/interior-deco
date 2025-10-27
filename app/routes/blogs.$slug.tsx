@@ -1,44 +1,22 @@
 import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData, useActionData, Link, Form } from "@remix-run/react";
+import { useLoaderData, useActionData, Link, useRevalidator } from "@remix-run/react";
 import groq from "groq";
-import { createClient } from "@sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
+import imageUrlBuilder from "@sanity/image-url"; // Add this back
 import CommentForm from "~/components/CommentForm";
 import CommentThread from "~/components/CommentThread";
+// Import from the new server file
+import { sanity, writeClient } from "~/sanity/write-client.server";
 
-const projectId = "pzhistba";
-const dataset = "production";
-const apiVersion = "2023-12-01";
-
-// Read-only client (for data fetching)
-const sanity = createClient({ 
-  projectId, 
-  dataset, 
-  apiVersion, 
-  useCdn: true 
-});
-
-// Write client (for mutations) - uses your token
-const writeClient = createClient({ 
-  projectId, 
-  dataset, 
-  apiVersion, 
-  useCdn: false,
-  token: process.env.SANITY_API_WRITE_TOKEN
-});
-
+// Create builder locally (not from server file)
 const builder = imageUrlBuilder(sanity);
-
-// Helper function to get the right client
-function getClient(write: boolean = false) {
-  return write ? writeClient : sanity;
-}
 
 /* ------------  loader  ------------ */
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const { slug } = params;
   if (!slug) throw new Response("Missing slug", { status: 404 });
+
+  console.log("🔄 LOADER RUNNING - Fetching comments");
 
   const post = await sanity.fetch(
     groq`*[_type == "blogDetail" && slug.current == $slug][0]{
@@ -63,27 +41,50 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   );
   if (!post) throw new Response("Post not found", { status: 404 });
 
-  const [latestPosts, categories, tags] = await Promise.all([
+  const [latestPosts, categories, tags, comments] = await Promise.all([
     sanity.fetch(groq`*[_type == "blogDetail"] | order(publishDate desc)[0...3]{ title, "slug": slug.current, publishDate }`),
     sanity.fetch(groq`*[_type == "category"] | order(_createdAt asc)[0...3]{ title, "slug": slug.current }`),
     sanity.fetch(groq`*[_type == "tag"] | order(_createdAt asc)[0...5]{ title, "slug": slug.current }`),
+    // Fetch ALL approved comments for this post with proper threading
+    sanity.fetch(
+      groq`*[_type == "comment" && post._ref == $postId && approved == true] | order(_createdAt asc){
+        _id, 
+        name, 
+        email,
+        website,
+        message, 
+        likes, 
+        _createdAt,
+        parent->{_id}
+      }`,
+      { postId: post._id }
+    ),
   ]);
 
-  const topLevel = await sanity.fetch(
-    groq`*[_type == "comment" && post._ref == $postId && !defined(parent._ref)] | order(likes desc, _createdAt desc)[0...10]{
-      _id, name, message, likes, _createdAt,
-      "replies": *[_type == "comment" && parent._ref == ^._id] | order(_createdAt asc)[0...3]
-    }`,
-    { postId: post._id }
-  );
+  console.log("✅ LOADER COMPLETE - Comments fetched:", comments.length);
 
-  return json({ post, latestPosts, categories, tags, topLevel });
+  return json({ 
+    post, 
+    latestPosts, 
+    categories, 
+    tags, 
+    comments
+  });
 }
 
 /* ------------  meta  ------------ */
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const post = data?.post;
-  const ogImage = post?.ogImage ? builder.image(post.ogImage).width(1200).height(630).url() : null;
+  
+  // Safe check for builder and ogImage
+  let ogImage = null;
+  if (post?.ogImage && builder) {
+    try {
+      ogImage = builder.image(post.ogImage).width(1200).height(630).url();
+    } catch (error) {
+      console.error("Error generating OG image:", error);
+    }
+  }
 
   return [
     { title: post?.metaTitle || post?.title || "Blog" },
@@ -101,45 +102,105 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
+// ... rest of your code remains the same
 /* ------------  action  ------------ */
 export async function action({ request, params }: ActionFunctionArgs) {
   const { slug } = params;
-  const form = await request.formData();
-  const intent = form.get("intent");
-  const writeClient = getClient(true);
+  const formData = await request.formData();
+  const _action = formData.get("_action");
 
-  if (intent === "comment") {
-    const name = (form.get("name") as string).trim();
-    const email = (form.get("email") as string).trim();
-    const website = (form.get("website") as string).trim();
-    const message = (form.get("message") as string).trim();
-    const postId = form.get("postId") as string;
-    if (!name || !email || !message) return json({ error: "Name, email and message required" }, 400);
-    await writeClient.create({ _type: "comment", post: { _type: "reference", _ref: postId }, name, email, website: website || undefined, message, likes: 0, approved: true });
-    return redirect(`/blogs/${slug}#comments`);
+  console.log("🔴 ACTION TRIGGERED:", _action);
+
+  // Get post first to validate
+  const post = await sanity.fetch(
+    groq`*[_type == "blogDetail" && slug.current == $slug][0] { _id }`,
+    { slug }
+  );
+
+  if (!post) {
+    return json({ error: "Post not found" }, { status: 404 });
   }
 
-  if (intent === "like") {
-    const commentId = form.get("commentId") as string;
-    await writeClient.patch(commentId).inc({ likes: 1 }).commit();
-    return json({ ok: true });
+  if (_action === "createComment") {
+    const name = (formData.get("name") as string)?.trim();
+    const email = (formData.get("email") as string)?.trim();
+    const website = (formData.get("website") as string)?.trim();
+    const message = (formData.get("message") as string)?.trim();
+    const parentId = formData.get("parentId") as string;
+
+    if (!name || !email || !message) {
+      return json({ error: "Name, email and message are required" }, { status: 400 });
+    }
+
+    try {
+      await writeClient.create({
+        _type: "comment",
+        post: { 
+          _type: "reference", 
+          _ref: post._id 
+        },
+        ...(parentId && {
+          parent: { 
+            _type: "reference", 
+            _ref: parentId 
+          }
+        }),
+        name,
+        email,
+        website: website || undefined,
+        message,
+        likes: 0,
+        approved: true,
+        createdAt: new Date().toISOString(),
+      });
+
+      return redirect(`/blogs/${slug}#comments`);
+    } catch (error) {
+      return json({ error: "Failed to create comment" }, { status: 500 });
+    }
   }
 
-  if (intent === "reply") {
-    const parentId = form.get("parentId") as string;
-    const name = (form.get("name") as string).trim();
-    const email = (form.get("email") as string).trim();
-    const website = (form.get("website") as string).trim();
-    const message = (form.get("message") as string).trim();
-    if (!name || !email || !message) return json({ error: "Required fields missing" }, 400);
-    await writeClient.create({ _type: "comment", post: { _type: "reference", _ref: form.get("postId") as string }, parent: { _type: "reference", _ref: parentId }, name, email, website: website || undefined, message, likes: 0, approved: true });
-    return redirect(`/blogs/${slug}#comments`);
+  if (_action === "likeComment") {
+    const commentId = formData.get("commentId") as string;
+    
+    console.log("🟡 PROCESSING LIKE for comment:", commentId);
+    
+    if (!commentId) {
+      console.log("🔴 ERROR: No commentId provided");
+      return json({ error: "Comment ID required" }, { status: 400 });
+    }
+
+    try {
+      // Get current comment to check likes
+      const currentComment = await sanity.fetch(
+        groq`*[_type == "comment" && _id == $commentId][0] { likes }`,
+        { commentId }
+      );
+
+      if (!currentComment) {
+        return json({ error: "Comment not found" }, { status: 404 });
+      }
+
+      console.log("🟡 Current likes:", currentComment.likes);
+
+      // For now, just increment (we'll add toggle logic later)
+      // TODO: Add user session tracking for proper toggle
+      await writeClient
+        .patch(commentId)
+        .setIfMissing({ likes: 0 })
+        .inc({ likes: 1 })
+        .commit();
+
+      console.log("🟢 Like successfully added to comment:", commentId);
+      return json({ success: true });
+    } catch (error) {
+      console.log("🔴 ERROR liking comment:", error);
+      return json({ error: "Failed to like comment" }, { status: 500 });
+    }
   }
 
-  return json({ error: "Unknown intent" }, 400);
+  return json({ error: "Unknown action" }, { status: 400 });
 }
-
-// Rest of your component code stays the same...
 
 /* ------------  section renderer  ------------ */
 function Section({ block }: { block: any }) {
@@ -163,8 +224,11 @@ function Section({ block }: { block: any }) {
 
 /* ------------  page  ------------ */
 export default function BlogDetail() {
-  const { post, latestPosts, categories, tags, topLevel } = useLoaderData<typeof loader>();
+  const { post, latestPosts, categories, tags, comments } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  const { revalidate } = useRevalidator(); // Add revalidator at route level
+
+  console.log("📊 Current comments data:", comments);
 
   return (
     <main className="min-h-screen bg-white">
@@ -228,7 +292,11 @@ export default function BlogDetail() {
             <h2 className="text-2xl font-semibold mb-4">Comments</h2>
             {actionData?.error && <p className="text-red-600 mb-4">{actionData.error}</p>}
             <CommentForm postId={post._id} />
-            <CommentThread comments={topLevel} postId={post._id} />
+            <CommentThread 
+              comments={comments} 
+              postId={post._id} 
+              onRevalidate={revalidate} // Pass revalidate function to comments
+            />
           </section>
         </article>
 
