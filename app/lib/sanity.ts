@@ -1,8 +1,7 @@
 import { createClient } from "@sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
 
 const projectId = "pzhistba";
-const dataset = "production";
+const dataset = "production"; 
 const apiVersion = "2023-12-01";
 
 // Write client (for mutations) - uses your token
@@ -21,8 +20,5 @@ export const sanity = createClient({
   apiVersion, 
   useCdn: true 
 });
-
-// Image URL builder
-export const builder = imageUrlBuilder(sanity);
 
 export { projectId, dataset, apiVersion };

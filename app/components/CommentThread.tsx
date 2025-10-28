@@ -1,5 +1,5 @@
 import { useFetcher } from "@remix-run/react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { SerializeFrom } from "@remix-run/node";
 import CommentForm from "./CommentForm";
 
@@ -17,10 +17,9 @@ type Comment = {
 type CommentThreadProps = {
   comments: Comment[];
   postId: string;
-  onRevalidate: () => void; // Add this prop
 };
 
-export default function CommentThread({ comments, postId, onRevalidate }: CommentThreadProps) {
+export default function CommentThread({ comments, postId }: CommentThreadProps) {
   // Group comments by parent to build thread structure
   const commentMap = new Map<string, Comment[]>();
   const rootComments: Comment[] = [];
@@ -46,7 +45,6 @@ export default function CommentThread({ comments, postId, onRevalidate }: Commen
         postId={postId}
         replies={commentMap.get(comment._id) || []}
         renderComments={renderComments}
-        onRevalidate={onRevalidate} // Pass it down
       />
     ));
   };
@@ -68,37 +66,15 @@ type CommentItemProps = {
   postId: string;
   replies: Comment[];
   renderComments: (comments: Comment[], depth: number) => JSX.Element[];
-  onRevalidate: () => void; // Add this prop
 };
 
-function CommentItem({ comment, depth, postId, replies, renderComments, onRevalidate }: CommentItemProps) {
+function CommentItem({ comment, depth, postId, replies, renderComments }: CommentItemProps) {
   const likeFetcher = useFetcher();
   const [showReplyForm, setShowReplyForm] = useState(false);
   const isLiking = likeFetcher.state === "submitting";
 
-  // Add this useEffect to monitor fetcher changes
-  useEffect(() => {
-    console.log("🔄 Fetcher state changed:", {
-      state: likeFetcher.state,
-      data: likeFetcher.data,
-      formData: likeFetcher.formData
-    });
-
-    // Revalidate when like action completes successfully
-    if (likeFetcher.state === 'idle' && likeFetcher.data?.success) {
-      console.log("✅ Like action completed, triggering revalidation");
-      onRevalidate();
-    }
-  }, [likeFetcher.state, likeFetcher.data, likeFetcher.formData, onRevalidate]);
-
   const handleLike = () => {
-    console.log("🔴 LIKE BUTTON CLICKED - START");
-    console.log("🔴 Comment ID:", comment._id);
-    console.log("🔴 Current likes:", comment.likes);
-    console.log("🔴 isLiking state:", isLiking);
-    
     if (!isLiking) {
-      console.log("🟡 Submitting like request...");
       likeFetcher.submit(
         { 
           _action: "likeComment", 
@@ -106,12 +82,7 @@ function CommentItem({ comment, depth, postId, replies, renderComments, onRevali
         }, 
         { method: "post" }
       );
-      console.log("🟢 Like request submitted");
-    } else {
-      console.log("🟠 Like already in progress, ignoring click");
     }
-    
-    console.log("🔴 LIKE BUTTON CLICKED - END");
   };
 
   const handleCancelReply = () => {

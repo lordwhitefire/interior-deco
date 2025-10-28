@@ -1,22 +1,42 @@
 import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData, useActionData, Link, useRevalidator } from "@remix-run/react";
+import { useLoaderData, useActionData, Link, Form } from "@remix-run/react";
 import groq from "groq";
-import imageUrlBuilder from "@sanity/image-url"; // Add this back
-import CommentForm from "~/components/CommentForm";
-import CommentThread from "~/components/CommentThread";
-// Import from the new server file
-import { sanity, writeClient } from "~/sanity/write-client.server";
+import { createClient } from "@sanity/client";
+import imageUrlBuilder from "@sanity/image-url";
+import CommentForm from "../components/CommentForm";
+import CommentThread from "../components/CommentThread";
 
-// Create builder locally (not from server file)
-const builder = imageUrlBuilder(sanity);
+const projectId = "pzhistba";
+const dataset = "production";
+const apiVersion = "2023-12-01";
+
+// Consistent date formatter (works on both server and client)
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  // Use UTC methods to avoid timezone differences
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1; // Months are 0-indexed
+  const day = date.getUTCDate();
+  
+  // Consistent format: YYYY-MM-DD
+  return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+}
 
 /* ------------  loader  ------------ */
 export async function loader({ params, request }: LoaderFunctionArgs) {
+  // Create clients INSIDE loader (server-only)
+  const sanity = createClient({ 
+    projectId, 
+    dataset, 
+    apiVersion, 
+    useCdn: true 
+  });
+
+  const builder = imageUrlBuilder(sanity);
+
   const { slug } = params;
   if (!slug) throw new Response("Missing slug", { status: 404 });
-
-  console.log("🔄 LOADER RUNNING - Fetching comments");
 
   const post = await sanity.fetch(
     groq`*[_type == "blogDetail" && slug.current == $slug][0]{
@@ -61,8 +81,6 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     ),
   ]);
 
-  console.log("✅ LOADER COMPLETE - Comments fetched:", comments.length);
-
   return json({ 
     post, 
     latestPosts, 
@@ -76,15 +94,16 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const post = data?.post;
   
-  // Safe check for builder and ogImage
-  let ogImage = null;
-  if (post?.ogImage && builder) {
-    try {
-      ogImage = builder.image(post.ogImage).width(1200).height(630).url();
-    } catch (error) {
-      console.error("Error generating OG image:", error);
-    }
-  }
+  // Create builder locally for meta function
+  const sanity = createClient({ 
+    projectId: "pzhistba", 
+    dataset: "production", 
+    apiVersion: "2023-12-01", 
+    useCdn: true 
+  });
+  const builder = imageUrlBuilder(sanity);
+  
+  const ogImage = post?.ogImage ? builder.image(post.ogImage).width(1200).height(630).url() : null;
 
   return [
     { title: post?.metaTitle || post?.title || "Blog" },
@@ -102,14 +121,28 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
-// ... rest of your code remains the same
 /* ------------  action  ------------ */
 export async function action({ request, params }: ActionFunctionArgs) {
   const { slug } = params;
   const formData = await request.formData();
   const _action = formData.get("_action");
 
-  console.log("🔴 ACTION TRIGGERED:", _action);
+  // Create write client INSIDE action (server-only)
+  const writeClient = createClient({ 
+    projectId: "pzhistba", 
+    dataset: "production", 
+    apiVersion: "2023-12-01", 
+    useCdn: false,
+    token: process.env.SANITY_API_WRITE_TOKEN
+  });
+
+  // Create read client for fetching
+  const sanity = createClient({ 
+    projectId: "pzhistba", 
+    dataset: "production", 
+    apiVersion: "2023-12-01", 
+    useCdn: true 
+  });
 
   // Get post first to validate
   const post = await sanity.fetch(
@@ -163,38 +196,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (_action === "likeComment") {
     const commentId = formData.get("commentId") as string;
     
-    console.log("🟡 PROCESSING LIKE for comment:", commentId);
-    
     if (!commentId) {
-      console.log("🔴 ERROR: No commentId provided");
       return json({ error: "Comment ID required" }, { status: 400 });
     }
 
     try {
-      // Get current comment to check likes
-      const currentComment = await sanity.fetch(
-        groq`*[_type == "comment" && _id == $commentId][0] { likes }`,
-        { commentId }
-      );
-
-      if (!currentComment) {
-        return json({ error: "Comment not found" }, { status: 404 });
-      }
-
-      console.log("🟡 Current likes:", currentComment.likes);
-
-      // For now, just increment (we'll add toggle logic later)
-      // TODO: Add user session tracking for proper toggle
       await writeClient
         .patch(commentId)
         .setIfMissing({ likes: 0 })
         .inc({ likes: 1 })
         .commit();
 
-      console.log("🟢 Like successfully added to comment:", commentId);
       return json({ success: true });
     } catch (error) {
-      console.log("🔴 ERROR liking comment:", error);
       return json({ error: "Failed to like comment" }, { status: 500 });
     }
   }
@@ -204,6 +218,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 /* ------------  section renderer  ------------ */
 function Section({ block }: { block: any }) {
+  // Create builder locally for component
+  const sanity = createClient({ 
+    projectId: "pzhistba", 
+    dataset: "production", 
+    apiVersion: "2023-12-01", 
+    useCdn: true 
+  });
+  const builder = imageUrlBuilder(sanity);
+
   switch (block._type) {
     case "heading":
       return block.style === "h2" ? (
@@ -226,9 +249,15 @@ function Section({ block }: { block: any }) {
 export default function BlogDetail() {
   const { post, latestPosts, categories, tags, comments } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const { revalidate } = useRevalidator(); // Add revalidator at route level
 
-  console.log("📊 Current comments data:", comments);
+  // Create builder locally for component
+  const sanity = createClient({ 
+    projectId: "pzhistba", 
+    dataset: "production", 
+    apiVersion: "2023-12-01", 
+    useCdn: true 
+  });
+  const builder = imageUrlBuilder(sanity);
 
   return (
     <main className="min-h-screen bg-white">
@@ -253,7 +282,7 @@ export default function BlogDetail() {
 
           {/* META BAR */}
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-            <span>{new Date(post.publishDate).toLocaleDateString()}</span>
+            <span>{formatDate(post.publishDate)}</span> {/* FIXED: Consistent date format */}
             <span>•</span>
             <span>{post.author}</span>
             <span>•</span>
@@ -292,11 +321,7 @@ export default function BlogDetail() {
             <h2 className="text-2xl font-semibold mb-4">Comments</h2>
             {actionData?.error && <p className="text-red-600 mb-4">{actionData.error}</p>}
             <CommentForm postId={post._id} />
-            <CommentThread 
-              comments={comments} 
-              postId={post._id} 
-              onRevalidate={revalidate} // Pass revalidate function to comments
-            />
+            <CommentThread comments={comments} postId={post._id} />
           </section>
         </article>
 
@@ -310,7 +335,7 @@ export default function BlogDetail() {
                   <Link to={`/blogs/${p.slug}`} className="hover:underline">
                     {p.title}
                   </Link>
-                  <div className="text-gray-500">{new Date(p.publishDate).toLocaleDateString()}</div>
+                  <div className="text-gray-500">{formatDate(p.publishDate)}</div> {/* FIXED: Consistent date format */}
                 </li>
               ))}
             </ul>

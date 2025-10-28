@@ -10,18 +10,13 @@ import {
 import type { MetaFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import groq from 'groq';
+import { createClient } from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 
 import NavigationBar from '~/components/NavigationBar';
 import Footer from '~/components/Footer';
 
 import tailwindStyles from '~/tailwind.css';
-
-// Import from the new server file
-import { sanity } from '~/sanity/write-client.server';
-
-// Create builder using the imported sanity client
-const builder = imageUrlBuilder(sanity);
 
 export const meta: MetaFunction = () => {
   return [
@@ -89,6 +84,20 @@ const fallbackFooterData = {
 };
 
 export const loader: LoaderFunction = async () => {
+  // Create Sanity clients INSIDE loader (server-only)
+  const projectId = "pzhistba";
+  const dataset = "production";
+  const apiVersion = "2023-12-01";
+
+  const sanity = createClient({ 
+    projectId, 
+    dataset, 
+    apiVersion, 
+    useCdn: true 
+  });
+
+  const builder = imageUrlBuilder(sanity);
+
   const footerDoc = await sanity.fetch(
     groq`*[_type == "siteSettings"][0]{
       logo,
