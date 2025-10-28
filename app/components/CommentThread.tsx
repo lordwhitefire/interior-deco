@@ -1,176 +1,135 @@
-import { useFetcher } from "@remix-run/react";
-import { useState } from "react";
-import type { SerializeFrom } from "@remix-run/node";
+// app/components/CommentThread.tsx
+// Renders one comment + its nested children.
+// Props: comment data, depth, like state, fetchers, and the new slug/user props.
+
+import * as React from "react";
+import { Form, useFetcher } from "@remix-run/react";
 import CommentForm from "./CommentForm";
 
 type Comment = {
   _id: string;
   name: string;
-  email: string;
-  website?: string;
   message: string;
   likes: number;
+  likedBy?: { sessionId: string }[];
   _createdAt: string;
-  parent?: { _id: string };
+  parent?: { _id: string } | null;
 };
 
-type CommentThreadProps = {
-  comments: Comment[];
-  postId: string;
-};
-
-export default function CommentThread({ comments, postId }: CommentThreadProps) {
-  // Group comments by parent to build thread structure
-  const commentMap = new Map<string, Comment[]>();
-  const rootComments: Comment[] = [];
-
-  comments.forEach(comment => {
-    if (comment.parent?._id) {
-      const parentId = comment.parent._id;
-      if (!commentMap.has(parentId)) {
-        commentMap.set(parentId, []);
-      }
-      commentMap.get(parentId)!.push(comment);
-    } else {
-      rootComments.push(comment);
-    }
-  });
-
-  const renderComments = (commentList: Comment[], depth = 0) => {
-    return commentList.map(comment => (
-      <CommentItem
-        key={comment._id}
-        comment={comment}
-        depth={depth}
-        postId={postId}
-        replies={commentMap.get(comment._id) || []}
-        renderComments={renderComments}
-      />
-    ));
-  };
-
-  if (comments.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        No comments yet. Be the first to comment!
-      </div>
-    );
-  }
-
-  return <div className="space-y-6">{renderComments(rootComments)}</div>;
-}
-
-type CommentItemProps = {
+type Props = {
   comment: Comment;
   depth: number;
+  liked: boolean;
+  likes: number;
+  likeFetcher: ReturnType<typeof useFetcher>;
+  commentFetcher: ReturnType<typeof useFetcher>;
   postId: string;
-  replies: Comment[];
-  renderComments: (comments: Comment[], depth: number) => JSX.Element[];
+  slug: string;
+  userName?: string;
+  userEmail?: string;
+  children?: React.ReactNode; // nested replies
 };
 
-function CommentItem({ comment, depth, postId, replies, renderComments }: CommentItemProps) {
-  const likeFetcher = useFetcher();
-  const [showReplyForm, setShowReplyForm] = useState(false);
-  const isLiking = likeFetcher.state === "submitting";
+export default function CommentThread({
+  comment,
+  depth,
+  liked,
+  likes,
+  likeFetcher,
+  commentFetcher,
+  postId,
+  slug,
+  userName,
+  userEmail,
+  children,
+}: Props) {
+  const [showReply, setShowReply] = React.useState(false);
 
-  const handleLike = () => {
-    if (!isLiking) {
-      likeFetcher.submit(
-        { 
-          _action: "likeComment", 
-          commentId: comment._id 
-        }, 
-        { method: "post" }
-      );
-    }
+  // Heart icon toggles like/unlike
+  const toggleLike = () => {
+    likeFetcher.submit(
+      { _action: "likeComment", commentId: comment._id },
+      { method: "post", action: `/blogs/${slug}`, replace: true }
+    );
   };
 
-  const handleCancelReply = () => {
-    setShowReplyForm(false);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  // Cap nesting depth for UI sanity
+  const tooDeep = depth >= 5;
 
   return (
-    <div 
-      className={`border-l-2 border-gray-200 pl-4 ${
-        depth > 0 ? 'ml-6' : ''
-      }`}
-      style={{ marginLeft: depth > 0 ? `${depth * 1.5}rem` : '0' }}
-    >
-      <div className="bg-white p-4 rounded-lg shadow-sm">
-        <div className="flex justify-between items-start mb-2">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-sm font-semibold text-gray-600">
-              {comment.name.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h4 className="font-semibold text-gray-900">{comment.name}</h4>
-              <p className="text-sm text-gray-500">
-                {formatDate(comment._createdAt)}
-              </p>
-            </div>
-          </div>
+    <div className={`${depth > 0 ? "ml-6 border-l-2 border-gray-200 pl-4 mt-4" : "mb-6"}`}>
+      <div className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-100">
+        {/* Author & date */}
+        <div className="flex items-center justify-between text-sm text-gray-600">
+          <span className="font-semibold text-gray-900">{comment.name}</span>
+          <time dateTime={comment._createdAt}>
+            {new Date(comment._createdAt).toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
+          </time>
         </div>
-        
-        <p className="text-gray-700 mb-4 whitespace-pre-wrap">{comment.message}</p>
-        
-        <div className="flex items-center space-x-4 text-sm">
+
+        {/* Message */}
+        <p className="mt-2 whitespace-pre-wrap text-gray-800">{comment.message}</p>
+
+        {/* Like + Reply buttons */}
+        <div className="mt-3 flex items-center gap-4">
           <button
-            onClick={handleLike}
-            disabled={isLiking}
-            className="flex items-center space-x-1 text-gray-500 hover:text-red-500 disabled:opacity-50 transition-colors"
+            type="button"
+            onClick={toggleLike}
+            disabled={likeFetcher.state !== "idle"}
+            className={`flex items-center gap-1 text-sm ${
+              liked ? "text-red-500" : "text-gray-500"
+            } hover:text-red-500 disabled:opacity-50`}
+            aria-pressed={liked}
           >
-            <svg 
-              className="w-4 h-4" 
-              fill={comment.likes > 0 ? "currentColor" : "none"} 
-              stroke="currentColor" 
+            <svg
+              className="h-5 w-5"
+              fill={liked ? "currentColor" : "none"}
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.5l1.318-1.182a4.5 4.5 0 116.364 6.364L12 20.25l-7.682-7.682a4.5 4.5 0 010-6.364z"
               />
             </svg>
-            <span>{comment.likes || 0}</span>
+            <span>{likes}</span>
           </button>
-          
-          <button
-            onClick={() => setShowReplyForm(!showReplyForm)}
-            className="text-gray-500 hover:text-blue-500 transition-colors"
-          >
-            {showReplyForm ? "Cancel Reply" : "Reply"}
-          </button>
-        </div>
 
-        {/* Reply Form */}
-        {showReplyForm && (
-          <div className="mt-4">
-            <CommentForm 
-              postId={postId} 
-              parentId={comment._id}
-              onCancelReply={handleCancelReply}
-            />
-          </div>
-        )}
+          {!tooDeep && (
+            <button
+              type="button"
+              onClick={() => setShowReply((s) => !s)}
+              className="text-sm text-indigo-600 hover:text-indigo-800"
+            >
+              Reply
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Nested Replies */}
-      {replies.length > 0 && (
+      {/* Reply form (hidden until clicked) */}
+      {showReply && (
         <div className="mt-4">
-          {renderComments(replies, depth + 1)}
+          <CommentForm
+            postId={postId}
+            slug={slug}
+            userName={userName}
+            userEmail={userEmail}
+            parentId={comment._id}
+            onCancelReply={() => setShowReply(false)}
+            fetcher={commentFetcher}
+          />
         </div>
       )}
+
+      {/* Nested replies */}
+      {children && <div className="mt-4">{children}</div>}
     </div>
   );
 }
