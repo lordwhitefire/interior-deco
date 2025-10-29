@@ -307,7 +307,7 @@ if (actionType === "likeComment") {
     
     groq`*[_type == "comment" && _id == $commentId][0]{
       _id,
-     "likedBy": likedBy[]->_ref 
+     "likedBy": coalesce(likedBy[]._ref, [])
     }`,
     { commentId }
   );
