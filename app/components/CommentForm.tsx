@@ -1,9 +1,15 @@
 // app/components/CommentForm.tsx
-// Receives slug + remembered name/email as plain props.
-// No useOutletContext.
-
 import { useEffect, useState } from "react";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, type FetcherWithComponents } from "@remix-run/react";
+
+type Comment = {
+  _id: string;
+  name: string;
+  message: string;
+  _createdAt: string;
+  likes: number;
+  parent?: { _id: string } | null;
+};
 
 type Props = {
   postId: string;
@@ -12,6 +18,8 @@ type Props = {
   userEmail?: string;
   parentId?: string | null;
   onCancelReply?: () => void;
+  onOptimisticAdd?: (comment: Partial<Comment>, parentId?: string) => void;
+  fetcher?: FetcherWithComponents<{ error?: string; newComment?: any }>;
 };
 
 export default function CommentForm({
@@ -21,30 +29,84 @@ export default function CommentForm({
   userEmail = "",
   parentId,
   onCancelReply,
+  onOptimisticAdd,
+  fetcher: propFetcher,
 }: Props) {
   const [remember, setRemember] = useState(false);
   const [initial, setInitial] = useState({ name: userName, email: userEmail, website: "" });
-  const fetcher = useFetcher();
+  const [savedValues, setSavedValues] = useState({ name: "", email: "", website: "" }); // ← NEW
+
+  const fetcher = propFetcher || useFetcher<{ error?: string; newComment?: any }>();
   const isSubmitting = fetcher.state !== "idle";
 
-  // Keep local state in sync with props (props win on mount)
+  // Sync props (auto-fill from cookie)
   useEffect(() => {
+    console.log("FORM: Received props → userName:", userName, "userEmail:", userEmail);
     setInitial({ name: userName, email: userEmail, website: "" });
   }, [userName, userEmail]);
 
+  // Handle success: reset + remember me
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data && !fetcher.data.error) {
-      // Success
       if (!parentId) {
-        // reset only top-level form
         const form = document.querySelector(
           `form[data-form-id="${parentId || "top"}"]`
         ) as HTMLFormElement | null;
         form?.reset();
       }
       onCancelReply?.();
+
+      // Save REAL values to cookie
+      if (remember && savedValues.name) {
+        const data = {
+          name: savedValues.name,
+          email: savedValues.email,
+          website: savedValues.website,
+        };
+        const encoded = encodeURIComponent(JSON.stringify(data));
+        const cookieStr = `commenter=${encoded}; max-age=31536000; path=/; SameSite=Strict`;
+        document.cookie = cookieStr;
+        console.log("FORM: Saved REAL values to cookie:", data);
+      }
+
+      setSavedValues({ name: "", email: "", website: "" }); // reset
     }
-  }, [fetcher.state, fetcher.data, onCancelReply, parentId]);
+  }, [fetcher.state, fetcher.data, onCancelReply, parentId, remember, savedValues]);
+
+  // Handle submit
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    const form = e.currentTarget;
+
+    // READ VALUES BEFORE SUBMIT (critical!)
+    const name = (form.elements.namedItem("name") as HTMLInputElement)?.value || "";
+    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value || "";
+    const website = (form.elements.namedItem("website") as HTMLInputElement)?.value || "";
+
+    // Save for success handler
+    setSavedValues({ name, email, website });
+
+    const formData = new FormData(form);
+    const message = formData.get("message") as string;
+
+    const fakeComment: Partial<Comment> = {
+      _id: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: name || "Anonymous",
+      message,
+      _createdAt: new Date().toISOString(),
+      likes: 0,
+      parent: parentId ? { _id: parentId } : null,
+    };
+
+    onOptimisticAdd?.(fakeComment, parentId || undefined);
+
+    fetcher.submit(formData, {
+      method: "post",
+      action: `/blogs/${slug}#comments`,
+    });
+  };
 
   return (
     <div className={parentId ? "ml-8 border-l-2 border-gray-200 pl-4 mt-4" : "mb-8"}>
@@ -66,6 +128,7 @@ export default function CommentForm({
         action={`/blogs/${slug}#comments`}
         data-form-id={parentId || "top"}
         className="space-y-4"
+        onSubmit={handleSubmit}
       >
         <input type="hidden" name="_action" value="createComment" />
         <input type="hidden" name="postId" value={postId} />

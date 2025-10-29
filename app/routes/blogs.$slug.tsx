@@ -1,14 +1,14 @@
 // app/routes/blogs.$slug.tsx
 // FULL, SINGLE FILE – server-only Sanity clients created INSIDE loader/action/meta.
 // Drop-in replacement for your old file.
+
 import * as React from "react";
 import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   useLoaderData,
   useActionData,
   Link,
-  Form,
   useFetcher,
   useRevalidator,
 } from "@remix-run/react";
@@ -19,6 +19,20 @@ import { nanoid } from "nanoid";
 import { getSession, commitSession } from "~/sessions";
 import CommentForm from "~/components/CommentForm";
 import CommentThread from "~/components/CommentThread";
+
+// -----------------------------------------------------------------------------
+// Cookie helper – read commenter cookie
+// -----------------------------------------------------------------------------
+function getCommenterCookie(request: Request) {
+  const cookieHeader = request.headers.get("Cookie");
+  const match = cookieHeader?.match(/commenter=([^;]+)/);
+  if (!match) return { name: "", email: "", website: "" };
+  try {
+    return JSON.parse(decodeURIComponent(match[1]));
+  } catch {
+    return { name: "", email: "", website: "" };
+  }
+}
 
 // -----------------------------------------------------------------------------
 // UTC date helper (safe for client)
@@ -39,7 +53,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     projectId: "pzhistba",
     dataset: "production",
     apiVersion: "2023-12-01",
-    useCdn: true,
+    useCdn: false,
   });
   const builder = imageUrlBuilder(sanity);
 
@@ -82,8 +96,8 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
         email,
         website,
         message,
-        likes,
-        likedBy,
+        "likes": count(likedBy),  
+       "likedBy": likedBy[]._ref,
         _createdAt,
         parent->{_id}
       }`,
@@ -91,18 +105,56 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     ),
   ]);
 
-  // Build visitor-specific like-state via session
+  // Session for likes
   const session = await getSession(request.headers.get("Cookie"));
-  const sessionId = session.get("sid");
-  const likedSet = new Set<string>();
-  if (sessionId) {
-    comments.forEach((c: any) => {
-      if (c.likedBy?.some((x: any) => x.sessionId === sessionId)) likedSet.add(c._id);
-    });
+  let sessionId = session.get("sid");
+  if (!sessionId) {
+    sessionId = nanoid(32);
+    session.set("sid", sessionId);
   }
 
+  const likedSet = new Set<string>();
+
+  // ────── DEBUG LOADER LIKES ──────
+  console.log("=== LOADER DEBUG ===");
+  console.log("sessionId:", sessionId);
+  console.log("Total comments:", comments.length);
+
+  comments.forEach((c: any) => {
+    console.log(`Comment ${c._id}:`);
+    console.log("  - likedBy array:", c.likedBy);
+    console.log("  - looking for session:", `session-${sessionId}`);
+    
+  const isLiked = Array.isArray(c.likedBy) && 
+  c.likedBy.some((ref: string) => ref === `session-${sessionId}`);
+    
+    console.log("  - isLiked:", isLiked);
+    
+    if (isLiked) {
+      likedSet.add(c._id);
+      console.log("  - ✅ ADDED TO LIKED SET");
+    }
+  });
+
+  console.log("Final likedIds:", Array.from(likedSet));
+  console.log("=== END LOADER DEBUG ===");
+
+  // Read commenter cookie
+  const commenter = getCommenterCookie(request);
+  console.log("LOADER: Raw cookie header:", request.headers.get("Cookie"));
+  console.log("LOADER: Parsed commenter:", commenter);
+
   return json(
-    { post, latestPosts, categories, tags, comments, likedSet },
+    {
+      post,
+      latestPosts,
+      categories,
+      tags,
+      comments,
+      likedIds: Array.from(likedSet),
+      userName: commenter.name || "",
+      userEmail: commenter.email || "",
+    },
     { headers: { "Set-Cookie": await commitSession(session) } }
   );
 }
@@ -117,7 +169,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     projectId: "pzhistba",
     dataset: "production",
     apiVersion: "2023-12-01",
-    useCdn: true,
+    useCdn: false,
   });
   const builder = imageUrlBuilder(sanity);
   const ogImage = post.ogImage ? builder.image(post.ogImage).width(1200).height(630).url() : null;
@@ -142,7 +194,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 // -----------------------------------------------------------------------------
 type RateEntry = { likes: number; comments: number; resetAt: number };
 const rateMap = new Map<string, RateEntry>();
-const RATE_WINDOW = 60_000; // 1 min
+const RATE_WINDOW = 60_000;
 const RATE_LIMIT = { likes: 5, comments: 3 };
 
 function checkLimit(key: string, type: "likes" | "comments"): boolean {
@@ -167,7 +219,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const form = await request.formData();
   const actionType = form.get("_action");
 
-  // Session
   const session = await getSession(request.headers.get("Cookie"));
   let sessionId = session.get("sid");
   if (!sessionId) {
@@ -175,17 +226,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
     session.set("sid", sessionId);
   }
 
-  // Rate limit
   if (!checkLimit(sessionId, actionType === "likeComment" ? "likes" : "comments")) {
     return json({ error: "Rate limit exceeded" }, { status: 429 });
   }
 
-  // Post must exist
   const readClient = createClient({
     projectId: "pzhistba",
     dataset: "production",
     apiVersion: "2023-12-01",
-    useCdn: true,
+    useCdn: false,
+    token: process.env.SANITY_API_WRITE_TOKEN!,  // ADD TOKEN FOR CONSISTENT READS
   });
   const post = await readClient.fetch(
     groq`*[_type == "blogDetail" && slug.current == $slug][0]{ _id }`,
@@ -201,7 +251,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
     token: process.env.SANITY_API_WRITE_TOKEN!,
   });
 
-  // --------- CREATE COMMENT ---------
   if (actionType === "createComment") {
     const name = (form.get("name") as string)?.trim();
     const email = (form.get("email") as string)?.trim();
@@ -218,56 +267,143 @@ export async function action({ request, params }: ActionFunctionArgs) {
       name,
       email,
       message,
-      likes: 0,
-      likedBy: [],
+      likedBy: [], // ← likes field removed
       approved: true,
     });
 
     return json(
-      { success: true, comment: { _id: newDoc._id, _createdAt: newDoc._createdAt } },
+      {
+        success: true,
+        newComment: {
+          _id: newDoc._id,
+          name,
+          email,
+          message,
+          likes: 0,
+          likedBy: [],
+          _createdAt: newDoc._createdAt,
+          parent: parentId ? { _id: parentId } : null,
+        },
+      },
       { headers: { "Set-Cookie": await commitSession(session) } }
     );
   }
 
-  // --------- LIKE / UNLIKE ---------
-  if (actionType === "likeComment") {
-    const commentId = form.get("commentId") as string;
-    if (!commentId) return json({ error: "Missing commentId" }, { status: 400 });
+if (actionType === "likeComment") {
+  const commentId = form.get("commentId") as string;
+  if (!commentId) return json({ error: "Missing commentId" }, { status: 400 });
 
-    const comment = await readClient.getDocument(commentId);
-    if (!comment) return json({ error: "Comment not found" }, { status: 404 });
+  // Ensure session document exists FIRST
+  const sessionDocId = `session-${sessionId}`;
+  await writeClient.createIfNotExists({
+    _id: sessionDocId,
+    _type: "session",
+    sessionId,
+  });
 
-    const alreadyLiked = comment.likedBy?.some((x: any) => x.sessionId === sessionId);
+  // USE SAME QUERY AS LOADER - fetch with expanded references
+// USE SAME QUERY AS LOADER - fetch with expanded references
+  const comment = await readClient.fetch(
+    
+    groq`*[_type == "comment" && _id == $commentId][0]{
+      _id,
+     "likedBy": likedBy[]->_ref 
+    }`,
+    { commentId }
+  );
+  if (!comment) return json({ error: "Comment not found" }, { status: 404 });
+  // ────── FIX: Normalize likedBy safely ──────
+if (!Array.isArray(comment.likedBy)) {
+  comment.likedBy = [];
+} else {
+  comment.likedBy = comment.likedBy.filter((id: string) => typeof id === "string" && id);
+}
 
-    if (alreadyLiked) {
-      await writeClient
-        .patch(commentId)
-        .unset([`likedBy[sessionId=="${sessionId}"]`])
-        .dec({ likes: 1 })
-        .commit();
-      return json(
-        { success: true, likes: comment.likes - 1, liked: false },
-        { headers: { "Set-Cookie": await commitSession(session) } }
-      );
-    } else {
-      await writeClient
-        .patch(commentId)
-        .setIfMissing({ likedBy: [] })
-        .append("likedBy", [{ sessionId }])
-        .inc({ likes: 1 })
-        .commit();
-      return json(
-        { success: true, likes: (comment.likes || 0) + 1, liked: true },
-        { headers: { "Set-Cookie": await commitSession(session) } }
-      );
-    }
+console.log("Normalized likedBy:", comment.likedBy);
+
+  // ────── DEBUG LOGS ──────
+  console.log("=== ACTION LIKE DEBUG ===");
+  console.log("sessionId:", sessionId);
+  console.log("sessionDocId:", sessionDocId);
+  console.log("commentId:", commentId);
+  console.log("comment.likedBy:", comment.likedBy); // ← FIXED: Use comment, not freshComment
+  console.log("comment.likedBy type:", typeof comment.likedBy?.[0]);
+
+  // NOW CHECK USING EXPANDED REFERENCES (strings instead of objects)
+  const alreadyLiked = Array.isArray(comment.likedBy) && 
+    comment.likedBy.some((ref: string) => ref === sessionDocId); // ← FIXED: Use comment, not freshComment
+
+  console.log("alreadyLiked:", alreadyLiked);
+
+  if (alreadyLiked) {
+    // UNLIKE - remove session reference
+     console.log("🧹 Unliking comment...");
+   // Remove ALL references that match this sessionDocId
+  await writeClient
+    .patch(commentId)
+    .unset([`likedBy[@._ref == "${sessionDocId}"]`])
+    .commit({ autoGenerateArrayKeys: true });
+    
+     // Re-fetch fresh copy to confirm it was removed
+  const updated = await readClient.fetch(
+    groq`*[_type == "comment" && _id == $commentId][0]{ "likedBy": likedBy[]->_ref }`,
+    { commentId }
+  );
+
+     const newLikes = Array.isArray(updated.likedBy) ? updated.likedBy.length : 0;
+     console.log("🧹 After unlike, likedBy:", updated.likedBy);
+
+    return json(
+    { success: true, likes: newLikes, liked: false },
+    { headers: { "Set-Cookie": await commitSession(session) } }
+  );
+} else {
+  // LIKE - add session reference, but check for duplicates first
+  const commentWithDupCheck = await readClient.fetch(
+    groq`*[_type == "comment" && _id == $commentId][0]{
+      _id,
+      "likedBy": likedBy[]->_ref
+    }`,
+    { commentId }
+  );
+
+  // Check if already exists (prevent duplicates)
+  const alreadyExists = Array.isArray(commentWithDupCheck.likedBy) && 
+    commentWithDupCheck.likedBy.includes(sessionDocId);
+
+  if (!alreadyExists) {
+    await writeClient
+      .patch(commentId)
+      .setIfMissing({ likedBy: [] })
+      .unset([`likedBy[_ref == "${sessionDocId}"]`])
+      .append("likedBy", [{ 
+        _ref: sessionDocId,
+        _key: `${sessionDocId}-${Date.now()}`
+      }])
+      .commit();
   }
+
+  // Get updated comment
+  const updated = await readClient.fetch(
+    groq`*[_type == "comment" && _id == $commentId][0]{
+      "likedBy": likedBy[]->_ref
+    }`,
+    { commentId }
+  );
+  const newLikes = Array.isArray(updated.likedBy) ? updated.likedBy.length : 0;
+
+  return json(
+    { success: true, likes: newLikes, liked: true },
+    { headers: { "Set-Cookie": await commitSession(session) } }
+  );
+}
+}
 
   return json({ error: "Unknown action" }, { status: 400 });
 }
 
 // -----------------------------------------------------------------------------
-// Section renderer (safe for client)
+// Section renderer
 // -----------------------------------------------------------------------------
 function Section({ block }: { block: any }) {
   const sanity = createClient({
@@ -313,48 +449,113 @@ function Section({ block }: { block: any }) {
 // Page component
 // -----------------------------------------------------------------------------
 export default function BlogDetail() {
-  const { post, latestPosts, categories, tags, comments, likedSet } = useLoaderData<typeof loader>();
+  const {
+    post,
+    latestPosts,
+    categories,
+    tags,
+    comments,
+    likedIds,
+    userName,
+    userEmail,
+  } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
-  // Revalidate after mutations
+    // ────── DEBUG CLIENT LIKES ──────
+  React.useEffect(() => {
+    console.log("=== CLIENT DEBUG ===");
+    console.log("likedIds from loader:", likedIds);
+    console.log("comments count:", comments.length);
+    comments.forEach((c: any) => {
+      console.log(`Comment ${c._id}: likes=${c.likes}, likedBy=`, c.likedBy);
+    });
+    console.log("=== END CLIENT DEBUG ===");
+  }, [comments, likedIds]);
+  
   const revalidator = useRevalidator();
   const likeFetcher = useFetcher();
   const commentFetcher = useFetcher();
+  
+  const [optimisticComments, setOptimisticComments] = React.useState(comments);
 
   React.useEffect(() => {
-    if (likeFetcher.state === "idle" && likeFetcher.data?.success && revalidator.state === "idle")
+    setOptimisticComments(comments);
+  }, [comments]);
+
+  const handleOptimisticAdd = (fakeComment: any, parentId?: string) => {
+    setOptimisticComments((prev: any[]) => {
+      const newComment = {
+        ...fakeComment,
+        replies: [],
+        parent: parentId ? { _id: parentId } : null,
+      };
+      if (!parentId) return [...prev, newComment];
+      return prev.map((c: any) =>
+        c._id === parentId
+          ? { ...c, replies: [...(c.replies || []), newComment] }
+          : c
+      );
+    });
+  };
+
+  React.useEffect(() => {
+    if (likeFetcher.state === "idle" && likeFetcher.data?.success && revalidator.state === "idle") {
       revalidator.revalidate();
+    }
   }, [likeFetcher.state, likeFetcher.data, revalidator]);
 
   React.useEffect(() => {
-    if (commentFetcher.state === "idle" && commentFetcher.data?.success && revalidator.state === "idle")
-      revalidator.revalidate();
+    if (
+      commentFetcher.state === "idle" &&
+      commentFetcher.data?.success &&
+      commentFetcher.data.newComment
+    ) {
+      const real = commentFetcher.data.newComment;
+
+      setOptimisticComments((prev) =>
+        prev.map((c) => {
+          const isTemp = c._id.startsWith("temp-");
+          const matchMessage = c.message === real.message;
+          const matchName = c.name === real.name;
+          const matchTime = Math.abs(new Date(c._createdAt).getTime() - new Date(real._createdAt).getTime()) < 5000;
+          const matchParent = (c.parent?._id || null) === (real.parent?._id || null);
+
+          if (isTemp && matchMessage && matchName && matchTime && matchParent) {
+            return real;
+          }
+          return c;
+        })
+      );
+
+      if (revalidator.state === "idle") revalidator.revalidate();
+    }
   }, [commentFetcher.state, commentFetcher.data, revalidator]);
 
-  // Build tree from flat comments
-  const map = new Map<string, typeof comments>();
-  comments.forEach((c: any) => map.set(c._id, []));
-  const roots: typeof comments = [];
-  comments.forEach((c: any) => {
+  const map = new Map<string, typeof optimisticComments>();
+  optimisticComments.forEach((c: any) => map.set(c._id, []));
+  const roots: typeof optimisticComments = [];
+  optimisticComments.forEach((c: any) => {
     const parentId = c.parent?._id;
     if (parentId && map.has(parentId)) map.get(parentId)!.push(c);
     else roots.push(c);
   });
 
-  const renderTree = (nodes: typeof comments, depth = 0) =>
+  const renderTree = (nodes: typeof optimisticComments, depth = 0) =>
     nodes.map((node: any) => (
       <CommentThread
         key={node._id}
         comment={node}
         depth={depth}
-        liked={likedSet.has(node._id)}
+        liked={likedIds.includes(node._id)}
         likes={node.likes}
         likeFetcher={likeFetcher}
         commentFetcher={commentFetcher}
         postId={post._id}
-        slug={post.slug} 
-        userName="" 
-        userEmail=""
+        slug={post.slug}
+        userName={userName}
+        userEmail={userEmail}
+        allComments={optimisticComments}
+        onOptimisticAdd={handleOptimisticAdd}
       >
         {map.has(node._id) && renderTree(map.get(node._id)!, depth + 1)}
       </CommentThread>
@@ -380,7 +581,6 @@ export default function BlogDetail() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-3 gap-10">
-        {/* Main content */}
         <article className="md:col-span-2 space-y-6">
           <img
             src={builder.image(post.coverImage).width(800).url()}
@@ -422,16 +622,23 @@ export default function BlogDetail() {
             ))}
           </div>
 
-          {/* Comments area */}
           <section id="comments" className="pt-12">
             <h2 className="text-2xl font-semibold mb-4">Comments</h2>
             {actionData?.error && <p className="text-red-600 mb-4">{actionData.error}</p>}
-           <CommentForm postId={post._id} slug={post.slug} userName="" userEmail="" fetcher={commentFetcher} />
+            
+            <CommentForm
+              fetcher={commentFetcher}
+              postId={post._id}
+              slug={post.slug}
+              userName={userName}
+              userEmail={userEmail}
+              onOptimisticAdd={handleOptimisticAdd}
+            />
+            
             <div className="mt-6 space-y-4">{renderTree(roots)}</div>
           </section>
         </article>
 
-        {/* Sidebar */}
         <aside className="space-y-10">
           <div>
             <h3 className="font-semibold mb-3">Latest Posts</h3>
