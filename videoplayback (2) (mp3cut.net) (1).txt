@@ -1,0 +1,195 @@
+(Transcribed by TurboScribe.ai. Go Unlimited to remove this message.)
+
+We can leverage that to create privacy for Charms transactions and by extension also for BTC transactions. And this can happen on the Bitcoin chain. And so by combining that with the programmability that our system provides, it will be possible to allow for fast, cheap, and private transactions without any third party.
+
+And in fact, even integrate that so that you can also have private DeFi. I think this is important for everyone. But we also know that it's particularly important for institutions.
+
+Institutions are particularly wary of anyone being able to see what they're trading, to copy their trades, to counter trade them. And that has been one of the main reasons that centralized exchanges and in particular things like futures trading have mostly not migrated with the same volumes into DeFi. And so much of the trade volume still remains on centralized exchanges.
+
+It's because when you deposit into a centralized exchange, only the centralized exchange knows what you're doing. It's not visible on chain. And so if we want to be able to bring privacy to everyone and confidential transactions that are acquired by institutions and therefore institutional activity into DeFi, we're going to have to build privacy in as a basic substrate.
+
+And so I think one of the most important things that BOSS is going to be able to do is to bring privacy to Bitcoin, privacy to token transactions, privacy to stable coin transactions, and privacy to DeFi. Thank you, Iago. This next question was a copy of another question.
+
+Guys, please do not copy other people's questions. I don't understand why you guys do this. You're not only cheating yourself, but you're also losing out on like a lot of XP here.
+
+So please refrain from doing that. Christoph asked, how long will it take to get to level three on Discord? It would literally take you like 10 minutes, probably with organic conversation. Next question, indulgent, Gboss fam.
+
+So my question is for those who build on BOSS. What token will their gas fees be charged in with regards to payment for services? And is it possible to see a feature like gas abstraction on BOSS if it doesn't exist already? Gas abstraction is built into BOSS as a fundamental layer. So long as a token is recognized by any operator as valuable enough that they will take payment in it, then you can pay in that asset.
+
+And if not, then you will default to either BOSS token or BTC. At the end of the day, it doesn't matter. And because the way the system is designed is all revenues are translated into BTC.
+
+And then that BTC, we will in the future turn on the buy and burn switch. And the buy and burn switch will basically take all of that BTC, which is connected, and start burning BOSS token on an ongoing basis. Basically, there will be an auction.
+
+People will be able to take their BOSS token and acquire BTC for their BOSS token. And on the other side of that, the protocol will be buying these BOSS tokens and burning them, turning BOSS into a deflationary asset. So you can think of it as a giant and ongoing BOSS buyback.
+
+This kind of token abstraction is incredibly important. First of all, it is where the industry is heading. Second, if you want to have really great, smooth, and easy UI, you don't want people to have to have another asset to transact in whatever asset they're transacting in.
+
+You don't want people to have to even think about it or know about that. And finally, we want to translate everything back into BTC. So the system will be doing two things.
+
+On an ongoing basis, it will be converting assets into BTC. So it will be buying BTC on an ongoing basis. And then it will be using that BTC to buy and burn BOSS.
+
+Thank you, Iago. All right, I'm doing another roll call before this next question. Guys, I need you to hit those reactions.
+
+Once more, we're going to give out another 200 engage points. Start throwing out those reactions. Like I said, giving you guys 30 seconds here.
+
+You guys want that PS5? It's time to hit the hearts. Let's go. Let's see.
+
+They're coming. All right, they're coming. 30 seconds, guys.
+
+Let's go. 29, 28. Let's go.
+
+Come on, Bitcoin BOSS. Throw those hearts out. I don't see you.
+
+On chain. John, let's go. Come on, guys.
+
+Throw those hearts out. Look, even Iago's doing it. Even Iago's doing it.
+
+Come on. Let's go. Solo, Cointree.
+
+I don't see it. Luxi, let's go. Where's the hearts? All right, 15 seconds, guys.
+
+15 seconds. I just went to PS5. Iago's actually going to be the winner of the PS5.
+
+Come on, guys. Throw those hearts out. Let's go.
+
+10 more seconds. 9, 8, 7, 6, 5, 4, 3, 2, 1. Good job, guys. I told you there's going to be opportunities.
+
+Some of you are complaining. You're like, 10K is going to be too hard to reach. But there will be opportunities, my friends.
+
+You guys just have to stay consistent. Thank you. All right.
+
+Next question from Jimmy Shaker. Also a sovereign OG, by the way, Iago. Question for Iago.
+
+How would you pitch BOSS to an individual who owns some Bitcoin but isn't involved in crypto otherwise? It's a pretty good question. I would pitch them. I mean, I would probably just start by asking them why they're in Bitcoin and what they're planning to do with their Bitcoin.
+
+Because I think that really matters. And then try and figure out like how BOS can help them achieve their personal goals. But because I don't know who we're talking to, I'll give a more generic answer, which I think is still valid.
+
+And really, it sort of is based on why I'm building BOS and what I want out of it, which is I want to be able to hold my Bitcoin for as long as I want, basically to be able to hold my Bitcoin forever. I want my kids to be able to inherit my Bitcoin. I want their kids to be able to inherit the Bitcoin.
+
+I think of Bitcoin like a house, right? So a house provides you with shelter, Bitcoin provides you with financial shelter and financial freedom. And if you want to be able to hold your Bitcoin forever, you want two things. You want to A, be able to borrow against it so that you don't have to sell it when you want to spend.
+
+People have real needs. At some point, everyone's going to have the need to utilize their capital. And if the only way that you can do that is by selling Bitcoin, then A, you will never have that Bitcoin again.
+
+And B, you're also creating self-pressure. So collectively, we're all creating self-pressure. So if you can borrow against your Bitcoin without having to hand it over to someone else or take the risk that someone will steal your Bitcoin, that is a huge unlock for your personal wealth and freedom, right? And that is the primary way in which wealthy individuals sort of manage their finances.
+
+They don't sell their assets, they borrow against their assets. And then even better, if your BTC can generate some yield for you, even if it's not a huge amount of yield, as Bitcoin appreciates, that can become a very, very significant stream of income. So the way I imagine my own sort of life is if I choose, I could hold on to my Bitcoin, borrow against it to generate some yield with it, and I could choose never to work again.
+
+And I think that is effectively an option which is open to everyone, right? I've been holding Bitcoin for 15 years to get to this point. I think anyone, even if they just buy it tomorrow and hold for 15 years, will be able to be in that position as well. And so my ultimate goal here is for myself and for everyone else to have a means of owning part of the value creation by humanity, right? You go, you work, you invest, you build something for humanity, you create some value for humanity, you contribute, and then you're given in return, you're paid in return, if you convert that into Bitcoin, that becomes a permanent ownership over a slice of humanity's collective sort of memory of who owns what, because that's ultimately what Bitcoin is.
+
+It's humanity's collective memory of who owns what. And then you can live off of that for the rest of your life, and maybe for the lives of your children and grandchildren. And because we're early enough in the Bitcoin journey that there's still a huge amount of appreciation to happen, and because the world is increasingly becoming very, very productive, and I think AI is only going to increase it, this is how you have a stake in the future wealth created by humanity and all of humanity's creations, including AI.
+
+So I know I got very, very philosophical, but ultimately, while that sounds very philosophical, it's actually a very, very practical thing, right? This is, it only sounds philosophical. This is literally the way that everyone stakes a claim to their little slice of contribution to humanity, and then can live off that forever. Are you bullish on bots now, guys? Are you bullish on Bitcoin now? That was amazing, Iago.
+
+That was amazing, and I really like the analogy you did there with Bitcoin being kind of like your financial house. Next question, which is a really good question. Lord Whitefire asked, did the institutions you met at Token 2049 share any thoughts that might shape how BOSS grows, like with tokenized energy or other real-world uses? Yes, not tokenized energy.
+
+I can tell you most of the people in the financial space are thinking quite practically about what they want to do over the next six months, the next year, the next two years. The big opportunity that they see right now is that there's this multi-trillion dollar pool of assets, which is constantly growing. People are sitting on these assets and not doing anything with them.
+
+They say to themselves, look, these are people who are going to want to diversify. These are people who are going to want to think about how they manage their wealth, and I want to be able to build a product where I can attract some of this wealth, and maybe make some fees off of that. That's basically the entire business model of the financial industry.
+
+So what they want to do in the near term is they want to bring financial assets like index funds, like fund management, like stocks and shares, like fractionalized ownership of art, basically all of the sort of real world asset classes that you probably already know about, and just make them available to the holders of trillions of dollars of wealth. Because if you can launch a fund, or if you can launch an index, or if you can issue shares and sell only to a very, very tiny little part of that trillions, right, even if you just attract $200, $300 million, which is nothing in an ocean of trillions, that's a huge success, a huge, huge win, obviously, for any financial service provider. So that's what they're trying to do.
+
+Thanks, Iago. Next question. What are the new ideas learned during the tour? And if there are, how is it going to be incubated in the setup of BOSS? I'm going to skip that question.
+
+Secondly, it seems there has been a halt in Charms Bro mining. Can we have an update on that? I don't know. Yeah.
+
+I can provide a little bit of an update. So the highest rewards to mining of Bro were at the beginning. And so there was obviously a big frenzy around mining Bro in the first epoch, the first halving.
+
+And then we've seen a decrease in Bro mining with every halving since. I think this was expected. This was like a launch of a product, it was designed by the Charms Inc team to test out the system, to show it's working, to generate some enthusiasm and to sort of introduce the first sort of token and meme coin into this ecosystem.
+
+It was a huge success with a lot of activity. And there are some diehard miners who are continuing to mine more than we expected. But it was anticipated that the vast majority of enthusiasm and excitement would be early on.
+
+We're also going to have a community call and or AMA, just kind of like an X-base with the Charms Inc team next week sometime. So if you guys do have questions for that call, please do drop them in the AMA questions channel as well. All right, let me see here.
+
+Elsa already asked a question. So unfortunately, I'm going to skip you, my friend. Next question here.
+
+What steps are the team taking to ensure Boss maintains strong visibility and liquidity once it's listed on CoinMarketCap? Our primary strategy around this is to make sure that we continue to deliver exciting new components of the system and the product. Continue to let people know that that's what we're doing. Make sure that we continue to get really great press and social media attention.
+
+And then at the same time, we also leverage this to see, you know, continued volumes, more launches. And also, as we're engaging the more institutional clients, we expect probably that some of them are going to want to take positions in Boss as well. So. 
+
+I think the you know, you can come up with lots of fancy answers to this question, but fundamentally, the answer is we need to continue to do great work in terms of building technology, in terms of building and launching product and in terms of making sure that we have a really great community and marketing team that can let the world know that we're doing that. Great answer, Iago. And I did want to ask, what are you looking like on time right now? We can keep going till the hour.
+
+OK, awesome. On Chain, John on Chain asked, for the Boss token, what specific advantages like bonuses, vesting schedules or exclusive access do pre-sale participants get over those buying post TGE? You get early access. This is probably the biggest and most significant advantage.
+
+I don't think that there's. I think that was the purpose of the pre-sale is to give early access. That's why we have a pre-sale.
+
+We will. We are planning on introducing staking. When that becomes available, that will be built into the UI for claiming.
+
+And so it will be an easy and easy, hopefully one click experience. And so you'll have like better UI and reduced frictions. But I think fundamentally, the pre-sale was about giving early access.
+
+Awesome. Thanks, Iago. Luis, I'm going to circle back to your question, my friend, because Iago is kind of like limited on time here.
+
+Let me see here. So Solo said. Are there any updates on partnerships with projects like Arbitrum, Merlin Chain or Mode and how they enhance Boss utility? I don't think there are any recent updates.
+
+The work continues. There is work that we're doing in order to make it possible for these systems to roll up to Bitcoin. We are planning to roll out, but that's not going to happen over the next few weeks, certainly, because right now all of our focus is around the TGE and system initialization. 
+
+Thanks, Iago. Next question. The system will allow for gas payments in both Boss and BTC.
+
+Will there be a fee discount or incentive structure offered to encourage users to pay fees entirely in Boss? Possibly, yes. Currently, no. Why not? Because we need to observe the way people are using the system.
+
+And then with things like that, we can experiment with them. Basically, you would do that because it makes economic sense for the system and drives demand. But you can't test those things and see if they actually, you know, create the impact and the effect that you have until the system is live and people are using the token and you have the volumes to allow you to build statistically significant tests.
+
+So we're going to start very, very plain, vanilla and simple. And then we can introduce experiments where we can, on a data driven basis, make decisions about what is the best way to sort of economically enhance the system. Thank you, Iago.
+
+Guys, I'm skipping a couple of your questions, but I'm going to circle back. Just like I said, I'm just trying to be mindful of Iago's time here. And those are questions I can answer.
+
+So Bitcoin Boss asked, will BOS be partners with Midnight on Cardano? Interesting question. We expect that BOS and Midnight will be integrated. Initially, that integration will be through Cardano, but later there may be a more direct integration.
+
+It's very hard to say exactly how that will look right now, because Midnight itself hasn't launched and is only planning to launch towards the end of the year. And so we're not entirely sure what that would look like. So early on, the integration will be via Cardano.
+
+Thanks, Iago. And last question here. Alexa asked, BOS already has some strong collabs with Sovereign, Cardano, Litecoin and others.
+
+Are there plans to partner with even more projects or chains soon? Yes, our goal is to partner with everyone and integrate everything into BOS and everything into Bitcoin. But right now, you've probably seen a slowdown in the sort of announcements around this. And that's because for us, the primary priority right now is to make sure that we roll out all of the stuff that we've already announced.
+
+We have all of these integrations properly in place before taking on a huge amount of new work. So right now, our focus is on rolling out the system, initializing, getting all of those integrations properly working. That will be the big focus in the near term.
+
+And then we will expand from there again. Awesome. Thank you so much, Iago.
+
+I guess that's all the questions that we have for you now. Like I said, guys, as soon as the announcement goes out that there's a community call, please get those questions out as soon as possible, because it's kind of a first come, first serve basis. But I will do my best to answer some of your questions now.
+
+Iago, thank you so much for joining us. Thank you for arranging this. And thanks, everyone, for joining.
+
+Of course. Thank you. Yeah, we look forward to having you on another call next week.
+
+Thanks very much, guys. I look forward to it. Take care, Iago.
+
+Thanks. All right, guys. So I'm going to do my best to answer some of your questions here.
+
+So, Louise, hello, Louise. You asked, what were the biggest takeaways from the events in Korea and Singapore? So we actually, our last community call, both Iago and I kind of dived into what that looked like. But I can just give you guys like a quick TLDR recap of that.
+
+So I obviously went over there to kind of like, you know, build a community from the ground, really connect with the Korean community there. I believe there was about 17,000 people that actually showed up to KBW, which was interesting. It's like it's most definitely an up and coming market out there, from my understanding.
+
+And there's a lot of institutions and businesses being established as a result of that as well. In terms of Bitcoin, there was a lot of enthusiasm around Bitcoin specifically. We were actually sponsoring a night called Bitcoin Night, where there was quite a few different like Bitcoin projects that showed up to that event.
+
+And I can't even begin to tell you the turnout. It was it actually blew my mind. There were so many people there, so many people there.
+
+And people were coming up to me and they were talking about how, you know, Bitcoin is obviously sound money. It's hard money. In Korea specifically, they trust Bitcoin more than any other cryptocurrency out there at the moment.
+
+And that it's just becoming more widely accepted by the Korean community. And they were specifically interested in programmability, as we all are, which is interesting. Obviously, like there weren't any like diehard Bitcoin maxis, you know, because it's kind of like an up and coming market.
+
+But it was interesting to obviously see that, you know, they're also interested in seeing, you know, Bitcoin evolved to just being more than this store of value. Right. So that was cool.
+
+And then I guess that was kind of like the takeaways for me. Let me see here if I have anything else written. Yeah, I mean, if you're interested, I put out daily vlogs for about like six or seven days.
+
+Just go back onto my profile and you can find all those videos if you're interested in watching. I know that the community definitely enjoyed that. And then you had one other question.
+
+I'm going to try to get through that real quick. I asked for Singapore. I can't really dive into that too much because I wasn't there.
+
+But from my understanding, the team met with quite a few institutions, which is obviously fantastic for us because a lot of our products at the moment are catered towards institutions. Right. We're trying to kind of eliminate counterparty risk so that they can actually like do more with their Bitcoin without giving up control.
+
+And that ties into the Grail Pro here. So you asked, how does the Grail Pro differentiate itself from existing Bitcoin programmability solutions? So the Grail Pro is it's a protocol, also technically a bridge in a sense, but we're definitely calling it a protocol here. And it is catered towards institutions so that they can essentially put their Bitcoin to work, right, get yield, borrow, borrowing, lending.
+
+They can actually use their Bitcoin for Bitcoin DeFi while maintaining control of their Bitcoin. Because the way that it works in this current moment, guys, is that if you want to put your Bitcoin to work, you have to trust somebody else with your Bitcoin, which nobody wants to do. Nobody wants to do. 
+
+Right. Because like what typically happens, right, is your Bitcoin sits in a vault that's governed by custodians or institutions. It's governed by actual people that have access to the keys of that vault.
+
+Right. So you end up there's counterparty risk involved. You end up giving up ownership.
+
+Institutions specifically do not want to do that. And so there hasn't been this method for them to safely be able to like put their Bitcoin to work. And we know that people want to put their Bitcoin to work, because if you look at wrapped Bitcoin, there is billions and billions and billions of dollars sitting in wrapped Bitcoin today, which is a clear evidence and reflection of the fact that people want to do more with their Bitcoin.
+
+So that's kind of how it differentiates from existing programmability solutions. And then obviously, ZKBTC is Bitcoin, literally backed one to one with Bitcoin, but it's programmable and it's chain agnostic, which means that it can initially live on any UTXO chain. Right. 
+
+It can live on Bitcoin. It can live on Cardano. It can live on Litecoin, hopefully in the future, Doge and Monero, so on and so forth.
+
+And then we're building a adapter.
+
+(Transcribed by TurboScribe.ai. Go Unlimited to remove this message.)
