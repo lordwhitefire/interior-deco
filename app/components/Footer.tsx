@@ -28,7 +28,7 @@ const fallbackFooter: FooterData = {
         { label: 'Our Team',      url: '/team' },
         { label: 'FAQ',           url: '/faq' },
         { label: 'Testimonials',  url: '/testimonials' },
-        { label: 'Projects',      url: '/projects' },
+        { label: 'Projects',      url: '/project' },
         { label: 'Blog',          url: '/blog' }
       ]
     },

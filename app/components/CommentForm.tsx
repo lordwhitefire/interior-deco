@@ -34,44 +34,22 @@ export default function CommentForm({
 }: Props) {
   const [remember, setRemember] = useState(false);
   const [initial, setInitial] = useState({ name: userName, email: userEmail, website: "" });
-  const [savedValues, setSavedValues] = useState({ name: "", email: "", website: "" }); // ← NEW
 
   const fetcher = propFetcher || useFetcher<{ error?: string; newComment?: any }>();
   const isSubmitting = fetcher.state !== "idle";
 
   // Sync props (auto-fill from cookie)
   useEffect(() => {
-    console.log("FORM: Received props → userName:", userName, "userEmail:", userEmail);
     setInitial({ name: userName, email: userEmail, website: "" });
   }, [userName, userEmail]);
 
-  // Handle success: reset + remember me
+  // Persist cookie only when checkbox changes AND is checked
   useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data && !fetcher.data.error) {
-      if (!parentId) {
-        const form = document.querySelector(
-          `form[data-form-id="${parentId || "top"}"]`
-        ) as HTMLFormElement | null;
-        form?.reset();
-      }
-      onCancelReply?.();
-
-      // Save REAL values to cookie
-      if (remember && savedValues.name) {
-        const data = {
-          name: savedValues.name,
-          email: savedValues.email,
-          website: savedValues.website,
-        };
-        const encoded = encodeURIComponent(JSON.stringify(data));
-        const cookieStr = `commenter=${encoded}; max-age=31536000; path=/; SameSite=Strict`;
-        document.cookie = cookieStr;
-        console.log("FORM: Saved REAL values to cookie:", data);
-      }
-
-      setSavedValues({ name: "", email: "", website: "" }); // reset
-    }
-  }, [fetcher.state, fetcher.data, onCancelReply, parentId, remember, savedValues]);
+    if (!remember) return;
+    const data = { name: initial.name, email: initial.email, website: "" };
+    const encoded = encodeURIComponent(JSON.stringify(data));
+    document.cookie = `commenter=${encoded}; max-age=31536000; path=/; SameSite=Strict`;
+  }, [remember, initial.name, initial.email]);
 
   // Handle submit
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -79,21 +57,12 @@ export default function CommentForm({
     if (isSubmitting) return;
 
     const form = e.currentTarget;
-
-    // READ VALUES BEFORE SUBMIT (critical!)
-    const name = (form.elements.namedItem("name") as HTMLInputElement)?.value || "";
-    const email = (form.elements.namedItem("email") as HTMLInputElement)?.value || "";
-    const website = (form.elements.namedItem("website") as HTMLInputElement)?.value || "";
-
-    // Save for success handler
-    setSavedValues({ name, email, website });
-
     const formData = new FormData(form);
     const message = formData.get("message") as string;
 
     const fakeComment: Partial<Comment> = {
       _id: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      name: name || "Anonymous",
+      name: initial.name || "Anonymous",
       message,
       _createdAt: new Date().toISOString(),
       likes: 0,
@@ -154,7 +123,6 @@ export default function CommentForm({
           />
           <input
             name="website"
-            defaultValue={initial.website}
             placeholder="Website (optional)"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={isSubmitting}

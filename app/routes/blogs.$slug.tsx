@@ -184,6 +184,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
           { property: "og:image:height", content: "630" },
           { name: "twitter:card", content: "summary_large_image" },
           { name: "twitter:image", content: ogImage },
+          { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         ]
       : []),
   ];
@@ -406,48 +407,21 @@ console.log("Normalized likedBy:", comment.likedBy);
 // Section renderer
 // -----------------------------------------------------------------------------
 function Section({ block }: { block: any }) {
-  const sanity = createClient({
-    projectId: "pzhistba",
-    dataset: "production",
-    apiVersion: "2023-12-01",
-    useCdn: true,
-  });
-  const builder = imageUrlBuilder(sanity);
-
-  switch (block._type) {
-    case "heading":
-      return block.style === "h2" ? (
-        <h2 className="text-2xl font-semibold mt-8 mb-4">{block.text}</h2>
-      ) : (
-        <h3 className="text-xl font-semibold mt-6 mb-3">{block.text}</h3>
-      );
-    case "paragraph":
-      return <p className="mb-4">{block.text}</p>;
-    case "customImage":
-      return (
-        <img
-          src={builder.image(block.asset).width(800).url()}
-          alt={block.alt || ""}
-          className="w-full rounded-xl shadow-lg my-6"
-        />
-      );
-    case "button":
-      return (
-        <a
-          href={block.url}
-          className="inline-block px-5 py-2 bg-black text-white rounded hover:bg-gray-800 my-6"
-        >
-          {block.label}
-        </a>
-      );
-    default:
-      return null;
-  }
+  // Remove client creation here; use the one created below
+  return null; // Placeholder to avoid TS errors
 }
 
 // -----------------------------------------------------------------------------
 // Page component
 // -----------------------------------------------------------------------------
+const sanity = createClient({
+  projectId: "pzhistba",
+  dataset: "production",
+  apiVersion: "2023-12-01",
+  useCdn: true,
+});
+const builder = imageUrlBuilder(sanity);
+
 export default function BlogDetail() {
   const {
     post,
@@ -461,7 +435,7 @@ export default function BlogDetail() {
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
-    // ────── DEBUG CLIENT LIKES ──────
+  // ────── DEBUG CLIENT LIKES ──────
   React.useEffect(() => {
     console.log("=== CLIENT DEBUG ===");
     console.log("likedIds from loader:", likedIds);
@@ -561,13 +535,38 @@ export default function BlogDetail() {
       </CommentThread>
     ));
 
-  const sanity = createClient({
-    projectId: "pzhistba",
-    dataset: "production",
-    apiVersion: "2023-12-01",
-    useCdn: true,
-  });
-  const builder = imageUrlBuilder(sanity);
+  // Inline Section renderer to use the shared builder
+  const renderSection = (block: any) => {
+    switch (block._type) {
+      case "heading":
+        return block.style === "h2" ? (
+          <h2 className="text-2xl font-semibold mt-8 mb-4">{block.text}</h2>
+        ) : (
+          <h3 className="text-xl font-semibold mt-6 mb-3">{block.text}</h3>
+        );
+      case "paragraph":
+        return <p className="mb-4">{block.text}</p>;
+      case "customImage":
+        return (
+          <img
+            src={builder.image(block.asset).width(800).url()}
+            alt={block.alt || ""}
+            className="w-full rounded-xl shadow-lg my-6"
+          />
+        );
+      case "button":
+        return (
+          <a
+            href={block.url}
+            className="inline-block px-5 py-2 bg-black text-white rounded hover:bg-gray-800 my-6"
+          >
+            {block.label}
+          </a>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <main className="min-h-screen bg-white">
@@ -618,7 +617,7 @@ export default function BlogDetail() {
 
           <div className="prose prose-lg max-w-none">
             {post.sections.map((block: any) => (
-              <Section key={block._key} block={block} />
+              <React.Fragment key={block._key}>{renderSection(block)}</React.Fragment>
             ))}
           </div>
 
