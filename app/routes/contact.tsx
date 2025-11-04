@@ -83,6 +83,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     { name: "description", content: description },
     { property: "og:title", content: title },
     { property: "og:description", content: description },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
   ];
 };
 
