@@ -25,7 +25,7 @@ const { results, loading, error } = useAISearch(query, isActive);
       <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 p-4 z-50">
         <div className="flex items-center space-x-3">
           <div className="animate-spin inline-block w-5 h-5 border-2 border-gray-300 border-t-indigo-600 rounded-full" />
-          <span className="text-sm text-gray-700 font-medium">Whitefire’s AI is thinking…</span>
+          <span className="text-sm text-gray-700 font-medium">Whitefire’s AI is thinking… <br /> do not press enter wait for results to display</span>
         </div>
       </div>
     );

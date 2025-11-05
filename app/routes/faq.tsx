@@ -1,200 +1,204 @@
+// app/routes/faq.tsx  –  REMIX + SANITY  –  6+3 LOAD-MORE
 import type { MetaFunction } from "@remix-run/node";
-import React, { useState } from 'react';
-import { Link } from '@remix-run/react';
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { useState } from "react";
+import { Link } from "@remix-run/react";
+import groq from "groq";
 
-import NavigationBar from '../components/NavigationBar';
+import { createClient } from "@sanity/client";
+import imageUrlBuilder from "@sanity/image-url";
 
+import NavigationBar from "~/components/NavigationBar";
+import Footer from "~/components/Footer";
 
-import Footer  from "~/components/Footer";
+/* ------------------------------------------------------------------ */
+/*  Sanity client                                                     */
+/* ------------------------------------------------------------------ */
+const sanityClient = createClient({
+  projectId: "pzhistba",
+  dataset: "production",
+  apiVersion: "2023-12-01",
+  useCdn: true,
+});
+const builder = imageUrlBuilder(sanityClient);
 
-import faqImage from '../assets/images/other3.jpeg';
-import faqImage2 from '../assets/images/project3.jpeg';
+/* ------------------------------------------------------------------ */
+/*  Loader – same as before                                            */
+/* ------------------------------------------------------------------ */
+export async function loader() {
+  const pageContent = await sanityClient.fetch(
+    groq`*[_type == "faqPage"][0]{
+      title, heroHeadline, heroBackgroundImage,
+      generalFaqsTitle, projectFaqsTitle, seoTitle, seoDescription
+    }`
+  );
 
-export const meta: MetaFunction = () => {
-    return [
-      { name: "description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
-      { property: "og:title", content: "Interior Decorators Inc. - Transforming Spaces" },
-      { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy" },
-      { property: "og:url", content: "https://interior-deco-kappa.vercel.app/" },
-      { property: "og:description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
-      { property: "og:site_name", content: "Interior Decorators Inc." },
-    ];
-  };
+  const faqItems = await sanityClient.fetch(
+    groq`*[_type == "faqItem"] | order(displayOrder asc){
+      _id, question, answer, isFeatured,
+      category->{ _id, title, isProjectRelated }
+    }`
+  );
 
+  const generalFaqs = faqItems
+    .filter((i) => !i.category.isProjectRelated)
+    .map((i) => ({ id: i._id, question: i.question, answer: i.answer }));
 
-  export default function Blog() {
-    // State for Exclusive dropdown in Navbar
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-    // Toggle function for Exclusive dropdown
-    const toggleMenuDropdown = () => {
-      setIsMenuOpen(!isMenuOpen);
-    };
-  
-    const BannerSection = (
-        <div className="relative">
-      <div className="h-60 bg-cover bg-center faq-banner"></div>
-      <div className="absolute inset-0 flex justify-center items-end">
-        <div className="bg-white py-8 px-16 rounded-t-[1rem] flex flex-col items-center">
-          <h2 className="text-3xl font-bold font1">Faq's</h2>
-          <p className="text-center text-gray-700">home/faqs</p>
-        </div>
-      </div>
-    </div>
-        );
+  const projectFaqs = faqItems
+    .filter((i) => i.category.isProjectRelated)
+    .map((i) => ({ id: i._id, question: i.question, answer: i.answer }));
 
-     const FaqSection =  (
-            <div className="sm:w-screen  mt-[5rem]">
-              <h2 className="text-xl mb-12 sm:text-3xl text-center font2">
-                Every Question Answered
-              </h2>
-              <div className="sm:flex sm:w-[45rem]  mx-auto justify-between items-center">
-                <div className="sm:w-[23rem] mx-[1.5rem] sm:mx-0 mb-[3rem] sm:mb-0">
-                  <div className="sm:w-[18.5rem] mb-2">
-                    <div className="flex justify-between items-center mb-4">
-                      <p className="font2 text-xs flex items-center">
-                        What is the Hipcouch interior Design Service?
-                      </p>
-                      <span className="icon-[iconamoon--arrow-right-2] w-[16] h-[16]"></span>
-                    </div>
-                    <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-                  </div>
-                  <div className="sm:w-[18.5rem] mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="font2 text-xs flex text-customColor2 items-center">
-                        So, How does this work?
-                      </p>
-                      <span className="icon-[iconamoon--arrow-down-2] w-[16] h-[16]"></span>
-                    </div>
-                    <p className="sm:w-[17rem] text-justify text-xs mb-4">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                      hendrerit eros id justo eleifend, vel aliquet urna porttitor. Ut
-                      non volutpat justo. Vivamus nec orci vel mauris vulputate
-                      fermentum. Nulla facilisi.
-                    </p>
-                    <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-                  </div>
-                  <div className="sm:w-[18.5rem] mb-2">
-                    <div className="flex justify-between items-center mb-4">
-                      <p className=" font2 text-xs flex items-center">
-                        Which cities do you currently operate in?
-                      </p>
-                      <span className="icon-[iconamoon--arrow-right-2] w-[16] h-[16]"></span>
-                    </div>
-                    <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-                  </div>
-                  <div className="sm:w-[18.5rem] mb-2">
-                    <div className="flex justify-between items-center mb-4">
-                      <p className="font2 text-xs flex items-center">
-                        Hipcouch interior Design Service?
-                      </p>
-                      <span className="icon-[iconamoon--arrow-right-2] w-[16] h-[16]"></span>
-                    </div>
-                    <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-                  </div>
-                  <div className="sm:w-[18.5rem] mb-2">
-                    <div className="flex justify-between items-center mb-4">
-                      <p className=" font2 text-xs flex items-center">
-                        What kind of interior designers do you have?
-                      </p>
-                      <span className="icon-[iconamoon--arrow-right-2] w-[16] h-[16]"></span>
-                    </div>
-                    <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-                  </div>
-                </div>
-                <div className="sm:w-[25rem] ">
-                  <img
-                    src={faqImage}
-                    className="h-[18rem] sm:h-[26rem] object-cover rounded-[1rem] sm:rounded-[1.4rem] mx-auto w-[23rem]"
-                    alt="FAQ Section Image"
-                  />
-                </div>
+  const heroImageUrl = pageContent?.heroBackgroundImage
+    ? builder.image(pageContent.heroBackgroundImage).width(1600).url()
+    : null;
+
+  return json({
+    pageContent: { ...pageContent, heroBackgroundImage: heroImageUrl },
+    generalFaqs,
+    projectFaqs,
+  });
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => [
+  { title: data?.pageContent?.seoTitle || "FAQ | Interior Decorators Inc." },
+  { name: "description", content: data?.pageContent?.seoDescription || "Find answers …" },
+  { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+];
+
+/* ------------------------------------------------------------------ */
+/*  Accordion with 6+3 load-more                                       */
+/* ------------------------------------------------------------------ */
+interface Faq {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+interface FaqAccordionProps {
+  faqs: Faq[];
+  title: string;
+}
+
+function FaqAccordion({ faqs, title }: FaqAccordionProps) {
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [visible, setVisible] = useState(6);          // start at 6
+
+  const toggle = (id: string) =>
+    setExpanded((p) => {
+      const n = new Set(p);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
+
+  const showMore = () => setVisible((v) => Math.min(v + 3, faqs.length));
+  const canLoadMore = visible < faqs.length;
+  const slice = faqs.slice(0, visible);
+
+  if (!faqs.length) return null;
+
+  return (
+    <section className="mb-16">
+      <h2 className="text-3xl font-bold text-center mb-12 font-serif">{title}</h2>
+
+      <div className="max-w-3xl mx-auto space-y-4">
+        {slice.map((f) => (
+          <div key={f.id} className="border border-gray-200 rounded-lg overflow-hidden">
+            <button
+              onClick={() => toggle(f.id)}
+              className="w-full flex justify-between items-center p-6 text-left hover:bg-gray-50 transition-colors"
+            >
+              <span className="font-medium text-gray-900">{f.question}</span>
+              <svg
+                className={`w-5 h-5 transform transition-transform ${
+                  expanded.has(f.id) ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {expanded.has(f.id) && (
+              <div className="px-6 pb-6 text-gray-700">
+                <p className="leading-relaxed">{f.answer}</p>
               </div>
-            </div>
-          );
+            )}
+          </div>
+        ))}
+      </div>
 
-          
-const ProjectQuestionsSection = (
-    <div className="sm:w-screen mt-[5rem] mb-10">
-      <h2 className="text-2xl mb-12 sm:text-4xl text-center font1">
-        Project related Questions
-      </h2>
-      <div className="sm:flex sm:w-[45rem] mx-auto items-center gap-x-10">
-        <div className="hidden sm:block sm:max-w-[22rem] sm:min-w-[21rem]">
-          <img
-            src={faqImage2}
-            className="h-[18rem] sm:h-[26rem] object-cover rounded-[1rem] sm:rounded-[1.4rem] mx-auto w-[23rem]"
-            alt="Project Section Image"
-          />
+      {canLoadMore && (
+        <div className="mt-8 text-center">
+          <button
+            onClick={showMore}
+            className="inline-block border border-gray-400 px-6 py-2 rounded hover:bg-gray-100 transition"
+          >
+            Load More
+          </button>
         </div>
-        <div className="sm:w-[23rem] mx-[1.5rem] mb-[3rem] sm:mb-[0rem]">
-          <div className="sm:w-[18.5rem] mb-2">
-            <div className="flex justify-between mx-auto items-center mb-4">
-              <p className="font-medium font1 text-xs flex items-center">
-                How long does it take?
-              </p>
-              <span className="icon-[iconamoon--arrow-right-2] w-[16] h-[16]"></span>
-            </div>
-            <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-          </div>
-          <div className="sm:w-[18.5rem] mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <p className="font-medium font1 text-xs flex text-[cda274] items-center">
-                Can I use my existing furnishing?
-              </p>
-              <span className="icon-[iconamoon--arrow-down-2] w-[16] h-[16]"></span>
-            </div>
-            <p className="sm:w-[17rem] text-justify text-xs mb-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-              hendrerit eros id justo eleifend, vel aliquet urna porttitor. Ut
-              non volutpat justo. Vivamus nec orci vel mauris vulputate
-              fermentum. Nulla facilisi.
-            </p>
-            <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-          </div>
-          <div className="sm:w-[18.5rem] mb-2">
-            <div className="flex justify-between items-center mb-4">
-              <p className="font-medium font1 text-xs flex items-center">
-                I pay into redesigning my interior?
-              </p>
-              <span className="icon-[iconamoon--arrow-right-2] w-[16] h-[16]"></span>
-            </div>
-            <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-          </div>
-          <div className="sm:w-[18.5rem] mb-2">
-            <div className="flex justify-between items-center mb-4">
-              <p className="font-medium font1 text-xs flex items-center">
-                What do your services cost?
-              </p>
-              <span className="icon-[iconamoon--arrow-right-2] w-[16] h-[16]"></span>
-            </div>
-            <hr className=" bg-customColor2 w-full sm:w-[18rem] h-[0.15rem] rounded-4"/>
-          </div>
-          <div className="sm:w-[18.5rem] mb-2">
-            <div className="flex justify-between items-center mb-4">
-              <p className="font-medium font1 text-xs flex items-center">
-                Do you offer free consultation?
-              </p>
-              <span className="icon-[iconamoon--arrow-right-2] w-[16] h-[16]"></span>
-            </div>
-            <span className="icon-[pepicons-pencil--line-x] w-[20rem] h-[0.1rem] text-[cda274] -ml-2"></span>
-          </div>
+      )}
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Hero Banner                                                         */
+/* ------------------------------------------------------------------ */
+function HeroBanner({ headline, backgroundImage }: { headline: string; backgroundImage: string | null }) {
+  return (
+    <div className="relative">
+      <div
+        className="h-60 bg-cover bg-center"
+        style={{
+          backgroundImage: backgroundImage
+            ? `url(${backgroundImage})`
+            : "linear-gradient(to right, #8B7355, #D2B48C)",
+        }}
+      />
+      <div className="absolute inset-0 flex justify-center items-end">
+        <div className="bg-white py-8 px-16 rounded-t-2xl flex flex-col items-center">
+          <h1 className="text-3xl font-bold font-serif">{headline}</h1>
+          <p className="text-center text-gray-700 mt-2">home / faq</p>
         </div>
       </div>
     </div>
   );
+}
 
+/* ------------------------------------------------------------------ */
+/*  Page                                                                */
+/* ------------------------------------------------------------------ */
+export default function Faq() {
+  const { pageContent, generalFaqs, projectFaqs } = useLoaderData<typeof loader>();
+  const [menu, setMenu] = useState(false);
 
+  return (
+    <div className="min-h-screen bg-white">
+    
 
-    return (
-      <div>
-        <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
-        {BannerSection}
-        {FaqSection}
-        {ProjectQuestionsSection}
-        
-        <Footer />
-      </div>
-    );
-  }
+      <HeroBanner
+        headline={pageContent.heroHeadline}
+        backgroundImage={pageContent.heroBackgroundImage}
+      />
+
+      <main className="py-16">
+        <FaqAccordion faqs={generalFaqs} title={pageContent.generalFaqsTitle} />
+        <FaqAccordion faqs={projectFaqs} title={pageContent.projectFaqsTitle} />
+
+        <div className="text-center mt-16">
+          <h3 className="text-xl font-semibold mb-4">Still have questions?</h3>
+          <Link
+            to="/contact"
+            className="inline-block bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition"
+          >
+            Contact Us
+          </Link>
+        </div>
+      </main>
+
+     
+    </div>
+  );
+}

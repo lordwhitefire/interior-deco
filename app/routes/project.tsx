@@ -165,6 +165,7 @@ export default function Projects() {
           {featuredProjects.length > 0 && (
             <div className="grid md:grid-cols-3 gap-8 mb-16">
               {featuredProjects.map((project) => (
+                 <Link to={`/projects/${project.slug.current}`} className="block">
                 <div key={project._id} className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300">
                   <div className="aspect-[4/3] overflow-hidden">
                     <img
@@ -180,6 +181,7 @@ export default function Projects() {
                     <p className="text-sm opacity-90">{project.location}</p>
                   </div>
                 </div>
+                </Link>
               ))}
             </div>
           )}
