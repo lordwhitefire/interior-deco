@@ -1,82 +1,81 @@
-import type { MetaFunction } from "@remix-run/node";
-import React, { useState } from 'react';
-import { Link } from '@remix-run/react';
+// app/routes/teams.tsx
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { createClient } from "@sanity/client";
 
-import NavigationBar from '../components/NavigationBar';
-import TeamSection from '../components/TeamSection';
-import BlogArticles from '../components/BlogCard';
+const sanity = createClient({
+  projectId: "pzhistba",
+  dataset: "production",
+  apiVersion: "2023-01-01",
+  useCdn: true
+});
 
-import Footer  from "~/components/Footer";
+const teamQuery = `
+  *[_type == "staff"] | order(order asc) {
+    _id,
+    fullName,
+    slug,
+    role,
+    "photoUrl": photo.asset->url
+  }[0...8]
+`;
 
-import blogImage from '../assets/images/Blog-1.jpeg';
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const list = await sanity.fetch(teamQuery);
+  return json({ list });
+};
 
-export const meta: MetaFunction = () => {
-    return [
-      { name: "description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
-      { property: "og:title", content: "Interior Decorators Inc. - Transforming Spaces" },
-      { property: "og:type", content: "website" },
-      { property: "og:image", content: "https://drive.google.com/uc?export=view&id=1G6deIUVFQG1pD-yxvBXrSRhe591u1REy" },
-      { property: "og:url", content: "https://interior-deco-kappa.vercel.app/" },
-      { property: "og:description", content: "Elevate your spaces with our expert interior decoration services. Discover innovative designs tailored to your style." },
-      { property: "og:site_name", content: "Interior Decorators Inc." },
-    ];
-  };
+export const meta: MetaFunction = () => [
+  { title: "Our Team" },
+  { name: "description", content: "Meet the interior design professionals." },
+  { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+];
 
+export default function TeamRoute() {
+  const { list } = useLoaderData<typeof loader>();
 
-  export default function Blog() {
-    // State for Exclusive dropdown in Navbar
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-    // Toggle function for Exclusive dropdown
-    const toggleMenuDropdown = () => {
-      setIsMenuOpen(!isMenuOpen);
-    };
-  
-    const BannerSection = (
-        <div className="relative">
-        <div className="h-60 bg-cover bg-center team-background"></div>
-        <div className="absolute inset-0 flex justify-center items-end">
-          <div className="bg-white py-8 px-16 rounded-t-[1rem] flex flex-col items-center">
-            <h2 className="text-3xl font-bold font1">Our team</h2>
-            <p className="text-center text-gray-700">home/Team </p>
+  const bannerImage = "https://cdn.sanity.io/images/pzhistba/production/6b240296001bfa91f6dc19d5f24464db59a1aa4c-1600x896.jpg?h=600&fit=crop&auto=format";
+
+  return (
+    <div className="min-h-screen">
+      {/* HERO BANNER */}
+      <div className="relative h-96 overflow-hidden">
+        <img
+          src={bannerImage}
+          alt="Our Team"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-serif font-bold">Our Team</h1>
+            <p className="text-lg mt-2 opacity-90">Designers, thinkers, creators</p>
           </div>
         </div>
       </div>
-        );
 
-    const NewsletterSignup =  (
-              <div className="bg-gray-100 max-w-[50rem] py-12 sm:rounded-xl mx-auto my-[4.2rem]">
-                <div className="container mx-auto px-4">
-                  <div className="max-w-3xl mx-auto text-center mb-8">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-4">Subscribe to Our Newsletter</h2>
-                    <p className="text-gray-600">Stay updated with our latest news and updates. Don't miss out!</p>
-                  </div>
-                  <form className="max-w-lg mx-auto">
-                    <div className="flex items-center justify-center">
-                      <input
-                        type="email"
-                        className="w-full py-2 px-4 border border-gray-300 rounded-l-md focus:outline-none"
-                        placeholder="Your Email Address"
-                      />
-                      <button
-                        type="submit"
-                        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-r-md focus:outline-none"
-                      >
-                        Subscribe
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            );
+      {/* TEAM GRID */}
+      <main className="max-w-7xl mx-auto px-6 mt-12 py-12">
 
-    return (
-      <div>
-        <NavigationBar isMenuOpen={isMenuOpen} toggleMenuDropdown={toggleMenuDropdown} />
-        {BannerSection}
-        <TeamSection />
-        {NewsletterSignup}
-        <Footer />
+      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((m) => (
+          <a
+            key={m._id}
+            href={`/teams/${m.slug.current}`}
+            className="group block"
+          >
+            <img
+              src={`${m.photoUrl}?auto=format&w=600&h=600&fit=crop&crop=focalpoint`}
+              alt={m.fullName}
+              className="w-full h-64 object-cover rounded-full group-hover:scale-105 transition"
+            />
+            <h3 className="mt-4 text-xl font-semibold">{m.fullName}</h3>
+            <p className="text-sm text-gray-600">{m.role}</p>
+          </a>
+        ))}
       </div>
-    );
-  }
+    </main>
+    </div>
+  );
+}

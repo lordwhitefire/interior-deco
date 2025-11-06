@@ -99,7 +99,7 @@ function FaqAccordion({ faqs, title }: FaqAccordionProps) {
 
   return (
     <section className="mb-16">
-      <h2 className="text-3xl font-bold text-center mb-12 font-serif">{title}</h2>
+      <h2 className="text-3xl font-bold text-center mt-8 mb-12 font-serif">{title}</h2>
 
       <div className="max-w-3xl mx-auto space-y-4">
         {slice.map((f) => (
