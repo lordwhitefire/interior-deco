@@ -33,7 +33,7 @@ export const meta: MetaFunction = () => {
 
 export const links = () => [
   { rel: 'stylesheet', href: tailwindStyles },
-  { rel: 'icon', href: 'https://lordwhitefire.github.io/interior-deco-assets/logo/favicon.ico', type: 'image/x-icon' },
+  { rel: 'icon', href: 'https://cdn.sanity.io/images/pzhistba/production/aedb15b805047b47c8a57f60f5bfcbcd43c6223e-1600x896.jpg?w=32&h=32&fit=crop', type: 'image/jpeg' },
   { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css' },
 ];
 

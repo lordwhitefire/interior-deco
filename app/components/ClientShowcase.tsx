@@ -89,10 +89,10 @@ export default function ClientShowcase({ data }: ClientShowcaseProps) {
         </div>
         <div className="text-center mt-12">
           <a
-            href="/portfolio"
+            href="/testimonials"
             className="inline-flex items-center gap-x-2 bg-gray-800 text-white px-6 py-3 rounded-md font-medium hover:bg-gray-700 transition-colors duration-300"
           >
-            View Our Portfolio
+            Client Stories
             <span className="icon-[solar--arrow-right-linear] w-4 h-4" />
           </a>
         </div>

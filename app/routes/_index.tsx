@@ -28,6 +28,29 @@ const sanityClient = createClient({
 const builder = imageUrlBuilder(sanityClient);
 export { sanityClient, builder };
 
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Interior Decorators Inc. – Award-Winning Interior Design" },
+    { name: "description", content: "Transform your home or office with our expert interior-design team. See portfolios, book a free consultation and get the space you deserve." },
+
+    // open-graph / social cards
+    { property: "og:title", content: "Interior Decorators Inc. – Award-Winning Interior Design" },
+    { property: "og:description", content: "Transform your home or office with our expert interior-design team. See portfolios, book a free consultation and get the space you deserve." },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: "https://interior-deco-kappa.vercel.app" },
+    { property: "og:image", content: "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max" },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // Twitter card
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: "Interior Decorators Inc. – Award-Winning Interior Design" },
+    { name: "twitter:description", content: "Transform your home or office with our expert interior-design team. See portfolios, book a free consultation and get the space you deserve." },
+    { name: "twitter:image", content: "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max" },
+  ];
+};
+
+
+
 export async function loader() {
   // Fetch hero data from Sanity
   const heroDoc = await sanityClient.fetch(
