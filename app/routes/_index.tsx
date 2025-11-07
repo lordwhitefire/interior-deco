@@ -4,6 +4,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import groq from 'groq';
 
+
 import Hero from "~/components/Hero";
 import Services from "~/components/Services";
 import Stylish from "~/components/Stylish";
@@ -32,6 +33,7 @@ export const meta: MetaFunction = () => {
   return [
     { title: "Interior Decorators Inc. – Award-Winning Interior Design" },
     { name: "description", content: "Transform your home or office with our expert interior-design team. See portfolios, book a free consultation and get the space you deserve." },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
 
     // open-graph / social cards
     { property: "og:title", content: "Interior Decorators Inc. – Award-Winning Interior Design" },
@@ -49,8 +51,11 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const links = () => [
+  { rel: 'icon', href: 'https://cdn.sanity.io/images/pzhistba/production/aedb15b805047b47c8a57f60f5bfcbcd43c6223e-1600x896.jpg?w=32&h=32&fit=crop', type: 'image/jpeg' },
+  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css' },
 
-
+];
 export async function loader() {
   // Fetch hero data from Sanity
   const heroDoc = await sanityClient.fetch(
