@@ -78,12 +78,27 @@ export async function action({ request }: ActionFunctionArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const title = "Contact – Interior Deco";
   const description = data?.contact.subtext || "Get in touch with our interior-design team.";
+  const img = "https://cdn.sanity.io/images/pzhistba/production/contact-hero.jpg?h=630&fit=max";
+  const url = "https://interior-deco-kappa.vercel.app/contact";
+
   return [
     { title },
     { name: "description", content: description },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: img },
   ];
 };
 
