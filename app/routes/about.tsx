@@ -67,10 +67,29 @@ export const loader = async () => {
 // 3.  META
 // ------------------------------------------------------------------
 export const meta: MetaFunction = ({ data }) => {
+  const title = data?.data?.seoTitle || "About Us";
+  const desc  = data?.data?.seoDescription || "Learn more about Interior Decorators Inc.";
+  const img   = "https://cdn.sanity.io/images/pzhistba/production/c24058cf07028ab0cd90ca5b9465891324b7002e-1600x896.jpg?w=2000&fit=max&auto=format";
+  const url   = "https://interior-deco-kappa.vercel.app/about";
+
   return [
-    { title: data?.data?.seoTitle || "About Us" },
-    { name: "description", content: data?.data?.seoDescription },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: desc },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: img },
   ];
 };
 // ------------------------------------------------------------------
