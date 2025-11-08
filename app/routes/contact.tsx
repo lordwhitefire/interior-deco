@@ -78,7 +78,7 @@ export async function action({ request }: ActionFunctionArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const title = "Contact – Interior Deco";
   const description = data?.contact.subtext || "Get in touch with our interior-design team.";
-  const img = "https://cdn.sanity.io/images/pzhistba/production/contact-hero.jpg?h=630&fit=max";
+  const img = "https://cdn.sanity.io/images/pzhistba/production/8e71c65f6f52893a54e9e2bc00bda30c96b3aeaf-1600x896.jpg?w=2000&fit=max&auto=format";
   const url = "https://interior-deco-kappa.vercel.app/contact";
 
   return [
