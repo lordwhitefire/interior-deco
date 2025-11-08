@@ -62,6 +62,20 @@ export const meta: MetaFunction = () => {
     { title: "Services | Interior Decorators Inc." },
     { name: "description", content: "Explore our interior decoration services and see how we work." },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    // open-graph / social cards
+    { property: "og:title", content: "Our Services | Interior Decorators Inc." },
+    { property: "og:description", content: "From full-home make-overs to single-room refreshes—see every service we offer and how our step-by-step process works." },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: "https://interior-deco-kappa.vercel.app/service" },
+    { property: "og:image", content: "https://cdn.sanity.io/images/pzhistba/production/90ce7c0ecc069be1c0c9f86f44bcc4e68042c951-1600x896.jpg?w=2000&fit=max&auto=format" },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // Twitter card
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: "Our Services | Interior Decorators Inc." },
+    { name: "twitter:description", content: "From full-home make-overs to single-room refreshes—see every service we offer and how our step-by-step process works." },
+    { name: "twitter:image", content: "https://cdn.sanity.io/images/pzhistba/production/90ce7c0ecc069be1c0c9f86f44bcc4e68042c951-1600x896.jpg?w=2000&fit=max&auto=format" },
+
   ];
 };
 
