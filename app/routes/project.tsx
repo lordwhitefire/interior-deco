@@ -20,12 +20,29 @@ const builder = imageUrlBuilder(sanityClient);
 const urlForImage = (source: any) => builder.image(source);
 
 export const meta: MetaFunction = () => {
+  const title = "Our Projects – Interior Design Portfolio";
+  const desc  = "Explore our portfolio of luxury interior design projects, from modern living spaces to timeless traditional homes.";
+  const img   = "https://cdn.sanity.io/images/pzhistba/production/9e0072efcafc8be15a1c27816717e24afd2e47a1-1600x896.jpg?w=2000&fit=max&auto=format";
+  const url   = "https://interior-deco-kappa.vercel.app/projects";
+
   return [
-    { title: "Our Projects - Interior Design Portfolio" },
-    { name: "description", content: "Explore our portfolio of luxury interior design projects. From modern living spaces to traditional kitchens, see how we transform homes and commercial spaces." },
-    { property: "og:title", content: "Our Projects - Interior Design Portfolio" },
-    { property: "og:description", content: "Explore our portfolio of luxury interior design projects across residential and commercial spaces." },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: desc },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: img },
   ];
 };
 

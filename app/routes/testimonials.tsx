@@ -34,11 +34,32 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ testimonials: selected });
 };
 
-export const meta: MetaFunction = () => [
-  { title: "Client Testimonials" },
-  { name: "description", content: "Real stories from clients who transformed their spaces." },
-  { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-];
+export const meta: MetaFunction = () => {
+  const title = "Client Testimonials – Interior Decorators Inc.";
+  const desc  = "Real stories from clients who transformed their spaces.";
+  const img   = "https://cdn.sanity.io/images/pzhistba/production/ce1888b3419fb1b157c21b34acd2ee1c78a82ce3-1600x896.jpg?w=2000&fit=max&auto=format";
+  const url   = "https://interior-deco-kappa.vercel.app/testimonials";
+
+  return [
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: desc },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: img },
+  ];
+};
 
 export default function TestimonialsRoute() {
   const { testimonials } = useLoaderData<typeof loader>();

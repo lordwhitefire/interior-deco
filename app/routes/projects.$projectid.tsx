@@ -28,14 +28,32 @@ export const meta: MetaFunction = ({ data }) => {
   }
 
   const { project } = data;
+  const title = `${project.title} - Interior Design Project`;
+  const desc  = project.metaDescription || project.challenge;
+  const img   = urlForImage(project.thumbnail || project.heroImage)
+                  .width(1200)
+                  .height(630)
+                  .url();
+  const url   = `https://interior-deco-kappa.vercel.app/projects/${project.slug.current}`;
+
   return [
-    { title: `${project.title} - Interior Design Project` },
-    { name: "description", content: project.metaDescription || project.challenge },
-    { property: "og:title", content: project.metaTitle || project.title },
-    { property: "og:description", content: project.metaDescription || project.challenge },
-    { property: "og:image", content: urlForImage(project.heroImage).width(1200).height(630).url() },
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: project.metaTitle || title },
+    { property: "og:description", content: desc },
     { property: "og:type", content: "website" },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: project.metaTitle || title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: img },
   ];
 };
 

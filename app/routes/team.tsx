@@ -26,11 +26,32 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ list });
 };
 
-export const meta: MetaFunction = () => [
-  { title: "Our Team" },
-  { name: "description", content: "Meet the interior design professionals." },
-  { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-];
+export const meta: MetaFunction = () => {
+  const title = "Our Team – Interior Decorators Inc.";
+  const desc = "Meet the interior-design professionals who bring your spaces to life.";
+  const img = "https://cdn.sanity.io/images/pzhistba/production/69b892cbda831e1a4e16764fd630bd8ebf6670e8-1600x896.jpg?w=2000&fit=max&auto=format";
+  const url = "https://interior-deco-kappa.vercel.app/team";
+
+  return [
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: desc },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: img },
+  ];
+};
 
 export default function TeamRoute() {
   const { list } = useLoaderData<typeof loader>();

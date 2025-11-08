@@ -45,12 +45,36 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data?.member) return [{ title: "Team Member Not Found" }];
+  if (!data?.member)
+    return [
+      { title: "Team Member Not Found" },
+      { name: "description", content: "Team member page not found." },
+    ];
+
   const { member } = data;
+  const title = member.metaTitle || `${member.fullName} – ${member.role}`;
+  const desc  = member.metaDescription || member.bio?.[0]?.children?.[0]?.text || "Meet our team member.";
+  const img   = `${member.photoUrl}?auto=format&w=1200&h=630&fit=crop`;
+  const url   = `https://interior-deco-kappa.vercel.app/teams/${member.slug.current}`;
+
   return [
-    { title: member.metaTitle || `${member.fullName} – ${member.role}` },
-    { name: "description", content: member.metaDescription || member.bio?.[0]?.children?.[0]?.text || "Meet our team member." },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: desc },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: img },
   ];
 };
 

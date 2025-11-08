@@ -60,11 +60,32 @@ export async function loader() {
   });
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => [
-  { title: data?.pageContent?.seoTitle || "FAQ | Interior Decorators Inc." },
-  { name: "description", content: data?.pageContent?.seoDescription || "Find answers …" },
-  { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-];
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const title = data?.pageContent?.seoTitle || "FAQ | Interior Decorators Inc.";
+  const desc  = data?.pageContent?.seoDescription || "Find answers to common interior-design questions.";
+  const img   = data?.pageContent?.heroBackgroundImage || "https://cdn.sanity.io/images/pzhistba/production/4e3667f477a817910a90e23a5d34748c339a8054-1600x896.jpg?w=2000&fit=max&auto=format";
+  const url   = "https://interior-deco-kappa.vercel.app/faq";
+
+  return [
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: desc },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: img },
+  ];
+};
 
 /* ------------------------------------------------------------------ */
 /*  Accordion with 6+3 load-more                                       */
