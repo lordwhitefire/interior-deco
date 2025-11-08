@@ -80,10 +80,34 @@ export async function loader({ request }: LoaderFunctionArgs) {
 /* ------------------------------------------------------------------ */
 /* 3.  META                                                           */
 /* ------------------------------------------------------------------ */
-export const meta: MetaFunction<typeof loader> = ({ data }) => [
-  { title: data?.blogPage?.title || "Blog" },
-  { name: 'viewport', content: 'width=device-width, initial-scale=1' }
-];
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const title = data?.blogPage?.title || "Blog";
+  const desc  = "Articles, tips and news from our interior-design experts.";
+  const img   = data?.blogPage?.bg
+    ? `${imageUrlBuilder(sanity).image(data.blogPage.bg).width(1200).height(630).url()}`
+    : "https://cdn.sanity.io/images/pzhistba/production/264a05e5631468c24669feaee63d38c226eb8bc9-1600x896.jpg?w=2000&fit=max&auto=format";
+  const url   = "https://interior-deco-kappa.vercel.app/blog";
+
+  return [
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: desc },
+    { property: "og:type", content: "website" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: img },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: img },
+  ];
+};
 
 /* ------------------------------------------------------------------ */
 /* 4.  UI                                                             */
