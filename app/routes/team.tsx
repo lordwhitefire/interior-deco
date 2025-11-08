@@ -89,7 +89,7 @@ export default function TeamRoute() {
             <img
               src={`${m.photoUrl}?auto=format&w=600&h=600&fit=crop&crop=focalpoint`}
               alt={m.fullName}
-              className="w-full h-64 object-cover rounded-full group-hover:scale-105 transition"
+              className="w-full h-64 object-cover rounded-3xl group-hover:scale-105 transition"
             />
             <h3 className="mt-4 text-xl font-semibold">{m.fullName}</h3>
             <p className="text-sm text-gray-600">{m.role}</p>

@@ -1,20 +1,17 @@
 // app/components/NavigationBar.tsx
-// ORIGINAL code, ONLY the fetch block removed and SearchResults plugged in.
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from '@remix-run/react';
 import logoImage from '../assets/logo/Logo.png';
-import { SearchResults } from '~/components/SearchResults';   // ← NEW IMPORT
+import { SearchResults } from '~/components/SearchResults';
 
 const NavigationBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');        // kept for UI flag
-  const dropdownRef = useRef(null);
-  const searchInputRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  /* ----- ORIGINAL HELPERS ----- */
   const handleSearchClick = () => {
     setIsSearchActive(true);
     setTimeout(() => searchInputRef.current?.focus(), 300);
@@ -23,39 +20,39 @@ const NavigationBar = () => {
   const handleSearchClose = () => {
     setIsSearchActive(false);
     setSearchQuery('');
-  
   };
 
-  /* ----- FETCH / DEBOUNCE / CONSOLE  REMOVED  ----- */
-  // OLD useEffect with 4-second debounce + fetch + console.log
-  // REPLACED by SearchResults which handles cache + API internally
-  // UI flag isThinking still toggled by SearchResults via isVisible prop
-
-  /* ----- CLICK-OUTSIDE (unchanged) ----- */
+  // CLICK-OUTSIDE: Close menu or search when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Close mobile menu if clicking outside
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         if (isMenuOpen) setIsMenuOpen(false);
       }
+      // Close search if clicking outside .search-container
       if (isSearchActive && !event.target.closest('.search-container')) {
         handleSearchClose();
       }
     };
+
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [isMenuOpen, isSearchActive]);
 
-  /* ----- DESKTOP MARKUP (zero changes) ----- */
+  // NEW: Close menu when any link inside mobile menu is clicked
+  const handleMenuLinkClick = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="bg-white/90 backdrop-blur-sm fixed z-10 w-full shadow-sm transition-all duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Desktop: identical structure, icons, transitions, blur, pl-10, etc. */}
+          {/* Desktop: unchanged */}
           <div className="hidden sm:flex items-center justify-between w-full">
             <Link to="/" className="flex items-center group">
               <img className="h-12 w-auto transition-all duration-300 group-hover:scale-105" src={logoImage} alt="Interior Decorators Inc." />
             </Link>
-
             <div className="flex items-baseline space-x-8">
               <Link to="/" className="text-gray-800 hover:text-gray-600 px-3 py-2 text-sm font-medium">Home</Link>
               <Link to="/service" className="text-gray-800 hover:text-gray-600 px-3 py-2 text-sm font-medium">Services</Link>
@@ -63,8 +60,6 @@ const NavigationBar = () => {
               <Link to="/blog" className="text-gray-800 hover:text-gray-600 px-3 py-2 text-sm font-medium">Blog</Link>
               <Link to="/contact" className="text-gray-800 hover:text-gray-600 px-3 py-2 text-sm font-medium">Contact us</Link>
             </div>
-
-            {/* Desktop Search - identical classes, pl-10, backdrop-blur, transitions, etc. */}
             <div className="relative search-container" onClick={(e) => e.stopPropagation()}>
               <input
                 ref={searchInputRef}
@@ -81,8 +76,6 @@ const NavigationBar = () => {
                   }
                 }}
               />
-
-              {/* OLD SPINNER REMOVED - SearchResults now owns loading UI */}
               {isSearchActive && searchQuery.length > 2 && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 p-4 z-50">
                   <SearchResults
@@ -92,7 +85,6 @@ const NavigationBar = () => {
                   />
                 </div>
               )}
-
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -101,14 +93,13 @@ const NavigationBar = () => {
             </div>
           </div>
 
-          {/* Mobile: identical slide, translate, blur, hamburger, close button, etc. */}
+          {/* Mobile: unchanged */}
           <div className="sm:hidden flex items-center justify-between w-full">
             <div className={`flex items-center transition-all duration-300 ${isSearchActive ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
               <Link to="/" className="flex items-center">
                 <img className="h-10 w-auto" src={logoImage} alt="Interior Decorators Inc." />
               </Link>
             </div>
-
             <div className="search-container flex items-center justify-end flex-1 mx-4" onClick={(e) => e.stopPropagation()}>
               <div className={`transition-all duration-300 ${isSearchActive ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
                 <button onClick={handleSearchClick} onFocus={handleSearchClick} className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-300" aria-label="Open search">
@@ -117,7 +108,6 @@ const NavigationBar = () => {
                   </svg>
                 </button>
               </div>
-
               <div className={`absolute left-4 right-16 transition-all duration-300 ${isSearchActive ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}>
                 <div className="relative">
                   <input
@@ -135,8 +125,6 @@ const NavigationBar = () => {
                       }
                     }}
                   />
-
-                  {/* OLD SPINNER REMOVED - SearchResults now owns loading UI */}
                   {isSearchActive && searchQuery.length > 2 && (
                     <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 p-4 z-50">
                       <SearchResults
@@ -146,7 +134,6 @@ const NavigationBar = () => {
                       />
                     </div>
                   )}
-
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -154,7 +141,6 @@ const NavigationBar = () => {
                   </div>
                 </div>
               </div>
-
               {isSearchActive && (
                 <button onClick={handleSearchClose} className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all duration-300 ml-2 z-20" aria-label="Close search">
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,8 +149,14 @@ const NavigationBar = () => {
                 </button>
               )}
             </div>
-
-            <button onClick={(e) => { e.stopPropagation(); setIsMenuOpen(!isMenuOpen); }} className="p-2 text-gray-600 hover:text-gray-800 z-10 hover:bg-gray-100 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-200" aria-label="Toggle menu">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMenuOpen(!isMenuOpen);
+              }}
+              className="p-2 text-gray-600 hover:text-gray-800 z-10 hover:bg-gray-100 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              aria-label="Toggle menu"
+            >
               <div className="w-6 h-6 flex flex-col justify-center items-center">
                 <span className={`bg-current block transition-all duration-300 ease-out h-0.5 w-6 rounded-sm ${isMenuOpen ? 'rotate-45 translate-y-1' : '-translate-y-0.5'}`}></span>
                 <span className={`bg-current block transition-all duration-300 ease-out h-0.5 w-6 rounded-sm my-0.5 ${isMenuOpen ? 'opacity-0' : 'opacity-100'}`}></span>
@@ -175,11 +167,24 @@ const NavigationBar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu - identical overlay, transitions, etc. */}
+      {/* Mobile Menu - NOW CLOSES ON LINK CLICK */}
       {isMenuOpen && (
         <div className="sm:hidden fixed inset-0 z-20 pointer-events-none">
-          <div className="absolute top-20 left-0 right-0 pointer-events-auto" onClick={(e) => e.stopPropagation()}>
-            <div ref={dropdownRef} className="bg-white/90 backdrop-blur-md mx-4 rounded-2xl shadow-2xl border border-white/20 overflow-hidden transform transition-all duration-300 ease-out" style={{ transform: isMenuOpen ? 'translateY(0)' : 'translateY(-10px)', opacity: isMenuOpen ? 1 : 0 }}>
+          <div
+            className="absolute top-20 left-0 right-0 pointer-events-auto"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Close menu if any link was clicked
+              if ((e.target as HTMLElement).closest('a')) {
+                setIsMenuOpen(false);
+              }
+            }}
+          >
+            <div
+              ref={dropdownRef}
+              className="bg-white/90 backdrop-blur-md mx-4 rounded-2xl shadow-2xl border border-white/20 overflow-hidden transform transition-all duration-300 ease-out"
+              style={{ transform: isMenuOpen ? 'translateY(0)' : 'translateY(-10px)', opacity: isMenuOpen ? 1 : 0 }}
+            >
               <div className="px-4 py-3 space-y-1">
                 <Link to="/" className="block px-4 py-3 text-gray-800 hover:bg-white/50 hover:text-gray-900 rounded-xl transition-all duration-300 text-base font-medium">Home</Link>
                 <Link to="/service" className="block px-4 py-3 text-gray-800 hover:bg-white/50 hover:text-gray-900 rounded-xl transition-all duration-300 text-base font-medium">Services</Link>
