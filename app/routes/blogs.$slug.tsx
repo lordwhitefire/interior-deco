@@ -172,21 +172,34 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     useCdn: false,
   });
   const builder = imageUrlBuilder(sanity);
-  const ogImage = post.ogImage ? builder.image(post.ogImage).width(1200).height(630).url() : null;
+
+  const title = post.metaTitle || post.title || "Blog";
+  const desc  = post.metaDescription || post.excerpt || "";
+  const url   = `https://interior-deco-kappa.vercel.app/blogs/${post.slug}`;
+  const ogImage = post.ogImage
+    ? builder.image(post.ogImage).width(1200).height(630).url()
+    : builder.image(post.coverImage).width(1200).height(630).url();
 
   return [
-    { title: post.metaTitle || post.title || "Blog" },
-    { name: "description", content: post.metaDescription || post.excerpt || "" },
-    ...(ogImage
-      ? [
-          { property: "og:image", content: ogImage },
-          { property: "og:image:width", content: "1200" },
-          { property: "og:image:height", content: "630" },
-          { name: "twitter:card", content: "summary_large_image" },
-          { name: "twitter:image", content: ogImage },
-          { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        ]
-      : []),
+    { title },
+    { name: "description", content: desc },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
+
+    // open-graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: desc },
+    { property: "og:type", content: "article" },
+    { property: "og:url", content: url },
+    { property: "og:image", content: ogImage },
+    { property: "og:image:width", content: "1200" },
+    { property: "og:image:height", content: "630" },
+    { property: "og:site_name", content: "Interior Decorators Inc." },
+
+    // twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: desc },
+    { name: "twitter:image", content: ogImage },
   ];
 };
 
