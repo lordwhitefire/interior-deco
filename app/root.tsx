@@ -17,6 +17,7 @@ import NavigationBar from '~/components/NavigationBar';
 import Footer from '~/components/Footer';
 
 import tailwindStyles from '~/tailwind.css';
+import { useNavigation } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -61,10 +62,10 @@ const fallbackFooterData = {
     {
       title: 'Services',
       links: [
-        { label: 'Interior Design', url: '/services/interior-design' },
-        { label: 'Home Staging', url: '/services/home-staging' },
-        { label: 'Consultation', url: '/services/consultation' },
-        { label: 'Project Management', url: '/services/project-management' }
+        { label: 'Outdoor & Patio Styling', url: '/services/outdoor-patio-styling' },
+        { label: 'Office Interiors', url: '/services/office-interiors' },
+        { label: 'Custom Furniture Design', url: '/services/custom-furniture-design' },
+        { label: 'Kitchen Remodeling', url: '/services/kitchen-remodeling' }
       ]
     },
     {
@@ -136,6 +137,22 @@ export const loader: LoaderFunction = async () => {
   return json({ footerData });
 };
 
+function GlobalLoading() {
+  const navigation = useNavigation();
+  const loading = navigation.state !== "idle";
+
+  return (
+    <div
+     className={`fixed inset-0 z-50 flex items-center justify-center bg-white/70 backdrop-blur-sm transition-opacity duration-300 ${
+  loading ? "opacity-100" : "opacity-0 pointer-events-none"
+}`}
+      aria-hidden={!loading}
+    >
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+    </div>
+  );
+}
+
 export default function Root() {
   const { footerData } = useLoaderData<typeof loader>();
 
@@ -150,6 +167,20 @@ export default function Root() {
         <header role="banner">
           <NavigationBar />
         </header>
+        {/* ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←← */}
+        {/* PASTE THE BLURRED BACKGROUND CODE RIGHT HERE */}
+        {/* Instant first-load vibe – blurred screenshot background */}
+        <div className="fixed inset-0 -z-10 overflow-hidden">
+          <img
+            src="/lqip.png"
+            alt=""
+            className="min-w-full min-h-full object-cover blur-2xl scale-125 supports-[backdrop-filter]:backdrop-blur-sm"
+          />
+          <div className="absolute inset-0 bg-white/80" />
+        </div>
+        {/* ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←← */}
+
+        <GlobalLoading />
         <main className="flex-grow">
           <Outlet />
         </main>
