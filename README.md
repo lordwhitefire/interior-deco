@@ -28,6 +28,8 @@ A full interior design agency website (services, portfolio, blog, team, testimon
 
 ## Getting Started
 
+![Homepage](public/screenshots/homepage.png)
+
 ```bash
 npm install
 npm run dev
