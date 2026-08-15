@@ -1,0 +1,139 @@
+{
+  "slug": "styling-decor",
+  "hero": {
+    "eyebrow": "OUR SERVICES",
+    "title": "Styling & Decor",
+    "description": "Curated decor and styling to bring personality, warmth, and soul to your space.",
+    "image": "services-hero-styling-decor.jpg",
+    "imageAlt": "Curated living room with a beige linen sofa, textured art and styled coffee table.",
+    "primaryCta": {
+      "label": "SCHEDULE A CONSULTATION",
+      "href": "/contact"
+    },
+    "secondaryCta": {
+      "label": "VIEW OUR WORK",
+      "href": "/projects"
+    }
+  },
+  "inclusions": [
+    {
+      "title": "Space Planning",
+      "description": "Smart layouts that maximize comfort and flow.",
+      "icon": "layout"
+    },
+    {
+      "title": "Material & Finishes",
+      "description": "Premium materials that bring warmth and elegance.",
+      "icon": "materials"
+    },
+    {
+      "title": "Custom Furniture",
+      "description": "Bespoke pieces tailored to your style and needs.",
+      "icon": "furniture"
+    },
+    {
+      "title": "Styling & Decor",
+      "description": "Curated decor and accessories to complete the look.",
+      "icon": "styling"
+    },
+    {
+      "title": "Lighting Design",
+      "description": "Ambient and task lighting to set the perfect mood.",
+      "icon": "lighting"
+    },
+    {
+      "title": "Project Management",
+      "description": "End-to-end management for a seamless experience.",
+      "icon": "management"
+    }
+  ],
+  "inclusionsImage": "services-inclusions-styling-decor.jpg",
+  "inclusionsImageAlt": "Styled console vignette with framed art, ceramic vases and sculptural objects.",
+  "process": [
+    {
+      "number": "01",
+      "title": "Discover",
+      "description": "We understand your needs, style, and budget.",
+      "icon": "discover"
+    },
+    {
+      "number": "02",
+      "title": "Design",
+      "description": "We create layout concepts, mood boards, and 3D visuals.",
+      "icon": "design"
+    },
+    {
+      "number": "03",
+      "title": "Plan",
+      "description": "We finalize materials, furniture, and all the details.",
+      "icon": "plan"
+    },
+    {
+      "number": "04",
+      "title": "Execute",
+      "description": "Our team brings the design to life with precision and care.",
+      "icon": "execute"
+    },
+    {
+      "number": "05",
+      "title": "Reveal",
+      "description": "We style the space and reveal your transformed space.",
+      "icon": "reveal"
+    }
+  ],
+  "gallery": [
+    {
+      "title": "Living Room Restyle",
+      "image": "services-gallery-styling-decor-01.jpg",
+      "imageAlt": "Living room restyle with throw pillows, textured art and layered rugs",
+      "href": "/projects"
+    },
+    {
+      "title": "Bedroom Styling",
+      "image": "services-gallery-styling-decor-02.jpg",
+      "imageAlt": "Bedroom styling with layered linen bedding and decorative cushions",
+      "href": "/projects"
+    },
+    {
+      "title": "Dining Table Styling",
+      "image": "services-gallery-styling-decor-03.jpg",
+      "imageAlt": "Styled dining table with a ceramic centerpiece and dried branches",
+      "href": "/projects"
+    },
+    {
+      "title": "Entryway Styling",
+      "image": "services-gallery-styling-decor-04.jpg",
+      "imageAlt": "Styled entryway with a console table, round mirror and gallery wall",
+      "href": "/projects"
+    }
+  ],
+  "cta": {
+    "eyebrow": "READY TO TRANSFORM YOUR SPACE?",
+    "title": "Let's Create Your\nPerfect Retreat",
+    "description": "Book a consultation with our design experts and take the first step toward your dream space.",
+    "image": "about_closing_dark_banner_table_vase.jpg",
+    "imageAlt": ""
+  },
+  "trust": [
+    {
+      "title": "Personalized Designs",
+      "description": "Every space is uniquely tailored to you.",
+      "icon": "personalized"
+    },
+    {
+      "title": "Quality Assured",
+      "description": "We use the finest materials and work with trusted craftspeople.",
+      "icon": "quality"
+    },
+    {
+      "title": "On-Time Delivery",
+      "description": "We respect your time and deliver as promised.",
+      "icon": "delivery"
+    },
+    {
+      "title": "Client Satisfaction",
+      "description": "Your happiness is our greatest reward.",
+      "icon": "satisfaction"
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "slug": "lighting-design",
+  "hero": {
+    "eyebrow": "OUR SERVICES",
+    "title": "Lighting Design",
+    "description": "Layered lighting solutions that enhance ambiance, functionality, and architectural features.",
+    "image": "services-hero-lighting-design.jpg",
+    "imageAlt": "Layered warm interior lighting with sconces grazing a textured plaster wall.",
+    "primaryCta": {
+      "label": "SCHEDULE A CONSULTATION",
+      "href": "/contact"
+    },
+    "secondaryCta": {
+      "label": "VIEW OUR WORK",
+      "href": "/projects"
+    }
+  },
+  "inclusions": [
+    {
+      "title": "Space Planning",
+      "description": "Smart layouts that maximize comfort and flow.",
+      "icon": "layout"
+    },
+    {
+      "title": "Material & Finishes",
+      "description": "Premium materials that bring warmth and elegance.",
+      "icon": "materials"
+    },
+    {
+      "title": "Custom Furniture",
+      "description": "Bespoke pieces tailored to your style and needs.",
+      "icon": "furniture"
+    },
+    {
+      "title": "Styling & Decor",
+      "description": "Curated decor and accessories to complete the look.",
+      "icon": "styling"
+    },
+    {
+      "title": "Lighting Design",
+      "description": "Ambient and task lighting to set the perfect mood.",
+      "icon": "lighting"
+    },
+    {
+      "title": "Project Management",
+      "description": "End-to-end management for a seamless experience.",
+      "icon": "management"
+    }
+  ],
+  "inclusionsImage": "services-inclusions-lighting-design.jpg",
+  "inclusionsImageAlt": "Ambient lighting vignette with a sculptural wall sconce casting warm light.",
+  "process": [
+    {
+      "number": "01",
+      "title": "Discover",
+      "description": "We understand your needs, style, and budget.",
+      "icon": "discover"
+    },
+    {
+      "number": "02",
+      "title": "Design",
+      "description": "We create layout concepts, mood boards, and 3D visuals.",
+      "icon": "design"
+    },
+    {
+      "number": "03",
+      "title": "Plan",
+      "description": "We finalize materials, furniture, and all the details.",
+      "icon": "plan"
+    },
+    {
+      "number": "04",
+      "title": "Execute",
+      "description": "Our team brings the design to life with precision and care.",
+      "icon": "execute"
+    },
+    {
+      "number": "05",
+      "title": "Reveal",
+      "description": "We style the space and reveal your transformed space.",
+      "icon": "reveal"
+    }
+  ],
+  "gallery": [
+    {
+      "title": "Living Room Layered Lighting",
+      "image": "services-gallery-lighting-design-01.jpg",
+      "imageAlt": "Living room with recessed ceiling lights and picture lights over art",
+      "href": "/projects"
+    },
+    {
+      "title": "Kitchen Task Lighting",
+      "image": "services-gallery-lighting-design-02.jpg",
+      "imageAlt": "Kitchen with under-cabinet task lights and pendants over the island",
+      "href": "/projects"
+    },
+    {
+      "title": "Bedroom Ambient Lighting",
+      "image": "services-gallery-lighting-design-03.jpg",
+      "imageAlt": "Bedroom with wall-mounted reading lamps and headboard cove light",
+      "href": "/projects"
+    },
+    {
+      "title": "Gallery Hallway Lighting",
+      "image": "services-gallery-lighting-design-04.jpg",
+      "imageAlt": "Hallway with picture lights on a gallery wall and a statement pendant",
+      "href": "/projects"
+    }
+  ],
+  "cta": {
+    "eyebrow": "READY TO TRANSFORM YOUR SPACE?",
+    "title": "Let's Create Your\nPerfect Retreat",
+    "description": "Book a consultation with our design experts and take the first step toward your dream space.",
+    "image": "about_closing_dark_banner_table_vase.jpg",
+    "imageAlt": ""
+  },
+  "trust": [
+    {
+      "title": "Personalized Designs",
+      "description": "Every space is uniquely tailored to you.",
+      "icon": "personalized"
+    },
+    {
+      "title": "Quality Assured",
+      "description": "We use the finest materials and work with trusted craftspeople.",
+      "icon": "quality"
+    },
+    {
+      "title": "On-Time Delivery",
+      "description": "We respect your time and deliver as promised.",
+      "icon": "delivery"
+    },
+    {
+      "title": "Client Satisfaction",
+      "description": "Your happiness is our greatest reward.",
+      "icon": "satisfaction"
+    }
+  ]
+}

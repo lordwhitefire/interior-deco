@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
 } from '@remix-run/react';
 import type { MetaFunction, LoaderFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
@@ -155,6 +156,12 @@ function GlobalLoading() {
 
 export default function Root() {
   const { footerData } = useLoaderData<typeof loader>();
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+  const hideGlobalHeader =
+    isHome ||
+    location.pathname === "/about" ||
+    location.pathname.startsWith("/services");
 
   return (
     <html lang="en" className="h-full">
@@ -164,9 +171,11 @@ export default function Root() {
         <Links />
       </head>
       <body className="min-h-screen flex flex-col bg-neutral-100 text-gray-800">
-        <header role="banner">
-          <NavigationBar />
-        </header>
+        {!hideGlobalHeader && (
+          <header role="banner">
+            <NavigationBar />
+          </header>
+        )}
         {/* ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←← */}
         {/* PASTE THE BLURRED BACKGROUND CODE RIGHT HERE */}
         {/* Instant first-load vibe – blurred screenshot background */}
@@ -184,9 +193,11 @@ export default function Root() {
         <main className="flex-grow">
           <Outlet />
         </main>
-        <footer role="contentinfo">
-          <Footer data={footerData} />
-        </footer>
+        {!hideGlobalHeader && (
+          <footer role="contentinfo">
+            <Footer data={footerData} />
+          </footer>
+        )}
         <ScrollRestoration />
         <Scripts />
       </body>
