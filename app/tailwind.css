@@ -7,4 +7,13 @@
     outline: 2px solid #b08a5a;
     outline-offset: 2px;
   }
+
+  body {
+    background-color: #10100f;
+    background-image: url("/ambient-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
 }

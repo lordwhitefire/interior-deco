@@ -131,9 +131,9 @@ export default function Root() {
         <JsonLd data={organizationJsonLd} />
         <JsonLd data={localBusinessJsonLd} />
       </head>
-      <body className="min-h-screen flex flex-col bg-neutral-100 text-gray-800">
+      <body className="min-h-screen flex flex-col text-gray-800">
         <SiteHeader activePath={location.pathname} />
-        <main id="main" className="flex-grow">
+        <main id="main" className="mx-auto w-full max-w-[1440px] flex-grow">
           <Outlet />
         </main>
         <SiteFooter />
@@ -164,7 +164,7 @@ export function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
+      <body className="min-h-screen font-sans text-[#171615]">
         <div className="mx-auto min-h-screen max-w-[1440px] bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
           <SiteHeader activePath="/" />
 
