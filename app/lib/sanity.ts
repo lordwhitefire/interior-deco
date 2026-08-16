@@ -7,7 +7,7 @@ export const sanityClient = createClient({
   projectId: 'pzhistba',
   dataset: 'production',
   apiVersion: '2023-12-01',
-  useCdn: true,
+  useCdn: false, // Always fresh reads — no CDN staleness after Studio edits
 });
 
 // Write client (for mutations) - uses your token
