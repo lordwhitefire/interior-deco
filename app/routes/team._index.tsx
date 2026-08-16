@@ -161,11 +161,20 @@ function TeamGrid({ members }: { members: TeamIndexData["shownMembers"] }) {
       aria-label="Whitefire Interior team members"
       className="bg-[#f5f3ef] px-6 pb-7 sm:px-8 lg:px-12 lg:pb-8 xl:px-14"
     >
-      <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {members.map((member) => (
-          <TeamCard key={member.slug} member={member} />
-        ))}
-      </div>
+      {members.length === 0 ? (
+        <div className="border border-[#DDD8D0] bg-[#FAF8F4] px-6 py-12 text-center">
+          <h3 className="font-serif text-2xl">No team members yet</h3>
+          <p className="mt-2 text-sm text-[#5B5751]">
+            Check back soon — our team is growing.
+          </p>
+        </div>
+      ) : (
+        <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {members.map((member) => (
+            <TeamCard key={member.slug} member={member} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

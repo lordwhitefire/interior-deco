@@ -97,7 +97,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const data = await getServicePageData(slug);
 
   if (!data) {
-    throw redirect("/services");
+    throw new Response("Service not found", { status: 404 });
   }
 
   return json(data);

@@ -107,11 +107,20 @@ function ServicesIntroduction({
 function ServicesGrid({ items }: { items: ServiceItem[] }) {
   return (
     <section className="bg-[#F7F4EF] px-6 pb-16 sm:px-8 lg:px-12 lg:pb-20">
-      <div className="mx-auto grid max-w-[1340px] grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((item) => (
-          <ServiceCard key={item.id} item={item} />
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <div className="border border-[#DDD8D0] bg-[#FAF8F4] px-6 py-12 text-center">
+          <h3 className="font-serif text-2xl">No services available yet</h3>
+          <p className="mt-2 text-sm text-[#5B5751]">
+            Check back soon — our services are being updated.
+          </p>
+        </div>
+      ) : (
+        <div className="mx-auto grid max-w-[1340px] grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((item) => (
+            <ServiceCard key={item.id} item={item} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

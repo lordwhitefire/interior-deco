@@ -6,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLocation,
+  useRouteError,
 } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/node';
 
@@ -120,11 +121,22 @@ export default function Root() {
 }
 
 export function ErrorBoundary() {
+  const error = useRouteError();
+  const status =
+    error instanceof Response
+      ? error.status
+      : (error as { status?: number } | null | undefined)?.status ?? 500;
+  const notFound = status === 404;
+
   return (
     <html lang="en" className="h-full">
       <head>
         <meta charSet="utf-8" />
-        <title>Something went wrong | Whitefire Interior</title>
+        <title>
+          {notFound
+            ? 'Page not found | Whitefire Interior'
+            : 'Something went wrong | Whitefire Interior'}
+        </title>
         <Meta />
         <Links />
       </head>
@@ -135,10 +147,12 @@ export function ErrorBoundary() {
           <main className="flex min-h-[60vh] items-center justify-center px-6 py-16 text-center">
             <div>
               <h1 className="font-serif text-[32px] tracking-[-0.02em]">
-                Oops, something went wrong!
+                {notFound ? 'Page not found' : 'Oops, something went wrong!'}
               </h1>
               <p className="mx-auto mt-3 max-w-[420px] text-[13px] leading-6 text-[#292929]">
-                We're sorry, but an error occurred. Please try again later.
+                {notFound
+                  ? "The page you're looking for doesn't exist or has moved."
+                  : "We're sorry, but an error occurred. Please try again later."}
               </p>
               <a
                 href="/"
