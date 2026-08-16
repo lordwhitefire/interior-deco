@@ -18,6 +18,7 @@ import {
 import { createClient } from "@sanity/client";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
+import { JsonLd, seo } from "~/utils/seo";
 import { Breadcrumbs } from "~/components/whitefire/Breadcrumbs";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
 import servicesCtaImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
@@ -142,23 +143,17 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const project = data as ProjectDetailData | undefined;
-  return [
-    {
-      title: project
-        ? `${project.metaTitle || project.title} | Whitefire Interior`
-        : "Project | Whitefire Interior",
-    },
-    {
-      name: "description",
-      content:
-        project?.metaDescription ||
-        project?.challenge ||
-        "Explore a Whitefire Interior project.",
-    },
-    ...(project?.heroImage
-      ? [{ property: "og:image", content: project.heroImage }]
-      : []),
-  ];
+  if (!project) return [{ title: "Project | Whitefire Interior" }];
+
+  return seo({
+    title: `${project.metaTitle || project.title} | Whitefire Interior`,
+    description:
+      project.metaDescription ||
+      project.challenge ||
+      "Explore a Whitefire Interior project.",
+    path: `/projects/${project.slug}`,
+    image: project.heroImage,
+  });
 };
 
 export default function ProjectDetailRoute() {
@@ -168,6 +163,29 @@ export default function ProjectDetailRoute() {
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#1C1A17]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
         <SiteHeader activePath="/projects" />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://interior-deco-kappa.vercel.app/" },
+              { "@type": "ListItem", position: 2, name: "Projects", item: "https://interior-deco-kappa.vercel.app/projects" },
+              { "@type": "ListItem", position: 3, name: project.title },
+            ],
+          }}
+        />
+        {project.heroImage ? (
+          <JsonLd
+            data={{
+              "@context": "https://schema.org",
+              "@type": "ImageObject",
+              contentUrl: project.heroImage,
+              representativeOfPage: true,
+              caption: project.heroImageAlt || project.title,
+              name: project.title,
+            }}
+          />
+        ) : null}
 
         <main>
           <ProjectHero project={project} />

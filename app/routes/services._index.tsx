@@ -2,6 +2,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { ArrowRight } from "lucide-react";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
+import { seo } from "~/utils/seo";
 
 import servicesHeroImage from "~/assets/images/living_design.jpg";
 import livingSpacesImage from "~/assets/images/services-hero-living-spaces.jpg";
@@ -345,26 +346,12 @@ export default function ServicesPage() {
 }
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Services | Whitefire Interior" },
-    {
-      name: "description",
-      content:
-        "Explore Whitefire Interior's comprehensive interior design services, from space planning and custom furniture to renovation, styling, lighting, and project management.",
-    },
-    { property: "og:type", content: "website" },
-    { property: "og:title", content: "Services | Whitefire Interior" },
-    {
-      property: "og:description",
-      content:
-        "Explore Whitefire Interior's comprehensive interior design services, from space planning and custom furniture to renovation, styling, lighting, and project management.",
-    },
-    { property: "og:url", content: "https://interior-deco-kappa.vercel.app/services" },
-    {
-      property: "og:image",
-      content:
-        "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max",
-    },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
-  ];
+  return seo({
+    title: "Services | Whitefire Interior",
+    description:
+      "Explore Whitefire Interior's comprehensive interior design services, from space planning and custom furniture to renovation, styling, lighting, and project management.",
+    path: "/services",
+    image:
+      "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max",
+  });
 };

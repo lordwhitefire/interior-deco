@@ -13,18 +13,17 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
+import { seo } from "~/utils/seo";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import sitepages from "~/data/sitepages.json";
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Contact | Whitefire Interior" },
-    {
-      name: "description",
-      content:
-        "Get in touch with the Whitefire Interior team. We'd love to hear from you about your next interior design project.",
-    },
-  ];
+  return seo({
+    title: "Contact | Whitefire Interior",
+    description:
+      "Get in touch with the Whitefire Interior team. We'd love to hear from you about your next interior design project.",
+    path: "/contact",
+  });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {

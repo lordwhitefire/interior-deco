@@ -8,6 +8,7 @@ import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { SectionEyebrow } from "~/components/whitefire/SectionEyebrow";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
+import { seo } from "~/utils/seo";
 
 import aboutHeroImage from "~/assets/images/about_hero_dark_living_room_fireplace.jpg";
 import aboutStoryImage from "~/assets/images/about_story_console_vase_dome_lamp.jpg";
@@ -429,29 +430,12 @@ export default function AboutRoute() {
 }
 
 export const meta: MetaFunction = () => {
-  const title = "About Whitefire Interior | Luxury Interior Design";
-  const desc =
-    "Discover Whitefire Interior, a luxury interior design studio creating timeless, functional spaces with thoughtful design and exceptional craftsmanship.";
-  const img =
-    "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max";
-
-  return [
-    { title },
-    { name: "description", content: desc },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-
-    // open-graph
-    { property: "og:title", content: title },
-    { property: "og:description", content: desc },
-    { property: "og:type", content: "website" },
-    { property: "og:url", content: "https://interior-deco-kappa.vercel.app/about" },
-    { property: "og:image", content: img },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
-
-    // twitter
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: desc },
-    { name: "twitter:image", content: img },
-  ];
+  return seo({
+    title: "About Whitefire Interior | Luxury Interior Design",
+    description:
+      "Discover Whitefire Interior, a luxury interior design studio creating timeless, functional spaces with thoughtful design and exceptional craftsmanship.",
+    path: "/about",
+    image:
+      "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max",
+  });
 };

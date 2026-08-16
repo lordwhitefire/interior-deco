@@ -28,6 +28,7 @@ import {
   profileFixture,
   teamMembers,
 } from "~/data/teamMock";
+import { JsonLd, seo } from "~/utils/seo";
 
 export const loader = ({ params }: LoaderFunctionArgs) => {
   const member = memberBySlug(params.slug ?? "");
@@ -46,10 +47,13 @@ export const meta: MetaFunction = ({ data }) => {
   if (!data?.member) {
     return [{ title: "Team Member | Whitefire Interior" }];
   }
-  return [
-    { title: data.member.metaTitle },
-    { name: "description", content: data.member.metaDescription },
-  ];
+  const member = data.member;
+  return seo({
+    title: member.metaTitle,
+    description: member.metaDescription,
+    path: `/team/${member.slug}`,
+    image: member.photoUrl,
+  });
 };
 
 export default function TeamMemberRoute() {
@@ -59,6 +63,24 @@ export default function TeamMemberRoute() {
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
         <SiteHeader activePath="/team" />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "Person",
+            name: member.fullName,
+            jobTitle: member.role,
+            image: member.photoUrl,
+            description: member.bio,
+            worksFor: {
+              "@type": "Organization",
+              name: "Whitefire Interior",
+              url: "https://interior-deco-kappa.vercel.app",
+            },
+            ...(Array.isArray(member.social) && member.social.length > 0
+              ? { sameAs: member.social.map((s: { url: string }) => s.url) }
+              : {}),
+          }}
+        />
 
         <main>
           <TeamMemberHero member={member} />

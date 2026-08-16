@@ -8,6 +8,7 @@ import { Breadcrumbs } from "~/components/whitefire/Breadcrumbs";
 import { ServiceProcessStep } from "~/components/whitefire/ServiceProcessStep";
 import { ProjectCard } from "~/components/whitefire/ProjectCard";
 import { ServiceInclusionItem } from "~/components/whitefire/ServiceInclusionItem";
+import { JsonLd, seo } from "~/utils/seo";
 import { TrustItem } from "~/components/whitefire/TrustItem";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
 import fs from "fs";
@@ -190,20 +191,13 @@ export async function loader({ params }: LoaderFunctionArgs) {
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) return [{ title: "Not found" }];
 
-  return [
-    { title: `${data.hero.title} | Whitefire Interior` },
-    { name: "description", content: data.hero.description },
-    { property: "og:type", content: "website" },
-    { property: "og:title", content: `${data.hero.title} | Whitefire Interior` },
-    { property: "og:description", content: data.hero.description },
-    { property: "og:url", content: `https://interior-deco-kappa.vercel.app/services/${data.slug}` },
-    {
-      property: "og:image",
-      content:
-        "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max",
-    },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
-  ];
+  return seo({
+    title: `${data.hero.title} | Whitefire Interior`,
+    description: data.hero.description,
+    path: `/services/${data.slug}`,
+    image:
+      "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max",
+  });
 };
 
 /* ----------  Components  ---------- */
@@ -440,6 +434,21 @@ export default function ServiceDetailRoute() {
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#292725]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
         <SiteHeader activePath="/services" showSearch />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: data.hero.title,
+            description: data.hero.description,
+            serviceType: data.hero.title,
+            provider: {
+              "@type": "LocalBusiness",
+              name: "Whitefire Interior",
+              url: "https://interior-deco-kappa.vercel.app",
+            },
+            areaServed: "Amsterdam, Netherlands",
+          }}
+        />
 
         <main>
           <ServiceHero data={data.hero} />

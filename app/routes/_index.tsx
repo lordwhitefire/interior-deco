@@ -15,26 +15,42 @@ import {
   Armchair,
   Award,
   BadgeCheck,
+  BedDouble,
+  Boxes,
   Building2,
+  ChefHat,
   ChevronLeft,
   ChevronRight,
   Hammer,
   LayoutGrid,
+  Minus,
   PanelsTopLeft,
   Play,
+  Sofa,
   Sparkles,
+  Store,
   Trophy,
+  UtensilsCrossed,
 } from "lucide-react";
 
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { SectionHeading } from "~/components/whitefire/SectionHeading";
+import { seo } from "~/utils/seo";
 
 import heroImage from "~/assets/images/living_design.jpg";
 import studioImage from "~/assets/images/Concept.jpg";
 import newsletterImage from "~/assets/images/Perfect.jpg";
 import projectsData from "~/data/projects.json";
 import { articles } from "~/data/blogMock";
+import bedroomsRetreats from "~/data/services/bedrooms-retreats.json";
+import boutiqueTransitional from "~/data/services/boutique-transitional.json";
+import compactMicroSpaces from "~/data/services/compact-micro-spaces.json";
+import hospitalityRetail from "~/data/services/hospitality-retail.json";
+import kitchensDining from "~/data/services/kitchens-dining.json";
+import livingSpaces from "~/data/services/living-spaces.json";
+import minimalistScandinavian from "~/data/services/minimalist-scandinavian.json";
+import workspaces from "~/data/services/workspaces.json";
 
 const sanityClient = createClient({
   projectId: "pzhistba",
@@ -135,44 +151,60 @@ const mockHero: HeroData = {
 
 const mockServices: ServiceItem[] = [
   {
-    id: "interior-design",
-    title: "Interior Design",
-    description:
-      "Bespoke interior design solutions tailored to your lifestyle.",
-    href: "/services/interior-design",
-    icon: "PanelsTopLeft",
+    id: "bedrooms-retreats",
+    title: bedroomsRetreats.hero.title,
+    description: bedroomsRetreats.hero.description,
+    href: "/services/bedrooms-retreats",
+    icon: "BedDouble",
   },
   {
-    id: "space-planning",
-    title: "Space Planning",
-    description:
-      "Smart layouts that maximize flow, comfort and functionality.",
-    href: "/services/space-planning",
-    icon: "LayoutGrid",
+    id: "boutique-transitional",
+    title: boutiqueTransitional.hero.title,
+    description: boutiqueTransitional.hero.description,
+    href: "/services/boutique-transitional",
+    icon: "Store",
   },
   {
-    id: "custom-furniture",
-    title: "Custom Furniture",
-    description:
-      "Bespoke furniture and joinery crafted with exceptional detail.",
-    href: "/services/custom-furniture",
-    icon: "Armchair",
+    id: "compact-micro-spaces",
+    title: compactMicroSpaces.hero.title,
+    description: compactMicroSpaces.hero.description,
+    href: "/services/compact-micro-spaces",
+    icon: "Boxes",
   },
   {
-    id: "renovation",
-    title: "Renovation",
-    description:
-      "Transforming existing spaces with creativity and precision.",
-    href: "/services/renovation",
-    icon: "Hammer",
+    id: "hospitality-retail",
+    title: hospitalityRetail.hero.title,
+    description: hospitalityRetail.hero.description,
+    href: "/services/hospitality-retail",
+    icon: "UtensilsCrossed",
   },
   {
-    id: "styling-decor",
-    title: "Styling & Decor",
-    description:
-      "Curated décor and styling to bring personality to your space.",
-    href: "/services/styling-decor",
-    icon: "Sparkles",
+    id: "kitchens-dining",
+    title: kitchensDining.hero.title,
+    description: kitchensDining.hero.description,
+    href: "/services/kitchens-dining",
+    icon: "ChefHat",
+  },
+  {
+    id: "living-spaces",
+    title: livingSpaces.hero.title,
+    description: livingSpaces.hero.description,
+    href: "/services/living-spaces",
+    icon: "Sofa",
+  },
+  {
+    id: "minimalist-scandinavian",
+    title: minimalistScandinavian.hero.title,
+    description: minimalistScandinavian.hero.description,
+    href: "/services/minimalist-scandinavian",
+    icon: "Minus",
+  },
+  {
+    id: "workspaces",
+    title: workspaces.hero.title,
+    description: workspaces.hero.description,
+    href: "/services/workspaces",
+    icon: "Building2",
   },
 ];
 
@@ -367,6 +399,22 @@ function IconForService({ name }: { name: string }) {
       return <Hammer className={className} />;
     case "Sparkles":
       return <Sparkles className={className} />;
+    case "BedDouble":
+      return <BedDouble className={className} />;
+    case "Store":
+      return <Store className={className} />;
+    case "Boxes":
+      return <Boxes className={className} />;
+    case "UtensilsCrossed":
+      return <UtensilsCrossed className={className} />;
+    case "ChefHat":
+      return <ChefHat className={className} />;
+    case "Sofa":
+      return <Sofa className={className} />;
+    case "Minus":
+      return <Minus className={className} />;
+    case "Building2":
+      return <Building2 className={className} />;
     default:
       return <PanelsTopLeft className={className} />;
   }
@@ -454,7 +502,7 @@ function ServicesSection() {
           align="center"
         />
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {mockServices.map((service, index) => (
             <a
               key={service.id}
@@ -956,28 +1004,14 @@ export default function HomePage() {
 }
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Interior Decorators Inc. – Award-Winning Interior Design" },
-    { name: "description", content: "Transform your home or office with our expert interior-design team. See portfolios, book a free consultation and get the space you deserve." },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-
-    // open-graph / social cards
-    { property: "og:title", content: "Interior Decorators Inc. – Award-Winning Interior Design" },
-    { property: "og:description", content: "Transform your home or office with our expert interior-design team. See portfolios, book a free consultation and get the space you deserve." },
-    { property: "og:type", content: "website" },
-    { property: "og:url", content: "https://interior-deco-kappa.vercel.app" },
-    { property: "og:image", content: "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max" },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
-
-    // Twitter card
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: "Interior Decorators Inc. – Award-Winning Interior Design" },
-    { name: "twitter:description", content: "Transform your home or office with our expert interior-design team. See portfolios, book a free consultation and get the space you deserve." },
-    { name: "twitter:image", content: "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max" },
-  ];
+  return seo({
+    title: "Whitefire Interior — Amsterdam Interior Design Studio",
+    description:
+      "Whitefire Interior — an Amsterdam interior design studio creating beautiful, functional spaces for homes and businesses.",
+    path: "/",
+    image:
+      "https://cdn.sanity.io/images/pzhistba/production/5a658a27bf9f81cebbc25319f37dfbd5edcb8d38-1600x896.jpg?h=200&fit=max",
+  });
 };
 
-export const links = () => [
-  { rel: 'icon', href: 'https://cdn.sanity.io/images/pzhistba/production/aedb15b805047b47c8a57f60f5bfcbcd43c6223e-1600x896.jpg?w=32&h=32&fit=crop', type: 'image/jpeg' },
-  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css' },
-];
+export const links = () => [];

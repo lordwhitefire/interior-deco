@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
+import { seo } from "~/utils/seo";
 import {
   articles,
   blogHero,
@@ -18,14 +19,13 @@ import {
 } from "~/data/blogMock";
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Blog | Whitefire Interior" },
-    {
-      name: "description",
-      content:
-        "Design inspiration, interior trends, and expert advice from Whitefire Interior for creating timeless, thoughtful spaces.",
-    },
-  ];
+  return seo({
+    title: "Blog | Whitefire Interior",
+    description:
+      "Design inspiration, interior trends, and expert advice from Whitefire Interior for creating timeless, thoughtful spaces.",
+    path: "/blog",
+    image: blogHero.src,
+  });
 };
 
 const PAGE_SIZE = 6;

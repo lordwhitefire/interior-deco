@@ -12,6 +12,7 @@ import {
 import { createClient } from "@sanity/client";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
+import { seo } from "~/utils/seo";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
 import servicesCtaImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
 
@@ -99,22 +100,12 @@ export async function loader({}: LoaderFunctionArgs) {
 }
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Projects | Whitefire Interior" },
-    {
-      name: "description",
-      content:
-        "Explore Whitefire Interior's curated portfolio of residential, commercial, and hospitality interiors created with timeless design and thoughtful detail.",
-    },
-    { property: "og:type", content: "website" },
-    { property: "og:title", content: "Projects | Whitefire Interior" },
-    {
-      property: "og:description",
-      content:
-        "Explore Whitefire Interior's curated portfolio of residential, commercial, and hospitality interiors created with timeless design and thoughtful detail.",
-    },
-    { property: "og:url", content: "https://interior-deco-kappa.vercel.app/projects" },
-  ];
+  return seo({
+    title: "Projects | Whitefire Interior",
+    description:
+      "Explore Whitefire Interior's curated portfolio of residential, commercial, and hospitality interiors created with timeless design and thoughtful detail.",
+    path: "/projects",
+  });
 };
 
 export default function ProjectsPage() {

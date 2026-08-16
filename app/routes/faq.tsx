@@ -5,6 +5,7 @@ import { ChevronRight, Minus, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { createClient } from "@sanity/client";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
+import { seo } from "~/utils/seo";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import sitepages from "~/data/sitepages.json";
 
@@ -16,14 +17,12 @@ const sanity = createClient({
 });
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "FAQ | Whitefire Interior" },
-    {
-      name: "description",
-      content:
-        "Everything you need to know about our design process, pricing, timelines, consultations, and project-specific details.",
-    },
-  ];
+  return seo({
+    title: "FAQ | Whitefire Interior",
+    description:
+      "Everything you need to know about our design process, pricing, timelines, consultations, and project-specific details.",
+    path: "/faq",
+  });
 };
 
 interface Category {

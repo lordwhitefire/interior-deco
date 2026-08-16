@@ -10,17 +10,17 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
+import { seo } from "~/utils/seo";
 import { intro, projectCta, shownMembers, teamHero, values } from "~/data/teamMock";
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Our Team | Whitefire Interior" },
-    {
-      name: "description",
-      content:
-        "Meet the designers, planners, and creatives behind Whitefire Interior's timeless spaces.",
-    },
-  ];
+  return seo({
+    title: "Our Team | Whitefire Interior",
+    description:
+      "Meet the designers, planners, and creatives behind Whitefire Interior's timeless spaces.",
+    path: "/team",
+    image: teamHero.src,
+  });
 };
 
 export default function TeamIndexRoute() {

@@ -4,6 +4,7 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { CalendarDays, ChevronRight, Star, Users } from "lucide-react";
 import { createClient } from "@sanity/client";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
+import { seo } from "~/utils/seo";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import sitepages from "~/data/sitepages.json";
 import projectsData from "~/data/projects.json";
@@ -16,14 +17,13 @@ const sanity = createClient({
 });
 
 export const meta: MetaFunction = () => {
-  return [
-    { title: "Testimonials | Whitefire Interior" },
-    {
-      name: "description",
-      content:
-        "Discover what Whitefire Interior clients say about their interior design projects and experiences.",
-    },
-  ];
+  return seo({
+    title: "Testimonials | Whitefire Interior",
+    description:
+      "Discover what Whitefire Interior clients say about their interior design projects and experiences.",
+    path: "/testimonials",
+    image: sitepages.testimonials.hero.src,
+  });
 };
 
 interface Testimonial {
