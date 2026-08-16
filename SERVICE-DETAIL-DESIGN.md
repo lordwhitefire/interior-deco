@@ -1,186 +1,126 @@
-# Service Detail Pages — Implementation Plan
+# Service Detail Pages — Implementation Plan (v2 — Sanity Project Curation)
 
-**Source of truth:** `/home/lordwhitefire/Downloads/page-04-bedroom-makeover-ui-implementation.md` (the Bedroom Makeover spec — used as the **template** for all 8 services).
+**Source of truth:** `/home/lordwhitefire/Downloads/page-04-bedroom-makeover-ui-implementation.md` (Bedroom Makeover spec = shared template for all 8 services).
 
-**Goal:** Replace the Sanity-driven `services.$slug.tsx` with a static implementation reading from 8 JSON files in `app/data/services/`. All 8 services share the exact same Bedroom Makeover template. **Images generated via Pollinations.ai** (batch, save locally, update JSON).
+**v2 change (2026-08-16, owner decision):** ALL Pollinations.ai images are deleted. The 8 services are **redefined around the 18 real Sanity projects** (projectId `pzhistba`). Every image on the service pages now comes from real project data (CDN URLs from a static `app/data/projects.json` snapshot) or the user's own photos. See `IMAGE-USAGE-RULE.md`.
 
 ---
 
-## 1. The 8 Services (from Services index grid)
+## 1. The 8 Services (redefined from real project taxonomy)
 
-| Slug | Title |
+| Slug | Title | Hero description (new) |
+|---|---|---|
+| `living-spaces` | Living Spaces | Warm, layered living rooms designed for everyday comfort — from Malibu oceanfront to a Norwegian lakeside cabin. |
+| `kitchens-dining` | Kitchens & Dining | Considered kitchens that balance craftsmanship, storage, and the ritual of gathering. |
+| `bedrooms-retreats` | Bedrooms & Retreats | Calm, restorative retreats — coastal, alpine, and urban bedrooms designed for deep rest. |
+| `workspaces` | Workspaces | Productive, people-first workplaces — from tech HQs to micro home offices. |
+| `hospitality-retail` | Hospitality & Retail | Memorable hospitality and retail interiors that turn visitors into regulars. |
+| `boutique-transitional` | Boutique & Transitional | Refined transitional interiors with brass, marble, and velvet detailing. |
+| `minimalist-scandinavian` | Minimalist & Scandinavian | Quiet, material-led spaces rooted in simplicity, light, and natural texture. |
+| `compact-micro-spaces` | Compact & Micro Spaces | Smart, space-efficient design for micro lofts and compact homes. |
+
+Old slugs (`interior-design`, `space-planning`, ...) are **replaced** — files renamed, VALID_SLUGS updated.
+
+---
+
+## 2. Service → Project mapping (4 real projects each, 32 slots / 18 unique / 14 repeats)
+
+| Service | Projects (gallery order) | Inclusions image source |
+|---|---|---|
+| living-spaces | manhattan-modern-loft · malibu-oceanfront-living · london-mayfair-townhouse · norwegian-lakeside-cabin | manhattan-modern-loft (gallery[0]) |
+| kitchens-dining | brooklyn-brownstone-kitchen · sunlit-scandinavian-kitchen · tokyo-shibuya-co-kitchen · melbourne-laneway-cafe | brooklyn-brownstone-kitchen (gallery[0]) |
+| bedrooms-retreats | hamptons-coastal-retreat · norwegian-lakeside-cabin · london-mayfair-townhouse · malibu-oceanfront-living | hamptons-coastal-retreat (gallery[0]) |
+| workspaces | berlin-mitte-tech-hq · sydney-harbour-cowork · chicago-warehouse-loft · tokyo-micro-loft | berlin-mitte-tech-hq (gallery[0]) |
+| hospitality-retail | melbourne-laneway-cafe · paris-saint-germain-wine-bar · amsterdam-jordaan-flower-shop · copenhagen-nordhavn-showroom | melbourne-laneway-cafe (gallery[0]) |
+| boutique-transitional | soho-maison-lobby · london-mayfair-townhouse · hamptons-coastal-retreat · paris-saint-germain-wine-bar | soho-maison-lobby (gallery[0]) |
+| minimalist-scandinavian | nyc-chelsea-yoga-studio · berlin-mitte-tech-hq · copenhagen-nordhavn-showroom · sunlit-scandinavian-kitchen | nyc-chelsea-yoga-studio (gallery[0]) |
+| compact-micro-spaces | tokyo-micro-loft · brooklyn-brownstone-kitchen · sunlit-scandinavian-kitchen · norwegian-lakeside-cabin | tokyo-micro-loft (gallery[0]) |
+
+**No image is used twice on a page:** gallery = 4 project **thumbnails** (1 per project); inclusions = that project's own **first gallery photo** (a different photo). CTA stays the constant shared image.
+
+---
+
+## 3. Image strategy (NO generation, NO new downloads)
+
+| Slot | Source |
 |---|---|
-| `interior-design` | Interior Design |
-| `space-planning` | Space Planning |
-| `custom-furniture` | Custom Furniture |
-| `renovation` | Renovation |
-| `styling-decor` | Styling & Decor |
-| `material-selection` | Material Selection |
-| `lighting-design` | Lighting Design |
-| `project-management` | Project Management |
+| Hero banner | User's real photos → `app/assets/images/services-hero-{new-slug}.jpg` (renamed from old slugs; grid order 1-8 preserved) |
+| Gallery ×4 | Real project **thumbnail** URLs from `app/data/projects.json` (CDN, w=1280&h=800&fit=crop&crop=center) |
+| Inclusions ×1 | `projects.json[inclusionsProject].galleryFirstUrl` (CDN, w=1024&h=1024&fit=crop&crop=center) — distinct photo from same project |
+| CTA (shared) | `about_closing_dark_banner_table_vase.jpg` (existing constant, all 8 pages) |
 
-Bedroom Makeover is **not** one of these 8 — it's the visual reference we copy for each.
+**Files to delete:** 40 Pollinations images — `services-inclusions-*.jpg` (8) + `services-gallery-*-01..04.jpg` (32). Keep `services-hero-*.jpg` (renamed) + all `about_*`.
+
+**`app/data/projects.json`:** generated by `scripts/snapshot-sanity-projects.cjs` (GROQ query, one-time static snapshot). Per project: `slug, title, location, category, style, thumbUrl, galleryFirstUrl`.
 
 ---
 
-## 2. Files to Change
-
-| File | Change |
-|---|---|
-| `app/data/services/interior-design.json` | NEW — Full page data for Interior Design |
-| `app/data/services/space-planning.json` | NEW — Full page data for Space Planning |
-| `app/data/services/custom-furniture.json` | NEW — Full page data for Custom Furniture |
-| `app/data/services/renovation.json` | NEW — Full page data for Renovation |
-| `app/data/services/styling-decor.json` | NEW — Full page data for Styling & Decor |
-| `app/data/services/material-selection.json` | NEW — Full page data for Material Selection |
-| `app/data/services/lighting-design.json` | NEW — Full page data for Lighting Design |
-| `app/data/services/project-management.json` | NEW — Full page data for Project Management |
-| `app/routes/services.$slug.tsx` | REPLACE — Remove Sanity loader, read JSON by slug, render Bedroom Makeover template, resolve generated image paths |
-| `app/components/whitefire/Breadcrumbs.tsx` | NEW — Shared component (spec §4.2) |
-| `app/components/whitefire/ServiceProcessStep.tsx` | NEW — Shared step (icon, number, title, desc, dotted connector) |
-| `app/components/whitefire/ProjectCard.tsx` | NEW — Shared gallery card |
-| `app/components/whitefire/ServiceInclusionItem.tsx` | NEW — Shared inclusion item |
-| `app/components/whitefire/TrustItem.tsx` | NEW — Shared trust strip item |
-| `scripts/generate-service-images.js` | NEW — Pollinations.ai batch generation script (48 images) |
-
-**Reuse existing shared components:**
-- `SiteHeader` (unified) — `activePath="/services"`, `showSearch`
-- `SiteFooter` (shared minimal)
-- `PrimaryButton` (filled = spec primary CTA)
-- `SectionEyebrow` (spec eyebrows)
-- `SectionHeading` (if needed)
-
----
-
-## 3. JSON Schema (per service — follows Bedroom Makeover spec)
+## 4. JSON Schema (per service — changes from v1)
 
 ```json
 {
-  "slug": "interior-design",
-  "hero": {
-    "eyebrow": "OUR SERVICES",
-    "title": "Interior Design",
-    "description": "Full-service interior design tailored to your lifestyle, aesthetic, and functional needs.",
-    "image": "services-hero-interior-design.jpg",
-    "imageAlt": "Warm luxury living room with dark wood cabinetry, fireplace, neutral seating and greenery.",
-    "primaryCta": { "label": "SCHEDULE A CONSULTATION", "href": "/contact" },
-    "secondaryCta": { "label": "VIEW OUR WORK", "href": "/projects" }
-  },
-  "inclusions": [
-    { "title": "Space Planning", "description": "Smart layouts that maximize comfort and flow.", "icon": "layout" },
-    { "title": "Material & Finishes", "description": "Premium materials that bring warmth and elegance.", "icon": "materials" },
-    { "title": "Custom Furniture", "description": "Bespoke pieces tailored to your style and needs.", "icon": "furniture" },
-    { "title": "Styling & Decor", "description": "Curated decor and accessories to complete the look.", "icon": "styling" },
-    { "title": "Lighting Design", "description": "Ambient and task lighting to set the perfect mood.", "icon": "lighting" },
-    { "title": "Project Management", "description": "End-to-end management for a seamless experience.", "icon": "management" }
-  ],
-  "inclusionsImage": "services-inclusions-interior-design.jpg",
-  "inclusionsImageAlt": "Warm bedroom seating area with shelving, art, and natural materials",
-  "process": [
-    { "number": "01", "title": "Discover", "description": "We understand your needs, style, and budget.", "icon": "discover" },
-    { "number": "02", "title": "Design", "description": "We create layout concepts, mood boards, and 3D visuals.", "icon": "design" },
-    { "number": "03", "title": "Plan", "description": "We finalize materials, furniture, and all the details.", "icon": "plan" },
-    { "number": "04", "title": "Execute", "description": "Our team brings the design to life with precision and care.", "icon": "execute" },
-    { "number": "05", "title": "Reveal", "description": "We style the space and reveal your transformed space.", "icon": "reveal" }
-  ],
+  "slug": "living-spaces",
+  "hero": { "eyebrow": "OUR SERVICES", "title": "Living Spaces", "description": "...", "image": "services-hero-living-spaces.jpg", "imageAlt": "...", "primaryCta": { "label": "SCHEDULE A CONSULTATION", "href": "/contact" }, "secondaryCta": { "label": "VIEW OUR WORK", "href": "/projects" } },
+  "inclusions": [ 6 items, unchanged template ],
+  "inclusionsProject": "manhattan-modern-loft",
+  "inclusionsImageAlt": "...",
+  "process": [ 5 steps, unchanged ],
   "gallery": [
-    { "title": "Moody Interior", "image": "services-gallery-interior-design-01.jpg", "imageAlt": "Dark warm interior", "href": "/projects" },
-    { "title": "Natural Green Interior", "image": "services-gallery-interior-design-02.jpg", "imageAlt": "Warm neutral interior with green accents", "href": "/projects" },
-    { "title": "Serene Neutral Interior", "image": "services-gallery-interior-design-03.jpg", "imageAlt": "Bright neutral interior", "href": "/projects" },
-    { "title": "Arched Interior", "image": "services-gallery-interior-design-04.jpg", "imageAlt": "Interior with arched wall and neutral furnishings", "href": "/projects" }
+    { "project": "manhattan-modern-loft", "title": "Manhattan Modern Loft", "href": "/projects/manhattan-modern-loft" },
+    ... ×4
   ],
-  "cta": {
-    "eyebrow": "READY TO TRANSFORM YOUR SPACE?",
-    "title": "Let's Create Your\nPerfect Retreat",
-    "description": "Book a consultation with our design experts and take the first step toward your dream space.",
-    "image": "about_closing_dark_banner_table_vase.jpg",
-    "imageAlt": ""
-  },
-  "trust": [
-    { "title": "Personalized Designs", "description": "Every space is uniquely tailored to you.", "icon": "personalized" },
-    { "title": "Quality Assured", "description": "We use the finest materials and work with trusted craftspeople.", "icon": "quality" },
-    { "title": "On-Time Delivery", "description": "We respect your time and deliver as promised.", "icon": "delivery" },
-    { "title": "Client Satisfaction", "description": "Your happiness is our greatest reward.", "icon": "satisfaction" }
-  ]
+  "galleryHeading": "LIVING SPACES WE'VE TRANSFORMED",
+  "galleryTitle": "Designed for Living. Styled for You.",
+  "cta": { unchanged constant },
+  "trust": [ 4 items, unchanged ]
 }
 ```
 
-Each of the 8 JSON files has the **same structure** — only these fields differ per service:
-- `slug`, `hero.title`, `hero.description`, `hero.image`, `hero.imageAlt`
-- `inclusionsImage`, `inclusionsImageAlt`
-- `gallery[].image`, `gallery[].title`, `gallery[].imageAlt`
-- `cta.image` (shared constant: `about_closing_dark_banner_table_vase.jpg`)
+- `inclusionsImage`/`inclusionsProject` → loader resolves image URL from `projects.json`.
+- `gallery[].project` → loader resolves `thumbUrl` from `projects.json` (title comes from service JSON, matches project title).
+- Distinct headings per service (no generic "PROJECTS WE'VE TRANSFORMED"):
 
-Everything else (inclusion items, process steps, trust items, CTA copy) stays identical across all 8 services — exactly as the Bedroom Makeover spec defines.
-
----
-
-## 4. Image Strategy — Pollinations.ai (Batch Generation)
-
-**Total images:** 48 generated (6 per service × 8 services) + 1 shared CTA (reuse existing `about_closing_dark_banner_table_vase.jpg`)
-
-| Slot | Per Service | Filename Pattern | Description |
-|---|---|---|---|
-| Hero | 1 | `services-hero-{slug}.jpg` | Cinematic service identity |
-| Inclusions | 1 | `services-inclusions-{slug}.jpg` | Supporting bedroom/living context |
-| Gallery 1-4 | 4 | `services-gallery-{slug}-01.jpg` ... `04.jpg` | 4 distinct project images |
-| **Total per service** | **6** | | |
-| **All services** | **48** | | |
-| **CTA (shared)** | **0** (reuse existing) | `about_closing_dark_banner_table_vase.jpg` | Dark atmospheric |
-
-**Generation workflow:**
-1. Write 48 curated prompts in `scripts/prompts/service-images.md` (reviewed/approved)
-2. Run `node scripts/generate-service-images.js` → Pollinations.ai batch → saves to `app/assets/images/`
-3. Filenames: `services-hero-interior-design.jpg`, `services-inclusions-space-planning.jpg`, `services-gallery-renovation-01.jpg`, etc.
-4. Update 8 JSON files with generated filenames
-5. Route resolves images via local imports (no runtime generation)
-
-**CTA image:** Shared constant `about_closing_dark_banner_table_vase.jpg` (existing asset — no generation).
+| Service | galleryHeading | galleryTitle |
+|---|---|---|
+| living-spaces | LIVING SPACES WE'VE TRANSFORMED | Designed for Living. Styled for You. |
+| kitchens-dining | KITCHENS WE'VE TRANSFORMED | Crafted for Cooking. Made for Gathering. |
+| bedrooms-retreats | RETREATS WE'VE TRANSFORMED | Designed for Rest. Styled for You. |
+| workspaces | WORKSPACES WE'VE TRANSFORMED | Built for Focus. Designed to Inspire. |
+| hospitality-retail | HOSPITALITY WE'VE TRANSFORMED | Spaces That Welcome. Rooms That Stay. |
+| boutique-transitional | BOUTIQUE INTERIORS WE'VE TRANSFORMED | Refined Details. Timeless Character. |
+| minimalist-scandinavian | MINIMAL SPACES WE'VE TRANSFORMED | Less, Thoughtfully Chosen. More, Felt. |
+| compact-micro-spaces | MICRO SPACES WE'VE TRANSFORMED | Small Footprints. Big Living. |
 
 ---
 
-## 5. Page Structure (Bedroom Makeover template verbatim)
+## 5. Files to Change (v2)
 
-```
-SiteHeader (unified, activePath="/services", showSearch)
-  ↓
-ServiceHero — cinematic image, dark overlay, breadcrumbs, title, description, dual CTAs
-  ↓
-ServiceInclusions — 2-col (text + image), 6 icon items
-  ↓
-ServiceProcess — 5 steps with dotted connectors, dark icon circles
-  ↓
-ServiceGalleryStrip — 4 images, 1.6:1 ratio, mobile scroll-snap
-  ↓
-ConsultationCTA — dark bg, subtle image, dual content, bronze button
-  ↓
-ServiceTrustStrip — 4 columns, thin separators, bronze icons
-  ↓
-SiteFooter (shared minimal)
-```
+| File | Change |
+|---|---|
+| `app/data/projects.json` | NEW — static Sanity snapshot (18 projects: thumb + first gallery URL + meta) |
+| `scripts/snapshot-sanity-projects.cjs` | NEW — GROQ query → projects.json |
+| `app/data/services/*.json` | 8 files RENAMED to new slugs + content rewritten (real titles/descriptions, project-based gallery/inclusions) |
+| `app/routes/services.$slug.tsx` | VALID_SLUGS → new slugs; imports: remove 40 Pollinations entries, keep 8 hero + CTA (renamed); loader reads service JSON + projects.json, resolves gallery/inclusions URLs; gallery strip uses `galleryHeading`/`galleryTitle` |
+| `app/routes/services._index.tsx` | 8 grid items: new titles/descriptions/numbers/hrefs + hero imports renamed |
+| `app/assets/images/` | delete 40 `services-inclusions-*` + `services-gallery-*`; rename 8 `services-hero-{old}→{new}` |
+| `IMAGE-USAGE-RULE.md` | NEW — reminder: no image reused until all used once |
+| `SERVICE-DETAIL-DESIGN.md` | this file, updated |
 
-**Framed stage:** Same as Home/About/Services — outer `bg-[#E8E2D8]`, 1440px panel `bg-[#F7F4EE]` + hairline ring.
+**Unchanged:** SiteHeader/SiteFooter, ServiceHero, inclusions/process/trust copy, CTA constant, framed stage, root.tsx (`/services` already hidden from global chrome).
 
 ---
 
 ## 6. Verification
 
 1. `npm run build` succeeds.
-2. `tsc --noEmit` — no new errors.
-3. For each of the 8 slugs:
-   - curl `/services/{slug}` — spec copy present, SERVICES active, breadcrumbs render, 6 inclusions, 5 process steps, 4 gallery images, CTA, trust strip.
-   - Full-page 1920px screenshot → `/home/lordwhitefire/interior-deoc-screenshot/`.
-4. Home / About / Services index unchanged.
+2. For each of the 8 new slugs: curl → hero title/description correct, 4 gallery images = real CDN thumbnails, inclusions = distinct project photo, headings per table, SERVICES active.
+3. Full-page 1920px screenshots → `/home/lordwhitefire/interior-deoc-screenshot/` for user review.
+4. Old slugs 404→redirect to /services. No `services-inclusions-*`/`services-gallery-*` references remain anywhere.
 
 ---
 
 ## 7. Out of Scope
 
-- Sanity integration (replaced with static JSON).
-- New font dependencies.
-- Swiper for gallery (native scroll-snap per spec; Swiper only if needed).
-- Any service not in the 8-grid list.
-
----
-
-**Ready to proceed: write prompts file, then generate images.**
+- Live Sanity on service pages (static snapshot; portfolio index may use live data).
+- Per-service inclusion items (template stays; may be tailored later per service).
+- Fixing dead project slugs on home page (tracked separately for Projects work).

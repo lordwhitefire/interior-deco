@@ -1,150 +1,358 @@
-// app/routes/testimonials.tsx
-import React from "react";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
+import { CalendarDays, ChevronRight, Star, Users } from "lucide-react";
 import { createClient } from "@sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
+import { SiteHeader } from "~/components/whitefire/SiteHeader";
+import { SiteFooter } from "~/components/whitefire/SiteFooter";
+import sitepages from "~/data/sitepages.json";
+import projectsData from "~/data/projects.json";
 
 const sanity = createClient({
   projectId: "pzhistba",
   dataset: "production",
-  apiVersion: "2023-01-01",
-  useCdn: true
+  apiVersion: "2023-12-01",
+  useCdn: true,
 });
 
-const builder = imageUrlBuilder(sanity);
-
-const testimonialsQuery = `
-  *[_type == "testimonial"] | order(date desc) {
-    _id,
-    clientName,
-    clientLocation,
-    rating,
-    review,
-    date,
-    "clientImageUrl": clientImage.asset->url
-  }
-`;
-
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const allTestimonials = await sanity.fetch(testimonialsQuery);
-  const shuffled = [...allTestimonials].sort(() => 0.5 - Math.random());
-  const selected = shuffled.slice(0, 6);
-  return json({ testimonials: selected });
-};
-
 export const meta: MetaFunction = () => {
-  const title = "Client Testimonials – Interior Decorators Inc.";
-  const desc  = "Real stories from clients who transformed their spaces.";
-  const img   = "https://cdn.sanity.io/images/pzhistba/production/ce1888b3419fb1b157c21b34acd2ee1c78a82ce3-1600x896.jpg?w=2000&fit=max&auto=format";
-  const url   = "https://interior-deco-kappa.vercel.app/testimonials";
-
   return [
-    { title },
-    { name: "description", content: desc },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-
-    // open-graph
-    { property: "og:title", content: title },
-    { property: "og:description", content: desc },
-    { property: "og:type", content: "website" },
-    { property: "og:url", content: url },
-    { property: "og:image", content: img },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
-
-    // twitter
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: desc },
-    { name: "twitter:image", content: img },
+    { title: "Testimonials | Whitefire Interior" },
+    {
+      name: "description",
+      content:
+        "Discover what Whitefire Interior clients say about their interior design projects and experiences.",
+    },
   ];
 };
 
+interface Testimonial {
+  id: string;
+  quote: string;
+  clientName: string;
+  projectName: string;
+  location: string;
+  clientImage?: string;
+  clientImageAlt?: string;
+  projectSlug?: string;
+}
+
+interface TrustStat {
+  id: string;
+  value: string;
+  label: string;
+  icon: "armchair" | "users" | "star" | "calendar";
+}
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const testimonials = await sanity.fetch(
+    `*[_type == "testimonial"] | order(date desc) {
+      _id,
+      clientName,
+      clientLocation,
+      rating,
+      review,
+      date,
+      "clientImage": clientImage.asset->url
+    }`
+  );
+
+  const projectsByLocation = new Map<string, string>();
+  for (const [slug, project] of Object.entries(projectsData)) {
+    projectsByLocation.set(project.location.toLowerCase(), slug);
+  }
+
+  const items: Testimonial[] = (testimonials ?? [])
+    .slice(0, 6)
+    .map((t: any) => {
+      const slug = projectsByLocation.get((t.clientLocation ?? "").toLowerCase());
+      const project = slug ? (projectsData as any)[slug] : null;
+      return {
+        id: t._id,
+        quote: t.review ?? "",
+        clientName: t.clientName ?? "",
+        projectName: project?.title ?? "",
+        location: t.clientLocation ?? "",
+        clientImage: t.clientImage
+          ? `${t.clientImage}?w=100&h=100&fit=crop&crop=center&auto=format&q=85`
+          : undefined,
+        clientImageAlt: `Portrait of ${t.clientName ?? "client"}`,
+        projectSlug: slug,
+      };
+    });
+
+  const stats: TrustStat[] = [
+    { id: "projects", value: "18+", label: "Projects Completed", icon: "armchair" },
+    { id: "clients", value: "18+", label: "Happy Clients", icon: "users" },
+    { id: "rating", value: "5/5", label: "Average Rating", icon: "star" },
+    { id: "experience", value: "8", label: "Team Members", icon: "calendar" },
+  ];
+
+  return json({ testimonials: items, stats });
+};
+
 export default function TestimonialsRoute() {
-  const { testimonials } = useLoaderData<typeof loader>();
-
-  const bannerImage = "https://cdn.sanity.io/images/pzhistba/production/f104fed083d01a99d9f761c39126817a3db840a3-1600x896.jpg?h=600&fit=crop&auto=format";
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { year: "numeric", month: "long" });
-  };
+  const { testimonials, stats } = useLoaderData<typeof loader>();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* HERO BANNER */}
-      <div className="relative h-96 overflow-hidden">
-        <img src={bannerImage} alt="Client Testimonials" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent" />
-        <div className="absolute inset-0 flex items-center justify-center text-center px-6">
-          <div className="max-w-4xl">
-            <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-4">Client Stories</h1>
-            <p className="text-xl text-white/90">Real people. Real homes. Real transformations.</p>
+    <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
+      <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
+        <SiteHeader activePath="/testimonials" />
+
+        <main>
+          <TestimonialsHero />
+          <Intro />
+          <TestimonialGrid testimonials={testimonials} />
+          <TrustStats stats={stats} />
+          <ConsultationCTA />
+        </main>
+
+        <SiteFooter />
+      </div>
+    </div>
+  );
+}
+
+function TestimonialsHero() {
+  return (
+    <section className="relative isolate min-h-[330px] overflow-hidden bg-[#0d0d0c]">
+      <img
+        src={sitepages.testimonials.hero.src}
+        alt={sitepages.testimonials.hero.alt}
+        className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
+        fetchPriority="high"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(8,8,7,0.97)_0%,rgba(8,8,7,0.85)_30%,rgba(8,8,7,0.38)_68%,rgba(8,8,7,0.08)_100%)]"
+      />
+
+      <div className="mx-auto flex min-h-[330px] max-w-[1440px] items-start px-6 py-[64px] sm:px-10 lg:px-[62px]">
+        <div className="max-w-[430px] text-white">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#b48a4a]">
+            TESTIMONIALS
+          </p>
+
+          <h1 className="font-serif text-[40px] leading-[1.13] tracking-[-0.02em] sm:text-[44px]">
+            Kind Words.
+            <br />
+            Beautiful Spaces.
+          </h1>
+
+          <div className="my-6 h-px w-[52px] bg-[#b48a4a]" />
+
+          <p className="max-w-[370px] text-[14px] leading-7 text-white/90 sm:text-[15px]">
+            We're honored to work with incredible clients and bring their
+            visions to life.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Intro() {
+  return (
+    <header className="mx-auto max-w-[700px] px-6 pt-9 text-center sm:px-8 lg:px-12">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.19em] text-[#a8783e]">
+        CLIENT TESTIMONIALS
+      </p>
+
+      <h2
+        id="testimonials-heading"
+        className="mt-3 font-serif text-[28px] leading-tight tracking-[-0.02em] sm:text-[31px]"
+      >
+        What Our Clients Say
+      </h2>
+
+      <div className="mx-auto my-4 h-px w-[46px] bg-[#b48a4a]" />
+
+      <p className="mx-auto max-w-[650px] text-[13px] leading-6 text-[#292929] sm:text-[14px]">
+        From concept to completion, we're passionate about creating spaces that
+        reflect our clients' stories and elevate their everyday.
+      </p>
+    </header>
+  );
+}
+
+function TestimonialGrid({ testimonials }: { testimonials: Testimonial[] }) {
+  if (!testimonials.length) {
+    return (
+      <div className="mt-7 border border-[#ded8d0] bg-[#f1ede8] px-6 py-12 text-center">
+        <p className="font-serif text-xl">Testimonials coming soon.</p>
+      </div>
+    );
+  }
+
+  return (
+    <section
+      aria-labelledby="testimonials-heading"
+      className="bg-[#F7F4EE] px-6 pb-7 pt-7 sm:px-8 lg:px-12 lg:pb-8"
+    >
+      <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-[14px] md:grid-cols-2 lg:grid-cols-3">
+        {testimonials.map((testimonial) => (
+          <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
+  return (
+    <article className="flex min-h-[228px] flex-col bg-[#efebe7] px-[21px] py-[18px]">
+      <div
+        aria-hidden="true"
+        className="font-serif text-[39px] leading-none text-[#b08a52]"
+      >
+        "
+      </div>
+
+      <blockquote className="mt-1 text-[13px] leading-[1.7] text-[#171717]">
+        {testimonial.quote}
+      </blockquote>
+
+      <div className="mt-auto pt-5">
+        <div className="mb-4 h-px w-[26px] bg-[#c9bfb2]" />
+
+        <div className="flex items-center gap-3">
+          {testimonial.clientImage ? (
+            <img
+              src={testimonial.clientImage}
+              alt={testimonial.clientImageAlt ?? ""}
+              className="h-[50px] w-[50px] shrink-0 rounded-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div
+              aria-hidden="true"
+              className="h-[50px] w-[50px] shrink-0 rounded-full bg-[#d8d1c8]"
+            />
+          )}
+
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.06em] text-[#171717]">
+              {testimonial.clientName}
+            </p>
+            <p className="mt-1 text-[9px] font-medium uppercase leading-[1.55] tracking-[0.11em] text-[#5e5a56]">
+              {testimonial.projectSlug ? (
+                <Link
+                  to={`/projects/${testimonial.projectSlug}`}
+                  className="transition-colors hover:text-[#a8793f]"
+                >
+                  {testimonial.projectName}
+                </Link>
+              ) : (
+                testimonial.projectName
+              )}
+              <br />
+              {testimonial.location}
+            </p>
           </div>
         </div>
       </div>
+    </article>
+  );
+}
 
-      {/* TESTIMONIALS GRID */}
-      <main className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((t) => (
-          <div key={t._id} className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-shadow">
-  {/* Rating Stars */}
-  <div className="flex mb-4">
-    {[...Array(5)].map((_, i) => (
-      <span key={i} className={`text-2xl ${i < t.rating ? "text-amber-400" : "text-gray-300"}`}>★</span>
-    ))}
-  </div>
+function TrustStats({ stats }: { stats: TrustStat[] }) {
+  return (
+    <section
+      aria-label="Whitefire Interior statistics"
+      className="mx-auto mt-2 max-w-[1320px] grid grid-cols-2 border-y border-[#ddd7d0] px-6 sm:px-8 lg:grid-cols-4 lg:px-12"
+    >
+      {stats.map((stat, index) => (
+        <div
+          key={stat.id}
+          className={[
+            "flex min-h-[90px] items-center justify-center gap-3 px-3 py-5",
+            index % 2 !== 0 ? "border-l border-[#ddd7d0]" : "",
+            index >= 2 ? "border-t border-[#ddd7d0]" : "",
+            index > 0 ? "lg:border-l" : "",
+            "lg:border-t-0",
+          ].join(" ")}
+        >
+          <StatIcon type={stat.icon} />
 
-  {/* Review Text – clamped inline */}
-  {(() => {
-    const limit = 160;
-    const [open, setOpen] = React.useState(false);
-    const isLong = t.review.length > limit;
-    return (
-      <p className="text-gray-700 italic mb-6 leading-relaxed">
-        “{open ? t.review : `${t.review.slice(0, limit)}${isLong ? '…' : ''}`}”
-        {isLong && (
-          <button
-            onClick={() => setOpen((o) => !o)}
-            className="ml-2 text-green-700 underline hover:no-underline"
+          <div>
+            <p className="font-serif text-[27px] leading-none tracking-[-0.02em] sm:text-[30px]">
+              {stat.value}
+            </p>
+            <p className="mt-1 text-[8px] font-semibold uppercase tracking-[0.11em] text-[#383838] sm:text-[9px]">
+              {stat.label}
+            </p>
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+function StatIcon({ type }: { type: TrustStat["icon"] }) {
+  const common = {
+    size: 29,
+    strokeWidth: 1.35,
+    className: "text-[#a8793f]",
+    "aria-hidden": true as const,
+  };
+
+  switch (type) {
+    case "users":
+      return <Users {...common} />;
+    case "star":
+      return <Star {...common} />;
+    case "calendar":
+      return <CalendarDays {...common} />;
+    case "armchair":
+    default:
+      return (
+        <span
+          aria-hidden="true"
+          className="flex h-7 w-7 items-center justify-center text-[25px] leading-none text-[#a8793f]"
+        >
+          ♧
+        </span>
+      );
+  }
+}
+
+function ConsultationCTA() {
+  return (
+    <section className="grid min-h-[285px] bg-[#171717] lg:grid-cols-[55%_45%]">
+      <div className="relative min-h-[230px] overflow-hidden">
+        <img
+          src={sitepages.testimonials.cta.src}
+          alt={sitepages.testimonials.cta.alt}
+          className="h-full w-full object-cover object-center"
+          loading="lazy"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-black/15" />
+      </div>
+
+      <div className="flex items-center px-7 py-10 text-white sm:px-10 lg:px-12">
+        <div className="max-w-[470px]">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#b48a4a]">
+            READY TO CREATE YOUR OWN STORY?
+          </p>
+
+          <h2 className="mt-3 font-serif text-[26px] leading-[1.18] tracking-[-0.02em] sm:text-[29px]">
+            Let's Design Something Beautiful
+          </h2>
+
+          <p className="mt-3 max-w-[390px] text-[13px] leading-6 text-white/85">
+            We'd love to hear about your project and help bring your vision to
+            life.
+          </p>
+
+          <Link
+            to="/contact"
+            className="mt-5 inline-flex min-h-[43px] items-center gap-4 bg-[#b58a52] px-5 text-[9px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#c39b69] focus:outline-none focus:ring-2 focus:ring-[#b58a52] focus:ring-offset-2 focus:ring-offset-[#171717]"
           >
-            {open ? 'Show less' : 'Read more'}
-          </button>
-        )}
-      </p>
-    );
-  })()}
-
-  {/* Client Info */}
-  <div className="flex items-center gap-4">
-    {t.clientImageUrl ? (
-      <img
-        src={builder.image(t.clientImageUrl).width(80).height(80).fit('crop').crop('center').auto('format').url()}
-        alt={t.clientName}
-        className="w-14 h-14 rounded-full object-cover"
-      />
-    ) : (
-      <div className="w-14 h-14 rounded-full bg-gray-200 border-2 border-dashed border-gray-300" />
-    )}
-    <div>
-      <h3 className="font-semibold text-lg">{t.clientName}</h3>
-      <p className="text-sm text-gray-500">{t.clientLocation} • {formatDate(t.date)}</p>
-    </div>
-  </div>
-</div>
-          ))}
+            SCHEDULE A CONSULTATION
+            <ChevronRight size={15} strokeWidth={1.5} aria-hidden="true" />
+          </Link>
         </div>
-
-        {/* CTA */}
-        <div className="text-center mt-16">
-          <p className="text-lg text-gray-600 mb-6">Ready to write your own story?</p>
-          <a href="/contact" className="inline-block bg-black text-white px-10 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition">
-            Start Your Project
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+    </section>
   );
 }

@@ -29,15 +29,9 @@ import { SectionHeading } from "~/components/whitefire/SectionHeading";
 
 import heroImage from "~/assets/images/living_design.jpg";
 import studioImage from "~/assets/images/Concept.jpg";
-import projectVillaImage from "~/assets/images/project1.jpg";
-import projectApartmentImage from "~/assets/images/project3.jpeg";
-import projectJordaanImage from "~/assets/images/project4.jpeg";
-import projectOfficeImage from "~/assets/images/project7.jpeg";
-import projectResidenceImage from "~/assets/images/progect5.jpg";
-import articleTrendsImage from "~/assets/images/blog-2.jpeg";
-import articleSmallSpaceImage from "~/assets/images/blog-3.jpeg";
-import articleMaterialsImage from "~/assets/images/blog-6.jpg";
 import newsletterImage from "~/assets/images/Perfect.jpg";
+import projectsData from "~/data/projects.json";
+import { articles } from "~/data/blogMock";
 
 const sanityClient = createClient({
   projectId: "pzhistba",
@@ -181,54 +175,54 @@ const mockServices: ServiceItem[] = [
 
 const mockProjects: ProjectCardData[] = [
   {
-    id: "modern-luxury-villa",
-    title: "Modern Luxury Villa",
-    location: "Bangalore, India",
+    id: "amsterdam-jordaan-flower-shop",
+    title: "Amsterdam Jordaan Flower Shop",
+    location: "Jordaan, Amsterdam",
     image: {
-      src: projectVillaImage,
-      alt: "Modern luxury villa interior",
+      src: projectsData["amsterdam-jordaan-flower-shop"].cardUrl,
+      alt: "Amsterdam Jordaan flower shop interior",
     },
-    href: "/projects/modern-luxury-villa",
+    href: "/projects/amsterdam-jordaan-flower-shop",
   },
   {
-    id: "urban-apartment",
-    title: "The Urban Apartment",
-    location: "Mumbai, India",
+    id: "berlin-mitte-tech-hq",
+    title: "Berlin Mitte Tech HQ",
+    location: "Mitte, Berlin",
     image: {
-      src: projectApartmentImage,
-      alt: "Urban apartment interior",
+      src: projectsData["berlin-mitte-tech-hq"].cardUrl,
+      alt: "Berlin Mitte tech headquarters interior",
     },
-    href: "/projects/the-urban-apartment",
+    href: "/projects/berlin-mitte-tech-hq",
   },
   {
-    id: "jordaan-flower-shop",
-    title: "Jordaan Flower Shop",
-    location: "Amsterdam, Netherlands",
+    id: "brooklyn-brownstone-kitchen",
+    title: "Brooklyn Brownstone Kitchen",
+    location: "Park Slope, Brooklyn",
     image: {
-      src: projectJordaanImage,
-      alt: "Jordaan flower shop interior",
+      src: projectsData["brooklyn-brownstone-kitchen"].cardUrl,
+      alt: "Brooklyn brownstone kitchen interior",
     },
-    href: "/projects/jordaan-flower-shop",
+    href: "/projects/brooklyn-brownstone-kitchen",
   },
   {
-    id: "contemporary-office",
-    title: "Contemporary Office",
-    location: "Gurugram, India",
+    id: "chicago-warehouse-loft",
+    title: "Chicago Warehouse Loft",
+    location: "West Loop, Chicago",
     image: {
-      src: projectOfficeImage,
-      alt: "Contemporary office interior",
+      src: projectsData["chicago-warehouse-loft"].cardUrl,
+      alt: "Chicago warehouse loft interior",
     },
-    href: "/projects/contemporary-office",
+    href: "/projects/chicago-warehouse-loft",
   },
   {
-    id: "minimalist-residence",
-    title: "Minimalist Residence",
-    location: "Pune, India",
+    id: "copenhagen-nordhavn-showroom",
+    title: "Copenhagen Nordhavn Showroom",
+    location: "Nordhavn, Copenhagen",
     image: {
-      src: projectResidenceImage,
-      alt: "Minimalist residence interior",
+      src: projectsData["copenhagen-nordhavn-showroom"].cardUrl,
+      alt: "Copenhagen Nordhavn showroom interior",
     },
-    href: "/projects/minimalist-residence",
+    href: "/projects/copenhagen-nordhavn-showroom",
   },
 ];
 
@@ -257,40 +251,31 @@ const mockStats: StatItem[] = [
 
 const mockArticles: ArticleCardData[] = [
   {
-    id: "interior-design-trends",
-    category: "DESIGN TRENDS",
-    title: "Top 7 Interior Design Trends to Watch in 2024",
-    date: "May 10, 2024",
-    readTime: "5 min read",
-    image: {
-      src: articleTrendsImage,
-      alt: "Contemporary interior design details",
-    },
-    href: "/blog/interior-design-trends",
+    id: articles[0].slug,
+    category: articles[0].category,
+    title: articles[0].title,
+    date: articles[0].date,
+    readTime: articles[0].readTime,
+    image: articles[0].image,
+    href: `/blog/${articles[0].slug}`,
   },
   {
-    id: "small-space",
-    category: "TIPS & GUIDE",
-    title: "How to Make a Small Space Feel Bigger",
-    date: "May 5, 2024",
-    readTime: "4 min read",
-    image: {
-      src: articleSmallSpaceImage,
-      alt: "Bright small living space",
-    },
-    href: "/blog/small-space",
+    id: articles[1].slug,
+    category: articles[1].category,
+    title: articles[1].title,
+    date: articles[1].date,
+    readTime: articles[1].readTime,
+    image: articles[1].image,
+    href: `/blog/${articles[1].slug}`,
   },
   {
-    id: "sustainable-materials",
-    category: "MATERIALS",
-    title: "Sustainable Materials for Modern Interiors",
-    date: "Apr 28, 2024",
-    readTime: "6 min read",
-    image: {
-      src: articleMaterialsImage,
-      alt: "Natural sustainable interior materials",
-    },
-    href: "/blog/sustainable-materials",
+    id: articles[2].slug,
+    category: articles[2].category,
+    title: articles[2].title,
+    date: articles[2].date,
+    readTime: articles[2].readTime,
+    image: articles[2].image,
+    href: `/blog/${articles[2].slug}`,
   },
 ];
 
@@ -660,7 +645,7 @@ function ProjectCard({ project }: { project: ProjectCardData }) {
   );
 }
 
-function FeaturedProjectsSection({ images }: { images?: string[] }) {
+function FeaturedProjectsSection() {
   return (
     <section className="bg-[#F7F4EE] px-6 py-16 sm:px-8 lg:px-12 lg:py-20">
       <div className="mx-auto max-w-[1280px]">
@@ -679,17 +664,8 @@ function FeaturedProjectsSection({ images }: { images?: string[] }) {
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          {mockProjects.map((project, index) => (
-            <ProjectCard
-              key={project.id}
-              project={{
-                ...project,
-                image: {
-                  ...project.image,
-                  src: images?.[index] ?? project.image.src,
-                },
-              }}
-            />
+          {mockProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       </div>
@@ -758,7 +734,7 @@ function ArticleCard({ article }: { article: ArticleCardData }) {
   );
 }
 
-function LatestArticlesSection({ images }: { images?: string[] }) {
+function LatestArticlesSection() {
   return (
     <section className="bg-[#F7F4EE] px-6 py-16 sm:px-8 lg:px-12 lg:py-20">
       <div className="mx-auto max-w-[1280px]">
@@ -774,17 +750,8 @@ function LatestArticlesSection({ images }: { images?: string[] }) {
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {mockArticles.map((article, index) => (
-            <ArticleCard
-              key={article.id}
-              article={{
-                ...article,
-                image: {
-                  ...article.image,
-                  src: images?.[index] ?? article.image.src,
-                },
-              }}
-            />
+          {mockArticles.map((article) => (
+            <ArticleCard key={article.id} article={article} />
           ))}
         </div>
       </div>
@@ -888,20 +855,13 @@ function NewsletterCTA({ image }: { image?: string | null }) {
 
 export async function loader() {
   try {
-    const [heroDoc, stylishDoc, projectsDoc, articlesDoc, clientsDoc] =
-      await Promise.all([
-        sanityClient.fetch(groq`*[_type == "hero"][0]{images}`),
-        sanityClient.fetch(groq`*[_type == "stylish"][0]{images}`),
-        sanityClient.fetch(
-          groq`*[_type == "project"] | order(id asc){id, image}`
-        ),
-        sanityClient.fetch(
-          groq`*[_type == "article"] | order(date desc){title, image}`
-        ),
-        sanityClient.fetch(
-          groq`*[_type == "client"] | order(id asc){id, name, logo}`
-        ),
-      ]);
+    const [heroDoc, stylishDoc, clientsDoc] = await Promise.all([
+      sanityClient.fetch(groq`*[_type == "hero"][0]{images}`),
+      sanityClient.fetch(groq`*[_type == "stylish"][0]{images}`),
+      sanityClient.fetch(
+        groq`*[_type == "client"] | order(id asc){id, name, logo}`
+      ),
+    ]);
 
     const heroImages: string[] = (heroDoc?.images ?? []).map((img: any) =>
       urlFor(img).url()
@@ -909,12 +869,6 @@ export async function loader() {
     const studioImage: string | null = stylishDoc?.images?.[0]
       ? urlFor(stylishDoc.images[0]).url()
       : null;
-    const projectImages: string[] = (projectsDoc ?? []).map((project: any) =>
-      urlFor(project.image).url()
-    );
-    const articleImages: string[] = (articlesDoc ?? []).map((article: any) =>
-      urlFor(article.image).url()
-    );
     const baseLogos: ClientLogo[] = (clientsDoc ?? []).map((client: any) => ({
       id: String(client.id),
       name: client.name,
@@ -929,23 +883,19 @@ export async function loader() {
     return json({
       heroImages,
       studioImage,
-      projectImages,
-      articleImages,
       clientLogos,
     });
   } catch {
     return json({
       heroImages: [],
       studioImage: null,
-      projectImages: [],
-      articleImages: [],
       clientLogos: [],
     });
   }
 }
 
 export default function HomePage() {
-  const { heroImages, studioImage, projectImages, articleImages, clientLogos } =
+  const { heroImages, studioImage, clientLogos } =
     useLoaderData<typeof loader>();
 
   return (
@@ -957,9 +907,9 @@ export default function HomePage() {
           <ServicesSection />
           <HomeStudioStatement image={studioImage} />
           <TestimonialsTrustSection logos={clientLogos} />
-          <FeaturedProjectsSection images={projectImages} />
+          <FeaturedProjectsSection />
           <HomeStats />
-          <LatestArticlesSection images={articleImages} />
+          <LatestArticlesSection />
           <NewsletterCTA image={heroImages[1]} />
         </main>
 

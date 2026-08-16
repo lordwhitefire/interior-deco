@@ -1,0 +1,99 @@
+{
+  "id": "article-1",
+  "slug": "bold-patterns-balanced-spaces-in-kitchens",
+  "category": "Kitchen Design",
+  "categorySlug": "kitchen-design",
+  "title": "Bold Patterns, Balanced Spaces in Kitchens",
+  "excerpt": "How to use statement patterns with intention—creating kitchens that are dynamic, timeless, and uniquely yours.",
+  "date": "May 6, 2024",
+  "readTime": "5 min read",
+  "featured": true,
+  "image": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/d0cc7a69dbad5fd0c200f0c487be52134d7676c8-1600x896.jpg?w=1280&h=800&fit=crop&crop=center&auto=format&q=85",
+    "alt": "Bold Patterns, Balanced Spaces in Kitchens — card"
+  },
+  "heroImage": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/6056555366568970f2eb88fb5ffcfa7ad391ecb2-1600x896.jpg?w=1920&h=1080&fit=crop&crop=center&auto=format&q=85",
+    "alt": "Bold Patterns, Balanced Spaces in Kitchens — hero"
+  },
+  "leadImage": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/c6bd07cefab8c8e2ec2c9f66bd36bae70e330cd6-1600x896.jpg?w=1280&h=640&fit=crop&crop=center&auto=format&q=85",
+    "alt": "Bold Patterns, Balanced Spaces in Kitchens — lead"
+  },
+  "intro": [
+    "Kitchens are more than just functional spaces—they’re the heart of the home. And when it comes to design, bold patterns can transform a kitchen from ordinary to unforgettable.",
+    "The key is balance. By pairing strong patterns with natural materials, neutral tones, and thoughtful details, you can create a space that feels both dynamic and timeless."
+  ],
+  "sections": [
+    {
+      "number": 1,
+      "title": "Start with a Statement",
+      "paragraphs": [
+        "Whether it’s a geometric tile backsplash, a dramatic stone countertop, or patterned floor tiles, choose one element to set the tone. Let it be the hero."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/d63268ac9c5e96f8685354e2a666225820597d5e-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Bold Patterns, Balanced Spaces in Kitchens — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/264a05e5631468c24669feaee63d38c226eb8bc9-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Bold Patterns, Balanced Spaces in Kitchens — inline"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Balance with Neutrals",
+      "paragraphs": [
+        "To keep the space from feeling overwhelming, ground bold patterns with neutral cabinetry, warm wood tones, and natural textures."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/081a61ca1dda4ce71d5c2353a1d4a5a573f45aee-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Bold Patterns, Balanced Spaces in Kitchens — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/d4c0f1b8295f4cc344876a353447c375ebf5c2ff-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Bold Patterns, Balanced Spaces in Kitchens — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/c2c4cc8f4ae6f98e365918c5aa5327244d5a615b-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Bold Patterns, Balanced Spaces in Kitchens — inline"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Layer in Texture",
+      "paragraphs": [
+        "Mix materials like wood, stone, metal, and ceramics to add depth and interest. Texture helps tie patterns into the overall design seamlessly."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/74474f50ad4400e3ceeb529f3aafecf786a90382-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Bold Patterns, Balanced Spaces in Kitchens — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/4c1f48ec0d526b1a0729cbd9b12feb1d8e38b368-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Bold Patterns, Balanced Spaces in Kitchens — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/501668381974253285806ff931f91527dbe931ea-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Bold Patterns, Balanced Spaces in Kitchens — inline"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Keep It Personal",
+      "paragraphs": [
+        "Bold patterns should reflect your personality and lifestyle. Choose designs that make you feel good every time you walk into the room.",
+        "When done right, bold patterns don’t just decorate a kitchen—they define it."
+      ],
+      "images": []
+    }
+  ],
+  "metaTitle": "Bold Patterns, Balanced Spaces in Kitchens | Whitefire Interior",
+  "metaDescription": "How to use statement patterns with intention—creating kitchens that are dynamic, timeless, and uniquely yours."
+}

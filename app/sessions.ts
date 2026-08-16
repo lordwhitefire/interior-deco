@@ -8,7 +8,7 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
     maxAge: 60 * 60 * 24 * 365, // 1 year
     path: "/",
     sameSite: "lax",
-    secrets: [process.env.SESSION_SECRET!], // add to .env
+    secrets: [process.env.SESSION_SECRET || "dev-secret"], // add to .env
     secure: process.env.NODE_ENV === "production",
   },
 });

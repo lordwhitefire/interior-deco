@@ -161,7 +161,16 @@ export default function Root() {
   const hideGlobalHeader =
     isHome ||
     location.pathname === "/about" ||
-    location.pathname.startsWith("/services");
+    location.pathname === "/projects" ||
+    location.pathname.startsWith("/services") ||
+    location.pathname.startsWith("/projects/") ||
+    location.pathname === "/blog" ||
+    location.pathname.startsWith("/blog/") ||
+    location.pathname === "/team" ||
+    location.pathname.startsWith("/team/") ||
+    location.pathname === "/testimonials" ||
+    location.pathname === "/faq" ||
+    location.pathname === "/contact";
 
   return (
     <html lang="en" className="h-full">

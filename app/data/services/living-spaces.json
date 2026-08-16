@@ -1,0 +1,137 @@
+{
+  "slug": "living-spaces",
+  "hero": {
+    "eyebrow": "OUR SERVICES",
+    "title": "Living Spaces",
+    "description": "Warm, layered living rooms designed for everyday comfort — from Malibu oceanfront to a Norwegian lakeside cabin.",
+    "image": "services-hero-living-spaces.jpg",
+    "imageAlt": "Warm luxury living room with a beige linen sectional, walnut cabinetry and a stone fireplace.",
+    "primaryCta": {
+      "label": "SCHEDULE A CONSULTATION",
+      "href": "/contact"
+    },
+    "secondaryCta": {
+      "label": "VIEW OUR WORK",
+      "href": "/projects"
+    }
+  },
+  "inclusions": [
+    {
+      "title": "Space Planning",
+      "description": "Smart layouts that maximize comfort and flow.",
+      "icon": "layout"
+    },
+    {
+      "title": "Material & Finishes",
+      "description": "Premium materials that bring warmth and elegance.",
+      "icon": "materials"
+    },
+    {
+      "title": "Custom Furniture",
+      "description": "Bespoke pieces tailored to your style and needs.",
+      "icon": "furniture"
+    },
+    {
+      "title": "Styling & Decor",
+      "description": "Curated decor and accessories to complete the look.",
+      "icon": "styling"
+    },
+    {
+      "title": "Lighting Design",
+      "description": "Ambient and task lighting to set the perfect mood.",
+      "icon": "lighting"
+    },
+    {
+      "title": "Project Management",
+      "description": "End-to-end management for a seamless experience.",
+      "icon": "management"
+    }
+  ],
+  "inclusionsProject": "manhattan-modern-loft",
+  "inclusionsImageAlt": "Manhattan Modern Loft — interior view from the project gallery.",
+  "process": [
+    {
+      "number": "01",
+      "title": "Discover",
+      "description": "We understand your needs, style, and budget.",
+      "icon": "discover"
+    },
+    {
+      "number": "02",
+      "title": "Design",
+      "description": "We create layout concepts, mood boards, and 3D visuals.",
+      "icon": "design"
+    },
+    {
+      "number": "03",
+      "title": "Plan",
+      "description": "We finalize materials, furniture, and all the details.",
+      "icon": "plan"
+    },
+    {
+      "number": "04",
+      "title": "Execute",
+      "description": "Our team brings the design to life with precision and care.",
+      "icon": "execute"
+    },
+    {
+      "number": "05",
+      "title": "Reveal",
+      "description": "We style the space and reveal your transformed space.",
+      "icon": "reveal"
+    }
+  ],
+  "gallery": [
+    {
+      "project": "manhattan-modern-loft",
+      "title": "Manhattan Modern Loft",
+      "href": "/projects/manhattan-modern-loft"
+    },
+    {
+      "project": "malibu-oceanfront-living",
+      "title": "Malibu Oceanfront Living",
+      "href": "/projects/malibu-oceanfront-living"
+    },
+    {
+      "project": "london-mayfair-townhouse",
+      "title": "London Mayfair Townhouse",
+      "href": "/projects/london-mayfair-townhouse"
+    },
+    {
+      "project": "norwegian-lakeside-cabin",
+      "title": "Norwegian Lakeside Cabin",
+      "href": "/projects/norwegian-lakeside-cabin"
+    }
+  ],
+  "galleryHeading": "LIVING SPACES WE'VE TRANSFORMED",
+  "galleryTitle": "Designed for Living. Styled for You.",
+  "cta": {
+    "eyebrow": "READY TO TRANSFORM YOUR SPACE?",
+    "title": "Let's Create Your\nPerfect Retreat",
+    "description": "Book a consultation with our design experts and take the first step toward your dream space.",
+    "image": "about_closing_dark_banner_table_vase.jpg",
+    "imageAlt": ""
+  },
+  "trust": [
+    {
+      "title": "Personalized Designs",
+      "description": "Every space is uniquely tailored to you.",
+      "icon": "personalized"
+    },
+    {
+      "title": "Quality Assured",
+      "description": "We use the finest materials and work with trusted craftspeople.",
+      "icon": "quality"
+    },
+    {
+      "title": "On-Time Delivery",
+      "description": "We respect your time and deliver as promised.",
+      "icon": "delivery"
+    },
+    {
+      "title": "Client Satisfaction",
+      "description": "Your happiness is our greatest reward.",
+      "icon": "satisfaction"
+    }
+  ]
+}

@@ -18,6 +18,7 @@ const staffQuery = `
     role,
     bio,
     "photoUrl": photo.asset->url,
+    "slug": slug.current,
     social,
     metaTitle,
     metaDescription,

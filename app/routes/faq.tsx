@@ -1,225 +1,456 @@
-// app/routes/faq.tsx  –  REMIX + SANITY  –  6+3 LOAD-MORE
-import type { MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { useState } from "react";
-import { Link } from "@remix-run/react";
-import groq from "groq";
-
+import { Link, useLoaderData } from "@remix-run/react";
+import { ChevronRight, Minus, Plus } from "lucide-react";
+import { useMemo, useState } from "react";
 import { createClient } from "@sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
+import { SiteHeader } from "~/components/whitefire/SiteHeader";
+import { SiteFooter } from "~/components/whitefire/SiteFooter";
+import sitepages from "~/data/sitepages.json";
 
-import NavigationBar from "~/components/NavigationBar";
-import Footer from "~/components/Footer";
-
-/* ------------------------------------------------------------------ */
-/*  Sanity client                                                     */
-/* ------------------------------------------------------------------ */
-const sanityClient = createClient({
+const sanity = createClient({
   projectId: "pzhistba",
   dataset: "production",
   apiVersion: "2023-12-01",
   useCdn: true,
 });
-const builder = imageUrlBuilder(sanityClient);
 
-/* ------------------------------------------------------------------ */
-/*  Loader – same as before                                            */
-/* ------------------------------------------------------------------ */
-export async function loader() {
-  const pageContent = await sanityClient.fetch(
-    groq`*[_type == "faqPage"][0]{
-      title, heroHeadline, heroBackgroundImage,
-      generalFaqsTitle, projectFaqsTitle, seoTitle, seoDescription
-    }`
-  );
-
-  const faqItems = await sanityClient.fetch(
-    groq`*[_type == "faqItem"] | order(displayOrder asc){
-      _id, question, answer, isFeatured,
-      category->{ _id, title, isProjectRelated }
-    }`
-  );
-
-  const generalFaqs = faqItems
-    .filter((i) => !i.category.isProjectRelated)
-    .map((i) => ({ id: i._id, question: i.question, answer: i.answer }));
-
-  const projectFaqs = faqItems
-    .filter((i) => i.category.isProjectRelated)
-    .map((i) => ({ id: i._id, question: i.question, answer: i.answer }));
-
-  const heroImageUrl = pageContent?.heroBackgroundImage
-    ? builder.image(pageContent.heroBackgroundImage).width(1600).url()
-    : null;
-
-  return json({
-    pageContent: { ...pageContent, heroBackgroundImage: heroImageUrl },
-    generalFaqs,
-    projectFaqs,
-  });
-}
-
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  const title = data?.pageContent?.seoTitle || "FAQ | Interior Decorators Inc.";
-  const desc  = data?.pageContent?.seoDescription || "Find answers to common interior-design questions.";
-  const img   = data?.pageContent?.heroBackgroundImage || "https://cdn.sanity.io/images/pzhistba/production/4e3667f477a817910a90e23a5d34748c339a8054-1600x896.jpg?w=2000&fit=max&auto=format";
-  const url   = "https://interior-deco-kappa.vercel.app/faq";
-
+export const meta: MetaFunction = () => {
   return [
-    { title },
-    { name: "description", content: desc },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-
-    // open-graph
-    { property: "og:title", content: title },
-    { property: "og:description", content: desc },
-    { property: "og:type", content: "website" },
-    { property: "og:url", content: url },
-    { property: "og:image", content: img },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
-
-    // twitter
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: desc },
-    { name: "twitter:image", content: img },
+    { title: "FAQ | Whitefire Interior" },
+    {
+      name: "description",
+      content:
+        "Everything you need to know about our design process, pricing, timelines, consultations, and project-specific details.",
+    },
   ];
 };
 
-/* ------------------------------------------------------------------ */
-/*  Accordion with 6+3 load-more                                       */
-/* ------------------------------------------------------------------ */
-interface Faq {
+interface Category {
+  id: string;
+  title: string;
+  cap: number;
+  count: number;
+}
+
+interface FaqItem {
   id: string;
   question: string;
   answer: string;
+  category: string;
 }
 
-interface FaqAccordionProps {
-  faqs: Faq[];
-  title: string;
-}
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const faqPage = await sanity.fetch(
+    `*[_type == "faqPage"][0]{ "hero": heroBackgroundImage.asset->url }`
+  );
+  const categoriesRaw = await sanity.fetch(
+    `*[_type == "faqCategory"] | order(_createdAt asc) { _id, title }`
+  );
+  const itemsRaw = await sanity.fetch(
+    `*[_type == "faqItem"] | order(displayOrder asc) {
+      _id,
+      question,
+      answer,
+      "category": category->title
+    }`
+  );
 
-function FaqAccordion({ faqs, title }: FaqAccordionProps) {
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [visible, setVisible] = useState(6);          // start at 6
+  const items: FaqItem[] = (itemsRaw ?? [])
+    .filter((i: any) => i.question && i.answer)
+    .map((i: any) => ({
+      id: i._id,
+      question: i.question,
+      answer: i.answer,
+      category: i.category ?? "General Questions",
+    }));
 
-  const toggle = (id: string) =>
-    setExpanded((p) => {
-      const n = new Set(p);
-      n.has(id) ? n.delete(id) : n.add(id);
-      return n;
+  const categoryOrder: string[] = (categoriesRaw ?? [])
+    .map((c: any) => c.title)
+    .filter((title: string) => title !== "Service & Process");
+  for (const item of items) {
+    if (!categoryOrder.includes(item.category)) item.category = "General Questions";
+  }
+
+  const caps = [3, 4, 2, 4];
+  const categories: Category[] = categoryOrder.map((title, index) => {
+    const cap = caps[index] ?? 4;
+    return {
+      id: title,
+      title,
+      cap,
+      count: Math.min(items.filter((i) => i.category === title).length, cap),
+    };
+  });
+
+  const hero =
+    faqPage?.hero &&
+    `${faqPage.hero}?w=1920&h=880&fit=crop&crop=center&auto=format&q=85`;
+
+  return json({ items, categories, hero });
+};
+
+export default function FaqRoute() {
+  const { items, categories, hero } = useLoaderData<typeof loader>();
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+
+  const groups = useMemo(() => {
+    const filtered =
+      activeCategory === "all"
+        ? items
+        : items.filter((item) => item.category === activeCategory);
+    const byCategory = new Map<string, FaqItem[]>();
+    for (const item of filtered) {
+      if (!byCategory.has(item.category)) byCategory.set(item.category, []);
+      byCategory.get(item.category)!.push(item);
+    }
+    return categories
+      .filter((category) => byCategory.has(category.title))
+      .map((category) => ({
+        category,
+        items: byCategory.get(category.title)!.slice(0, category.cap),
+      }));
+  }, [items, categories, activeCategory]);
+
+  const selectCategory = (key: string) => {
+    setActiveCategory(key);
+    setOpenItems(new Set());
+  };
+
+  const toggleItem = (id: string) => {
+    setOpenItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
     });
-
-  const showMore = () => setVisible((v) => Math.min(v + 3, faqs.length));
-  const canLoadMore = visible < faqs.length;
-  const slice = faqs.slice(0, visible);
-
-  if (!faqs.length) return null;
+  };
 
   return (
-    <section className="mb-16">
-      <h2 className="text-3xl font-bold text-center mt-8 mb-12 font-serif">{title}</h2>
+    <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
+      <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
+        <SiteHeader activePath="/faq" />
 
-      <div className="max-w-3xl mx-auto space-y-4">
-        {slice.map((f) => (
-          <div key={f.id} className="border border-gray-200 rounded-lg overflow-hidden">
-            <button
-              onClick={() => toggle(f.id)}
-              className="w-full flex justify-between items-center p-6 text-left hover:bg-gray-50 transition-colors"
-            >
-              <span className="font-medium text-gray-900">{f.question}</span>
-              <svg
-                className={`w-5 h-5 transform transition-transform ${
-                  expanded.has(f.id) ? "rotate-180" : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {expanded.has(f.id) && (
-              <div className="px-6 pb-6 text-gray-700">
-                <p className="leading-relaxed">{f.answer}</p>
+        <main>
+          <FaqHero hero={hero} />
+
+          <section className="mx-auto grid max-w-[1320px] grid-cols-1 gap-10 bg-[#F7F4EE] px-6 py-10 sm:px-8 md:grid-cols-[230px_1px_1fr] md:gap-[14px] md:py-12 lg:px-12">
+            <div className="flex flex-col gap-8 md:pr-1">
+              <FaqCategoryNavigation
+                categories={categories}
+                activeCategory={activeCategory}
+                totalCount={categories.reduce((sum, category) => sum + category.count, 0)}
+                onSelect={selectCategory}
+              />
+              <ContactPromptCard />
+              <div className="hidden aspect-[4/5] overflow-hidden md:block">
+                <img
+                  src={sitepages.faq.sidebar.src}
+                  alt={sitepages.faq.sidebar.alt}
+                  className="h-full w-full object-cover object-center"
+                  loading="lazy"
+                />
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+            </div>
 
-      {canLoadMore && (
-        <div className="mt-8 text-center">
-          <button
-            onClick={showMore}
-            className="inline-block border border-gray-400 px-6 py-2 rounded hover:bg-gray-100 transition"
-          >
-            Load More
-          </button>
-        </div>
+            <div aria-hidden="true" className="hidden w-px bg-[#d8d4ce] md:block" />
+
+            <FaqContent groups={groups} openItems={openItems} onToggle={toggleItem} />
+          </section>
+
+          <ConsultationCTA />
+        </main>
+
+        <SiteFooter />
+      </div>
+    </div>
+  );
+}
+
+function FaqHero({ hero }: { hero?: string | null }) {
+  return (
+    <section className="relative isolate min-h-[330px] overflow-hidden bg-[#0d0d0c]">
+      {hero && (
+        <img
+          src={hero}
+          alt="Whitefire Interior studio — frequently asked questions"
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
+          fetchPriority="high"
+        />
       )}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(8,8,7,0.97)_0%,rgba(8,8,7,0.85)_30%,rgba(8,8,7,0.38)_68%,rgba(8,8,7,0.08)_100%)]"
+      />
+
+      <div className="mx-auto flex min-h-[330px] max-w-[1440px] items-start px-6 pb-[64px] pt-[104px] sm:px-10 lg:px-[62px]">
+        <div className="max-w-[430px] text-white">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#b48a4a]">
+            FAQ
+          </p>
+
+          <h1 className="font-serif text-[40px] leading-[1.13] tracking-[-0.02em] sm:text-[44px]">
+            Answers to Common
+            <br />
+            Questions
+          </h1>
+
+          <div className="my-6 h-px w-[52px] bg-[#b48a4a]" />
+
+          <p className="max-w-[370px] text-[14px] leading-7 text-white/90 sm:text-[15px]">
+            Everything you need to know about our process, pricing, and how we
+            work with you to create beautiful spaces.
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Hero Banner                                                         */
-/* ------------------------------------------------------------------ */
-function HeroBanner({ headline, backgroundImage }: { headline: string; backgroundImage: string | null }) {
+function FaqCategoryNavigation({
+  categories,
+  activeCategory,
+  totalCount,
+  onSelect,
+}: {
+  categories: Category[];
+  activeCategory: string;
+  totalCount: number;
+  onSelect: (key: string) => void;
+}) {
   return (
-    <div className="relative">
+    <nav aria-label="FAQ categories" className="min-w-0">
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#1f1f1f]">
+        Categories
+      </h2>
+
+      <ul className="mt-4 flex gap-2 overflow-x-auto pb-1 md:flex-col md:gap-0 md:overflow-visible md:pb-0">
+        <li>
+          <button
+            type="button"
+            aria-pressed={activeCategory === "all"}
+            onClick={() => onSelect("all")}
+            className={[
+              "flex min-h-[40px] w-full items-center justify-between gap-3 whitespace-nowrap px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors focus:outline-none focus:ring-2 focus:ring-[#b58a52] focus:ring-offset-2 focus:ring-offset-[#F7F4EE]",
+              activeCategory === "all"
+                ? "bg-[#e9e2d9] text-[#161616]"
+                : "text-[#3a3836] hover:bg-[#f0ece6]",
+            ].join(" ")}
+          >
+            All Questions
+            <span className="text-[10px] text-[#6b665f]">{totalCount}</span>
+          </button>
+        </li>
+
+        {categories.map((category) => (
+          <li key={category.id}>
+            <button
+              type="button"
+              aria-pressed={activeCategory === category.id}
+              onClick={() => onSelect(category.id)}
+              className={[
+                "flex min-h-[40px] w-full items-center justify-between gap-3 whitespace-nowrap px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors focus:outline-none focus:ring-2 focus:ring-[#b58a52] focus:ring-offset-2 focus:ring-offset-[#F7F4EE]",
+                activeCategory === category.id
+                  ? "bg-[#e9e2d9] text-[#161616]"
+                  : "text-[#3a3836] hover:bg-[#f0ece6]",
+              ].join(" ")}
+            >
+              {category.title}
+              <span className="text-[10px] text-[#6b665f]">{category.count}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+function ContactPromptCard() {
+  return (
+    <div className="bg-[#e9e2d9] px-[19px] py-[17px]">
+      <h2 className="font-serif text-[18px] leading-[1.25] tracking-[-0.01em]">
+        Still Have Questions?
+      </h2>
+
+      <p className="mt-2 text-[11px] leading-[1.75] text-[#3c3a38]">
+        Our team is ready to help. Reach out to us and we'll be happy to answer
+        anything on your mind.
+      </p>
+
+      <Link
+        to="/contact"
+        className="mt-3 inline-flex min-h-[40px] items-center gap-3 bg-[#2d2b2a] px-4 text-[9px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#3d3a38] focus:outline-none focus:ring-2 focus:ring-[#b58a52] focus:ring-offset-2 focus:ring-offset-[#e9e2d9]"
+      >
+        CONTACT US
+        <ChevronRight size={14} strokeWidth={1.5} aria-hidden="true" />
+      </Link>
+    </div>
+  );
+}
+
+function FaqContent({
+  groups,
+  openItems,
+  onToggle,
+}: {
+  groups: Array<{ category: Category; items: FaqItem[] }>;
+  openItems: Set<string>;
+  onToggle: (id: string) => void;
+}) {
+  if (!groups.length) {
+    return (
+      <div className="flex min-h-[240px] items-center justify-center border border-[#d8d4ce]">
+        <p className="text-[13px] text-[#5e5a56]">
+          No questions in this category yet.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-w-0">
+      {groups.map((group) => (
+        <FaqSection
+          key={group.category.id}
+          category={group.category}
+          items={group.items}
+          openItems={openItems}
+          onToggle={onToggle}
+        />
+      ))}
+    </div>
+  );
+}
+
+function FaqSection({
+  category,
+  items,
+  openItems,
+  onToggle,
+}: {
+  category: Category;
+  items: FaqItem[];
+  openItems: Set<string>;
+  onToggle: (id: string) => void;
+}) {
+  return (
+    <section aria-labelledby={`faq-group-${category.id}`}>
+      <h2
+        id={`faq-group-${category.id}`}
+        className="mb-5 font-serif text-[22px] leading-tight tracking-[-0.01em]"
+      >
+        {category.title}
+      </h2>
+
+      {items.map((item) => (
+        <AccordionItem
+          key={item.id}
+          item={item}
+          open={openItems.has(item.id)}
+          onToggle={() => onToggle(item.id)}
+        />
+      ))}
+    </section>
+  );
+}
+
+function AccordionItem({
+  item,
+  open,
+  onToggle,
+}: {
+  item: FaqItem;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  const panelId = `faq-panel-${item.id}`;
+  const triggerId = `faq-trigger-${item.id}`;
+
+  return (
+    <div className="border-b border-[#d8d4ce]">
+      <h3>
+        <button
+          type="button"
+          id={triggerId}
+          aria-expanded={open}
+          aria-controls={panelId}
+          onClick={onToggle}
+          className="flex w-full items-center justify-between gap-4 py-[15px] text-left focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#b58a52]"
+        >
+          <span className="text-[13px] font-medium leading-[1.5] text-[#1f1f1f]">
+            {item.question}
+          </span>
+
+          <span
+            aria-hidden="true"
+            className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full border border-[#cbc4ba] text-[#171615]"
+          >
+            {open ? (
+              <Minus size={13} strokeWidth={1.5} />
+            ) : (
+              <Plus size={13} strokeWidth={1.5} />
+            )}
+          </span>
+        </button>
+      </h3>
+
       <div
-        className="h-60 bg-cover bg-center"
-        style={{
-          backgroundImage: backgroundImage
-            ? `url(${backgroundImage})`
-            : "linear-gradient(to right, #8B7355, #D2B48C)",
-        }}
-      />
-      <div className="absolute inset-0 flex justify-center items-end">
-        <div className="bg-white py-8 px-16 rounded-t-2xl flex flex-col items-center">
-          <h1 className="text-3xl font-bold font-serif">{headline}</h1>
-          <p className="text-center text-gray-700 mt-2">home / faq</p>
+        id={panelId}
+        role="region"
+        aria-labelledby={triggerId}
+        className={[
+          "grid transition-[grid-template-rows] duration-300 ease-out",
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+        ].join(" ")}
+      >
+        <div className="overflow-hidden">
+          <p className="pb-[17px] text-[12px] leading-[1.8] text-[#44413d]">
+            {item.answer}
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Page                                                                */
-/* ------------------------------------------------------------------ */
-export default function Faq() {
-  const { pageContent, generalFaqs, projectFaqs } = useLoaderData<typeof loader>();
-  const [menu, setMenu] = useState(false);
-
+function ConsultationCTA() {
   return (
-    <div className="min-h-screen bg-white">
-    
+    <section className="grid min-h-[285px] bg-[#171717] lg:grid-cols-2">
+      <div className="relative min-h-[230px] overflow-hidden">
+        <img
+          src={sitepages.faq.cta.src}
+          alt={sitepages.faq.cta.alt}
+          className="h-full w-full object-cover object-center"
+          loading="lazy"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-black/15" />
+      </div>
 
-      <HeroBanner
-        headline={pageContent.heroHeadline}
-        backgroundImage={pageContent.heroBackgroundImage}
-      />
+      <div className="flex items-center px-7 py-10 text-white sm:px-10 lg:px-12">
+        <div className="max-w-[470px]">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#b48a4a]">
+            READY TO START YOUR PROJECT?
+          </p>
 
-      <main className="py-16">
-        <FaqAccordion faqs={generalFaqs} title={pageContent.generalFaqsTitle} />
-        <FaqAccordion faqs={projectFaqs} title={pageContent.projectFaqsTitle} />
+          <h2 className="mt-3 font-serif text-[26px] leading-[1.18] tracking-[-0.02em] sm:text-[29px]">
+            Let's Create Something Beautiful Together
+          </h2>
 
-        <div className="text-center mt-16">
-          <h3 className="text-xl font-semibold mb-4">Still have questions?</h3>
+          <p className="mt-3 max-w-[390px] text-[13px] leading-6 text-white/85">
+            Book a consultation with our team and take the first step towards
+            your dream space.
+          </p>
+
           <Link
             to="/contact"
-            className="inline-block bg-gray-900 text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition"
+            className="mt-5 inline-flex min-h-[43px] items-center gap-4 bg-[#b58a52] px-5 text-[9px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#c39b69] focus:outline-none focus:ring-2 focus:ring-[#b58a52] focus:ring-offset-2 focus:ring-offset-[#171717]"
           >
-            Contact Us
+            SCHEDULE A CONSULTATION
+            <ChevronRight size={15} strokeWidth={1.5} aria-hidden="true" />
           </Link>
         </div>
-      </main>
-
-     
-    </div>
+      </div>
+    </section>
   );
 }

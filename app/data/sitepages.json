@@ -1,0 +1,32 @@
+{
+  "testimonials": {
+    "hero": {
+      "src": "https://cdn.sanity.io/images/pzhistba/production/68e2fbddd93ae1edfa2d83ceebc4ba15ec0ee798-1600x896.jpg?w=1920&h=1080&fit=crop&crop=center&auto=format&q=85",
+      "alt": "Manhattan Modern Loft interior — testimonials hero photograph"
+    },
+    "cta": {
+      "src": "https://cdn.sanity.io/images/pzhistba/production/f91692a4029a8b1d86232fdc79cfbe45ac33f679-1600x896.jpg?w=1280&h=720&fit=crop&crop=center&auto=format&q=85",
+      "alt": "Manhattan Modern Loft interior — testimonials CTA photograph"
+    }
+  },
+  "faq": {
+    "sidebar": {
+      "src": "https://cdn.sanity.io/images/pzhistba/production/60738a0ef614f45e620d3fee6abac9b913f979ca-1600x896.jpg?w=800&h=1000&fit=crop&crop=center&auto=format&q=85",
+      "alt": "Manhattan Modern Loft interior — FAQ sidebar photograph"
+    },
+    "cta": {
+      "src": "https://cdn.sanity.io/images/pzhistba/production/96c80494572042bbb155ab388ccb023eb062a82a-1600x896.jpg?w=1280&h=720&fit=crop&crop=center&auto=format&q=85",
+      "alt": "Manhattan Modern Loft interior — FAQ CTA photograph"
+    }
+  },
+  "contact": {
+    "hero": {
+      "src": "https://cdn.sanity.io/images/pzhistba/production/a8950b44ce1fee4301829cd16b2e4895cfe4f72a-1600x896.jpg?w=1920&h=1080&fit=crop&crop=center&auto=format&q=85",
+      "alt": "Manhattan Modern Loft interior — contact hero photograph"
+    },
+    "cta": {
+      "src": "https://cdn.sanity.io/images/pzhistba/production/b207c17c23cbafd12a35ff3981c95aa45ea32bd2-1600x896.jpg?w=1280&h=720&fit=crop&crop=center&auto=format&q=85",
+      "alt": "Manhattan Modern Loft interior — contact CTA photograph"
+    }
+  }
+}

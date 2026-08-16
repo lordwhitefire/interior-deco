@@ -14,107 +14,27 @@ import fs from "fs";
 
 /* ----------  Image imports  ---------- */
 
-import servicesHerointeriorDesignImage from "~/assets/images/services-hero-interior-design.jpg";
-import servicesInclusionsinteriorDesignImage from "~/assets/images/services-inclusions-interior-design.jpg";
-import servicesGalleryinteriorDesign01Image from "~/assets/images/services-gallery-interior-design-01.jpg";
-import servicesGalleryinteriorDesign02Image from "~/assets/images/services-gallery-interior-design-02.jpg";
-import servicesGalleryinteriorDesign03Image from "~/assets/images/services-gallery-interior-design-03.jpg";
-import servicesGalleryinteriorDesign04Image from "~/assets/images/services-gallery-interior-design-04.jpg";
-import servicesHerospacePlanningImage from "~/assets/images/services-hero-space-planning.jpg";
-import servicesInclusionsspacePlanningImage from "~/assets/images/services-inclusions-space-planning.jpg";
-import servicesGalleryspacePlanning01Image from "~/assets/images/services-gallery-space-planning-01.jpg";
-import servicesGalleryspacePlanning02Image from "~/assets/images/services-gallery-space-planning-02.jpg";
-import servicesGalleryspacePlanning03Image from "~/assets/images/services-gallery-space-planning-03.jpg";
-import servicesGalleryspacePlanning04Image from "~/assets/images/services-gallery-space-planning-04.jpg";
-import servicesHerocustomFurnitureImage from "~/assets/images/services-hero-custom-furniture.jpg";
-import servicesInclusionscustomFurnitureImage from "~/assets/images/services-inclusions-custom-furniture.jpg";
-import servicesGallerycustomFurniture01Image from "~/assets/images/services-gallery-custom-furniture-01.jpg";
-import servicesGallerycustomFurniture02Image from "~/assets/images/services-gallery-custom-furniture-02.jpg";
-import servicesGallerycustomFurniture03Image from "~/assets/images/services-gallery-custom-furniture-03.jpg";
-import servicesGallerycustomFurniture04Image from "~/assets/images/services-gallery-custom-furniture-04.jpg";
-import servicesHerorenovationImage from "~/assets/images/services-hero-renovation.jpg";
-import servicesInclusionsrenovationImage from "~/assets/images/services-inclusions-renovation.jpg";
-import servicesGalleryrenovation01Image from "~/assets/images/services-gallery-renovation-01.jpg";
-import servicesGalleryrenovation02Image from "~/assets/images/services-gallery-renovation-02.jpg";
-import servicesGalleryrenovation03Image from "~/assets/images/services-gallery-renovation-03.jpg";
-import servicesGalleryrenovation04Image from "~/assets/images/services-gallery-renovation-04.jpg";
-import servicesHerostylingDecorImage from "~/assets/images/services-hero-styling-decor.jpg";
-import servicesInclusionsstylingDecorImage from "~/assets/images/services-inclusions-styling-decor.jpg";
-import servicesGallerystylingDecor01Image from "~/assets/images/services-gallery-styling-decor-01.jpg";
-import servicesGallerystylingDecor02Image from "~/assets/images/services-gallery-styling-decor-02.jpg";
-import servicesGallerystylingDecor03Image from "~/assets/images/services-gallery-styling-decor-03.jpg";
-import servicesGallerystylingDecor04Image from "~/assets/images/services-gallery-styling-decor-04.jpg";
-import servicesHeromaterialSelectionImage from "~/assets/images/services-hero-material-selection.jpg";
-import servicesInclusionsmaterialSelectionImage from "~/assets/images/services-inclusions-material-selection.jpg";
-import servicesGallerymaterialSelection01Image from "~/assets/images/services-gallery-material-selection-01.jpg";
-import servicesGallerymaterialSelection02Image from "~/assets/images/services-gallery-material-selection-02.jpg";
-import servicesGallerymaterialSelection03Image from "~/assets/images/services-gallery-material-selection-03.jpg";
-import servicesGallerymaterialSelection04Image from "~/assets/images/services-gallery-material-selection-04.jpg";
-import servicesHerolightingDesignImage from "~/assets/images/services-hero-lighting-design.jpg";
-import servicesInclusionslightingDesignImage from "~/assets/images/services-inclusions-lighting-design.jpg";
-import servicesGallerylightingDesign01Image from "~/assets/images/services-gallery-lighting-design-01.jpg";
-import servicesGallerylightingDesign02Image from "~/assets/images/services-gallery-lighting-design-02.jpg";
-import servicesGallerylightingDesign03Image from "~/assets/images/services-gallery-lighting-design-03.jpg";
-import servicesGallerylightingDesign04Image from "~/assets/images/services-gallery-lighting-design-04.jpg";
-import servicesHeroprojectManagementImage from "~/assets/images/services-hero-project-management.jpg";
-import servicesInclusionsprojectManagementImage from "~/assets/images/services-inclusions-project-management.jpg";
-import servicesGalleryprojectManagement01Image from "~/assets/images/services-gallery-project-management-01.jpg";
-import servicesGalleryprojectManagement02Image from "~/assets/images/services-gallery-project-management-02.jpg";
-import servicesGalleryprojectManagement03Image from "~/assets/images/services-gallery-project-management-03.jpg";
-import servicesGalleryprojectManagement04Image from "~/assets/images/services-gallery-project-management-04.jpg";
+import servicesHeroLivingSpacesImage from "~/assets/images/services-hero-living-spaces.jpg";
+import servicesHeroKitchensDiningImage from "~/assets/images/services-hero-kitchens-dining.jpg";
+import servicesHeroBedroomsRetreatsImage from "~/assets/images/services-hero-bedrooms-retreats.jpg";
+import servicesHeroWorkspacesImage from "~/assets/images/services-hero-workspaces.jpg";
+import servicesHeroHospitalityRetailImage from "~/assets/images/services-hero-hospitality-retail.jpg";
+import servicesHeroBoutiqueTransitionalImage from "~/assets/images/services-hero-boutique-transitional.jpg";
+import servicesHeroMinimalistScandinavianImage from "~/assets/images/services-hero-minimalist-scandinavian.jpg";
+import servicesHeroCompactMicroSpacesImage from "~/assets/images/services-hero-compact-micro-spaces.jpg";
 import aboutClosingImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
 
 /* ----------  Image map  ---------- */
 
 const imageMap: Record<string, string> = {
-  "services-hero-interior-design": servicesHerointeriorDesignImage,
-  "services-inclusions-interior-design": servicesInclusionsinteriorDesignImage,
-  "services-gallery-interior-design-01": servicesGalleryinteriorDesign01Image,
-  "services-gallery-interior-design-02": servicesGalleryinteriorDesign02Image,
-  "services-gallery-interior-design-03": servicesGalleryinteriorDesign03Image,
-  "services-gallery-interior-design-04": servicesGalleryinteriorDesign04Image,
-  "services-hero-space-planning": servicesHerospacePlanningImage,
-  "services-inclusions-space-planning": servicesInclusionsspacePlanningImage,
-  "services-gallery-space-planning-01": servicesGalleryspacePlanning01Image,
-  "services-gallery-space-planning-02": servicesGalleryspacePlanning02Image,
-  "services-gallery-space-planning-03": servicesGalleryspacePlanning03Image,
-  "services-gallery-space-planning-04": servicesGalleryspacePlanning04Image,
-  "services-hero-custom-furniture": servicesHerocustomFurnitureImage,
-  "services-inclusions-custom-furniture": servicesInclusionscustomFurnitureImage,
-  "services-gallery-custom-furniture-01": servicesGallerycustomFurniture01Image,
-  "services-gallery-custom-furniture-02": servicesGallerycustomFurniture02Image,
-  "services-gallery-custom-furniture-03": servicesGallerycustomFurniture03Image,
-  "services-gallery-custom-furniture-04": servicesGallerycustomFurniture04Image,
-  "services-hero-renovation": servicesHerorenovationImage,
-  "services-inclusions-renovation": servicesInclusionsrenovationImage,
-  "services-gallery-renovation-01": servicesGalleryrenovation01Image,
-  "services-gallery-renovation-02": servicesGalleryrenovation02Image,
-  "services-gallery-renovation-03": servicesGalleryrenovation03Image,
-  "services-gallery-renovation-04": servicesGalleryrenovation04Image,
-  "services-hero-styling-decor": servicesHerostylingDecorImage,
-  "services-inclusions-styling-decor": servicesInclusionsstylingDecorImage,
-  "services-gallery-styling-decor-01": servicesGallerystylingDecor01Image,
-  "services-gallery-styling-decor-02": servicesGallerystylingDecor02Image,
-  "services-gallery-styling-decor-03": servicesGallerystylingDecor03Image,
-  "services-gallery-styling-decor-04": servicesGallerystylingDecor04Image,
-  "services-hero-material-selection": servicesHeromaterialSelectionImage,
-  "services-inclusions-material-selection": servicesInclusionsmaterialSelectionImage,
-  "services-gallery-material-selection-01": servicesGallerymaterialSelection01Image,
-  "services-gallery-material-selection-02": servicesGallerymaterialSelection02Image,
-  "services-gallery-material-selection-03": servicesGallerymaterialSelection03Image,
-  "services-gallery-material-selection-04": servicesGallerymaterialSelection04Image,
-  "services-hero-lighting-design": servicesHerolightingDesignImage,
-  "services-inclusions-lighting-design": servicesInclusionslightingDesignImage,
-  "services-gallery-lighting-design-01": servicesGallerylightingDesign01Image,
-  "services-gallery-lighting-design-02": servicesGallerylightingDesign02Image,
-  "services-gallery-lighting-design-03": servicesGallerylightingDesign03Image,
-  "services-gallery-lighting-design-04": servicesGallerylightingDesign04Image,
-  "services-hero-project-management": servicesHeroprojectManagementImage,
-  "services-inclusions-project-management": servicesInclusionsprojectManagementImage,
-  "services-gallery-project-management-01": servicesGalleryprojectManagement01Image,
-  "services-gallery-project-management-02": servicesGalleryprojectManagement02Image,
-  "services-gallery-project-management-03": servicesGalleryprojectManagement03Image,
-  "services-gallery-project-management-04": servicesGalleryprojectManagement04Image,
+  "services-hero-living-spaces": servicesHeroLivingSpacesImage,
+  "services-hero-kitchens-dining": servicesHeroKitchensDiningImage,
+  "services-hero-bedrooms-retreats": servicesHeroBedroomsRetreatsImage,
+  "services-hero-workspaces": servicesHeroWorkspacesImage,
+  "services-hero-hospitality-retail": servicesHeroHospitalityRetailImage,
+  "services-hero-boutique-transitional": servicesHeroBoutiqueTransitionalImage,
+  "services-hero-minimalist-scandinavian": servicesHeroMinimalistScandinavianImage,
+  "services-hero-compact-micro-spaces": servicesHeroCompactMicroSpacesImage,
   about_closing_dark_banner_table_vase: aboutClosingImage,
 };
 
@@ -156,6 +76,12 @@ export interface ServiceGalleryItem {
   href: string;
 }
 
+export interface ServiceGalleryEntry {
+  project: string;
+  title: string;
+  href: string;
+}
+
 export interface ServiceCtaData {
   eyebrow: string;
   title: string;
@@ -174,10 +100,13 @@ export interface ServicePageData {
   slug: string;
   hero: ServiceHeroData;
   inclusions: ServiceInclusion[];
+  inclusionsProject: string;
   inclusionsImage: string;
   inclusionsImageAlt: string;
   process: ServiceProcessStepData[];
   gallery: ServiceGalleryItem[];
+  galleryHeading: string;
+  galleryTitle: string;
   cta: ServiceCtaData;
   trust: TrustItemData[];
 }
@@ -185,17 +114,18 @@ export interface ServicePageData {
 /* ----------  Loader: load JSON by slug  ---------- */
 
 const VALID_SLUGS = [
-  "interior-design",
-  "space-planning",
-  "custom-furniture",
-  "renovation",
-  "styling-decor",
-  "material-selection",
-  "lighting-design",
-  "project-management",
+  "living-spaces",
+  "kitchens-dining",
+  "bedrooms-retreats",
+  "workspaces",
+  "hospitality-retail",
+  "boutique-transitional",
+  "minimalist-scandinavian",
+  "compact-micro-spaces",
 ];
 
 const DATA_DIR = "app/data/services";
+const PROJECTS_JSON = "app/data/projects.json";
 
 function resolveImages(data: any) {
   const resolve = (val: string): string => {
@@ -209,11 +139,6 @@ function resolveImages(data: any) {
       ...data.hero,
       image: resolve(data.hero.image),
     },
-    inclusionsImage: resolve(data.inclusionsImage),
-    gallery: data.gallery.map((g: any) => ({
-      ...g,
-      image: resolve(g.image),
-    })),
     cta: {
       ...data.cta,
       image: resolve(data.cta.image),
@@ -237,7 +162,25 @@ export async function loader({ params }: LoaderFunctionArgs) {
   const raw = fs.readFileSync(filePath, "utf-8");
   const data = JSON.parse(raw);
 
-  const resolvedData = resolveImages(data);
+  const projects = JSON.parse(fs.readFileSync(PROJECTS_JSON, "utf-8"));
+
+  const gallery = (data.gallery as ServiceGalleryEntry[]).map((entry) => {
+    const project = projects[entry.project];
+    return {
+      title: entry.title,
+      image: project?.thumbUrl ?? "",
+      imageAlt: project ? `${project.title} — ${project.location}`.trim() : entry.title,
+      href: entry.href,
+    };
+  });
+
+  const inclusionsProject = projects[data.inclusionsProject as string];
+
+  const resolvedData = {
+    ...resolveImages(data),
+    inclusionsImage: inclusionsProject?.galleryFirstUrl ?? "",
+    gallery,
+  };
 
   return json(resolvedData);
 }
@@ -392,18 +335,26 @@ function ServiceProcess({ steps }: { steps: ServiceProcessStepData[] }) {
   );
 }
 
-function ServiceGalleryStrip({ items }: { items: ServiceGalleryItem[] }) {
+function ServiceGalleryStrip({
+  items,
+  heading,
+  title,
+}: {
+  items: ServiceGalleryItem[];
+  heading: string;
+  title: string;
+}) {
   return (
     <section className="border-b border-black/10 bg-[#F4F1EA] px-6 py-10 sm:px-10 lg:px-16 lg:py-12">
       <div className="mx-auto max-w-[1320px]">
         <div className="flex items-end justify-between gap-5">
           <div>
             <p className="text-[10px] font-semibold tracking-[0.2em] text-[#9C794A]">
-              BEDROOMS WE'VE TRANSFORMED
+              {heading}
             </p>
 
             <h2 className="mt-2 font-serif text-[31px] leading-none tracking-[-0.02em] text-[#20201E] sm:text-[38px]">
-              Designed for Rest. Styled for You.
+              {title}
             </h2>
           </div>
 
@@ -501,7 +452,11 @@ export default function ServiceDetailRoute() {
 
           <ServiceProcess steps={data.process} />
 
-          <ServiceGalleryStrip items={data.gallery} />
+          <ServiceGalleryStrip
+            items={data.gallery}
+            heading={data.galleryHeading}
+            title={data.galleryTitle}
+          />
 
           <ConsultationCta data={data.cta} />
 

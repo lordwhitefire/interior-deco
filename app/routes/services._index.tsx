@@ -4,14 +4,14 @@ import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 
 import servicesHeroImage from "~/assets/images/living_design.jpg";
-import interiorDesignImage from "~/assets/images/services-hero-interior-design.jpg";
-import spacePlanningImage from "~/assets/images/services-hero-space-planning.jpg";
-import customFurnitureImage from "~/assets/images/services-hero-custom-furniture.jpg";
-import renovationImage from "~/assets/images/services-hero-renovation.jpg";
-import stylingDecorImage from "~/assets/images/services-hero-styling-decor.jpg";
-import materialSelectionImage from "~/assets/images/services-hero-material-selection.jpg";
-import lightingDesignImage from "~/assets/images/services-hero-lighting-design.jpg";
-import projectManagementImage from "~/assets/images/services-hero-project-management.jpg";
+import livingSpacesImage from "~/assets/images/services-hero-living-spaces.jpg";
+import kitchensDiningImage from "~/assets/images/services-hero-kitchens-dining.jpg";
+import bedroomsRetreatsImage from "~/assets/images/services-hero-bedrooms-retreats.jpg";
+import workspacesImage from "~/assets/images/services-hero-workspaces.jpg";
+import hospitalityRetailImage from "~/assets/images/services-hero-hospitality-retail.jpg";
+import boutiqueTransitionalImage from "~/assets/images/services-hero-boutique-transitional.jpg";
+import minimalistScandinavianImage from "~/assets/images/services-hero-minimalist-scandinavian.jpg";
+import compactMicroSpacesImage from "~/assets/images/services-hero-compact-micro-spaces.jpg";
 import servicesCtaImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
 
 export interface ServiceItem {
@@ -60,78 +60,78 @@ const mockServicesPageData: ServicesPageData = {
       "Every space has potential. Our services are designed to bring out the best in your space with thoughtful planning, curated materials, and expert craftsmanship.",
   },
 
-  services: [
+services: [
     {
-      id: "interior-design",
+      id: "living-spaces",
       number: "01",
-      title: "Interior Design",
+      title: "Living Spaces",
       description:
-        "Full-service interior design tailored to your lifestyle, aesthetic, and functional needs.",
-      image: interiorDesignImage,
-      href: "/services/interior-design",
+        "Warm, layered living rooms designed for everyday comfort — from Malibu oceanfront to a Norwegian lakeside cabin.",
+      image: livingSpacesImage,
+      href: "/services/living-spaces",
     },
     {
-      id: "space-planning",
+      id: "kitchens-dining",
       number: "02",
-      title: "Space Planning",
+      title: "Kitchens & Dining",
       description:
-        "Smart layouts that maximize flow, comfort, and functionality in every square foot.",
-      image: spacePlanningImage,
-      href: "/services/space-planning",
+        "Considered kitchens that balance craftsmanship, storage, and the ritual of gathering.",
+      image: kitchensDiningImage,
+      href: "/services/kitchens-dining",
     },
     {
-      id: "custom-furniture",
+      id: "bedrooms-retreats",
       number: "03",
-      title: "Custom Furniture",
+      title: "Bedrooms & Retreats",
       description:
-        "Bespoke furniture and joinery crafted with exceptional materials and attention to detail.",
-      image: customFurnitureImage,
-      href: "/services/custom-furniture",
+        "Calm, restorative retreats — coastal, alpine, and urban bedrooms designed for deep rest.",
+      image: bedroomsRetreatsImage,
+      href: "/services/bedrooms-retreats",
     },
     {
-      id: "renovation",
+      id: "workspaces",
       number: "04",
-      title: "Renovation",
+      title: "Workspaces",
       description:
-        "Transforming existing spaces with creativity, precision, and quality craftsmanship.",
-      image: renovationImage,
-      href: "/services/renovation",
+        "Productive, people-first workplaces — from tech HQs to micro home offices.",
+      image: workspacesImage,
+      href: "/services/workspaces",
     },
     {
-      id: "styling-decor",
+      id: "hospitality-retail",
       number: "05",
-      title: "Styling & Decor",
+      title: "Hospitality & Retail",
       description:
-        "Curated decor and styling to bring personality, warmth, and soul to your space.",
-      image: stylingDecorImage,
-      href: "/services/styling-decor",
+        "Memorable hospitality and retail interiors that turn visitors into regulars.",
+      image: hospitalityRetailImage,
+      href: "/services/hospitality-retail",
     },
     {
-      id: "material-selection",
+      id: "boutique-transitional",
       number: "06",
-      title: "Material Selection",
+      title: "Boutique & Transitional",
       description:
-        "Thoughtfully curated materials that balance beauty, durability, and sustainability.",
-      image: materialSelectionImage,
-      href: "/services/material-selection",
+        "Refined transitional interiors with brass, marble, and velvet detailing.",
+      image: boutiqueTransitionalImage,
+      href: "/services/boutique-transitional",
     },
     {
-      id: "lighting-design",
+      id: "minimalist-scandinavian",
       number: "07",
-      title: "Lighting Design",
+      title: "Minimalist & Scandinavian",
       description:
-        "Layered lighting solutions that enhance ambiance, functionality, and architectural features.",
-      image: lightingDesignImage,
-      href: "/services/lighting-design",
+        "Quiet, material-led spaces rooted in simplicity, light, and natural texture.",
+      image: minimalistScandinavianImage,
+      href: "/services/minimalist-scandinavian",
     },
     {
-      id: "project-management",
+      id: "compact-micro-spaces",
       number: "08",
-      title: "Project Management",
+      title: "Compact & Micro Spaces",
       description:
-        "End-to-end project management to ensure a seamless and stress-free experience.",
-      image: projectManagementImage,
-      href: "/services/project-management",
+        "Smart, space-efficient design for micro lofts and compact homes.",
+      image: compactMicroSpacesImage,
+      href: "/services/compact-micro-spaces",
     },
   ],
 };

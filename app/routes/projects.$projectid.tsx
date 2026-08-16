@@ -1,13 +1,27 @@
-// app/routes/projects.$projectid.tsx
+import { useEffect, useState } from "react";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
-import { useState, useEffect,useRef } from "react";
-import groq from "groq";
+import { useLoaderData } from "@remix-run/react";
+import {
+  ArrowRight,
+  CalendarDays,
+  Camera,
+  ChevronLeft,
+  ChevronRight,
+  Lightbulb,
+  MapPin,
+  Ruler,
+  Sparkles,
+  Tags,
+  X,
+} from "lucide-react";
 import { createClient } from "@sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
+import { SiteHeader } from "~/components/whitefire/SiteHeader";
+import { SiteFooter } from "~/components/whitefire/SiteFooter";
+import { Breadcrumbs } from "~/components/whitefire/Breadcrumbs";
+import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
+import servicesCtaImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
 
-// Create Sanity client inline
 const sanityClient = createClient({
   projectId: "pzhistba",
   dataset: "production",
@@ -15,787 +29,576 @@ const sanityClient = createClient({
   useCdn: true,
 });
 
-// Create image URL builder inline
-const builder = imageUrlBuilder(sanityClient);
-const urlForImage = (source: any) => builder.image(source);
-
-export const meta: MetaFunction = ({ data }) => {
-  if (!data?.project) {
-    return [
-      { title: "Project Not Found" },
-      { name: "description", content: "The requested project could not be found." },
-    ];
-  }
-
-  const { project } = data;
-  const title = `${project.title} - Interior Design Project`;
-  const desc  = project.metaDescription || project.challenge;
-  const img   = urlForImage(project.thumbnail || project.heroImage)
-                  .width(1200)
-                  .height(630)
-                  .url();
-  const url   = `https://interior-deco-kappa.vercel.app/projects/${project.slug.current}`;
-
-  return [
-    { title },
-    { name: "description", content: desc },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
-
-    // open-graph
-    { property: "og:title", content: project.metaTitle || title },
-    { property: "og:description", content: desc },
-    { property: "og:type", content: "website" },
-    { property: "og:url", content: url },
-    { property: "og:image", content: img },
-    { property: "og:site_name", content: "Interior Decorators Inc." },
-
-    // twitter
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: project.metaTitle || title },
-    { name: "twitter:description", content: desc },
-    { name: "twitter:image", content: img },
-  ];
+const CATEGORY_LABELS: Record<string, string> = {
+  commercial: "Commercial",
+  "living-room": "Living Room",
+  kitchen: "Kitchen",
+  "home-office": "Home Office",
+  bedroom: "Bedroom",
 };
+
+function withParams(url: string, w: number, h: number) {
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}w=${w}&h=${h}&fit=crop&crop=center&auto=format&q=85`;
+}
+
+function formatDate(value: string | null) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+}
+
+export interface ProjectDetailData {
+  slug: string;
+  title: string;
+  location: string;
+  category: string;
+  categoryLabel: string;
+  completionDate: string;
+  squareFootage: number | null;
+  challenge: string;
+  solution: string;
+  process: string;
+  materials: string[];
+  colorPalette: string[];
+  metaTitle: string;
+  metaDescription: string;
+  heroImage: string;
+  heroImageAlt: string;
+  storyImage: string;
+  gallery: { url: string; caption: string }[];
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { projectid } = params;
 
-  if (!projectid) {
-    throw new Response("Project ID is required", { status: 400 });
-  }
-
-  // Fetch single project with all related data
-  const project = await sanityClient.fetch(groq`
-    *[_type == "projectPage" && slug.current == $projectid][0] {
-      _id,
+  const project = await sanityClient.fetch(
+    `*[_type == "projectPage" && slug.current == $slug][0] {
+      "slug": slug.current,
       title,
-      slug,
       location,
       category,
-      style,
-      budget,
-      squareFootage,
-      timeline,
       completionDate,
-      featured,
+      squareFootage,
       challenge,
       solution,
       process,
       materials,
       colorPalette,
-      furniture,
-      tags,
       metaTitle,
       metaDescription,
-      "heroImage": heroImage.asset->{
-        _id,
-        url,
-        metadata {
-          dimensions {
-            width,
-            height
-          }
-        }
-      },
+      "heroImage": heroImage.asset->url,
+      "thumbnail": thumbnail.asset->url,
       "gallery": gallery[]{
-        "asset": asset->{
-          _id,
-          url,
-          metadata {
-            dimensions {
-              width,
-              height
-            }
-          }
-        },
+        "url": asset->url,
         caption,
-        category,
         isFeatured
-      },
-      "relatedProjects": relatedProjects[]->{
-        _id,
-        title,
-        slug,
-        location,
-        category,
-        "heroImage": heroImage.asset->{
-          _id,
-          url,
-          metadata {
-            dimensions {
-              width,
-              height
-            }
-          }
-        },
-        challenge
-      },
-      "testimonial": testimonial->{
-        clientName,
-        clientLocation,
-        rating,
-        review,
-        clientImage
       }
-    }
-  `, { projectid });
+    }`,
+    { slug: projectid }
+  );
 
-  // Handle 404 if project not found
   if (!project) {
     throw new Response("Project not found", { status: 404 });
   }
 
-  // Fetch more related projects if needed (fallback)
-  if (!project.relatedProjects || project.relatedProjects.length < 3) {
-    const additionalProjects = await sanityClient.fetch(groq`
-      *[_type == "projectPage" && slug.current != $projectid && (category == $category || style[0] in $style)] | order(completionDate desc) [0..${3 - (project.relatedProjects?.length || 0)}] {
-        _id,
-        title,
-        slug,
-        location,
-        category,
-        "heroImage": heroImage.asset->{
-          _id,
-          url,
-          metadata {
-            dimensions {
-              width,
-              height
-            }
-          }
-        },
-        challenge
-      }
-    `, { 
-      projectid, 
-      category: project.category,
-      style: project.style || []
-    });
+  const categoryLabel = CATEGORY_LABELS[project.category] || project.category || "Project";
 
-    project.relatedProjects = [...(project.relatedProjects || []), ...additionalProjects];
-  }
+  const gallery = [...(project.gallery ?? [])]
+    .sort(
+      (a: any, b: any) =>
+        Number(b.isFeatured ?? false) - Number(a.isFeatured ?? false)
+    )
+    .slice(0, 5)
+    .map((g: any, index: number) => ({
+      url: g.url ? withParams(g.url, 640, 610) : "",
+      caption: g.caption || `Project photo ${index + 1}`,
+    }));
 
-  return json({ project });
+  const data: ProjectDetailData = {
+    slug: project.slug,
+    title: project.title,
+    location: project.location || "",
+    category: project.category || "",
+    categoryLabel,
+    completionDate: formatDate(project.completionDate),
+    squareFootage: project.squareFootage ?? null,
+    challenge: project.challenge || "",
+    solution: project.solution || "",
+    process: project.process || "",
+    materials: Array.isArray(project.materials) ? project.materials : [],
+    colorPalette: Array.isArray(project.colorPalette) ? project.colorPalette : [],
+    metaTitle: project.metaTitle || "",
+    metaDescription: project.metaDescription || "",
+    heroImage: project.heroImage ? withParams(project.heroImage, 1920, 880) : "",
+    heroImageAlt: `${project.title}${project.location ? ` — ${project.location}` : ""}`,
+    storyImage: project.thumbnail ? withParams(project.thumbnail, 1280, 754) : "",
+    gallery,
+  };
+
+  return json(data);
 }
 
-// Before/After Slider Component
-function BeforeAfterSlider({
-  beforeImage,
-  afterImage,
-  caption,
-}: {
-  beforeImage: any;
-  afterImage: any;
-  caption?: string;
-}) {
-  const [pos, setPos] = useState(50);
-  const rootRef = useRef<HTMLDivElement | null>(null);
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  const project = data as ProjectDetailData | undefined;
+  return [
+    {
+      title: project
+        ? `${project.metaTitle || project.title} | Whitefire Interior`
+        : "Project | Whitefire Interior",
+    },
+    {
+      name: "description",
+      content:
+        project?.metaDescription ||
+        project?.challenge ||
+        "Explore a Whitefire Interior project.",
+    },
+    ...(project?.heroImage
+      ? [{ property: "og:image", content: project.heroImage }]
+      : []),
+  ];
+};
 
-  /* ----------  shared move handler  ---------- */
-  const handleMove = (clientX: number) => {
-    const root = rootRef.current;
-    if (!root) return;
-    const rect = root.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const pct = Math.min(100, Math.max(0, (x / rect.width) * 100));
-    setPos(pct);
-  };
-
-  /* ----------  mouse  ---------- */
-  const onMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX);
-    const onMouseUp = () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-  };
-
-  /* ----------  touch  ---------- */
-  const onTouchStart = (e: React.TouchEvent) => {
-    const onTouchMove = (e: TouchEvent) => handleMove(e.touches[0].clientX);
-    const onTouchEnd = () => {
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-    };
-    window.addEventListener("touchmove", onTouchMove);
-    window.addEventListener("touchend", onTouchEnd);
-  };
-
-  if (!beforeImage || !afterImage) return null;
+export default function ProjectDetailRoute() {
+  const project = useLoaderData<typeof loader>();
 
   return (
-    <div
-      ref={rootRef}
-      className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-stone-100 select-none cursor-ew-resize"
-      onMouseDown={onMouseDown}
-      onTouchStart={onTouchStart}
-    >
-      {/* After (full) */}
-      <img
-        src={urlForImage(afterImage).width(1200).height(750).quality(90).url()}
-        alt="After renovation"
-        className="absolute inset-0 w-full h-full object-cover"
-        draggable={false}
-      />
+    <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#1C1A17]">
+      <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
+        <SiteHeader activePath="/projects" />
 
-      {/* Before (clipped) */}
-      <div
-        className="absolute inset-0 overflow-hidden"
-        style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
-      >
-        <img
-          src={urlForImage(beforeImage).width(1200).height(750).quality(90).url()}
-          alt="Before renovation"
-          className="absolute inset-0 w-full h-full object-cover"
-          draggable={false}
-        />
+        <main>
+          <ProjectHero project={project} />
+          <ProjectOverview project={project} />
+          <ProjectStory project={project} />
+          <ProjectGallery images={project.gallery} />
+          <ProjectHighlights project={project} />
+          <ProjectCta />
+        </main>
+
+        <SiteFooter />
       </div>
-
-      {/* Handle */}
-      <div
-        className="absolute top-0 bottom-0 w-1 bg-white pointer-events-none"
-        style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
-      >
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center pointer-events-none">
-          <svg
-            className="w-6 h-6 text-stone-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </div>
-
-      {caption && (
-        <div className="absolute bottom-4 left-4 right-4 pointer-events-none">
-          <p className="text-white text-sm bg-black/50 px-3 py-1 rounded-full inline-block">
-            {caption}
-          </p>
-        </div>
-      )}
     </div>
   );
 }
 
-export default function ProjectDetail() {
-  const { project } = useLoaderData<typeof loader>();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+/* ----------  Hero  ---------- */
 
-  const toggleMenuDropdown = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+function ProjectHero({ project }: { project: ProjectDetailData }) {
+  return (
+    <section className="relative min-h-[560px] overflow-hidden bg-[#0B0B0A] text-white">
+      <img
+        src={project.heroImage}
+        alt={project.heroImageAlt}
+        fetchPriority="high"
+        className="absolute inset-0 h-full w-full object-cover object-center"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,4,.94)_0%,rgba(5,5,4,.72)_30%,rgba(5,5,4,.30)_65%,rgba(5,5,4,.48)_100%)]"
+      />
 
-  // Separate gallery images by category
-  const beforeAfterImages = project.gallery?.filter((img: any) => img.category === 'before' || img.category === 'after') || [];
-  const beforeImage = beforeAfterImages.find((img: any) => img.category === 'before')?.asset;
-  const afterImage = beforeAfterImages.find((img: any) => img.category === 'after')?.asset;
+      <div className="relative z-10 mx-auto flex min-h-[560px] max-w-[1440px] flex-col px-6 pb-12 pt-7 md:px-10 lg:px-14">
+        <Breadcrumbs
+          dark
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Projects", href: "/projects" },
+            { label: project.title },
+          ]}
+        />
 
-  const openLightbox = (index: number) => {
-    setCurrentImageIndex(index);
-    setLightboxOpen(true);
-  };
+        <div className="mt-auto max-w-[510px]">
+          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#B89451]">
+            {project.categoryLabel} Project
+          </p>
 
-  const navigateLightbox = (direction: 'prev' | 'next') => {
-    const totalImages = project.gallery?.length || 0;
-    if (direction === 'prev') {
-      setCurrentImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
-    } else {
-      setCurrentImageIndex((prev) => (prev + 1) % totalImages);
-    }
-  };
+          <h1 className="font-serif text-[42px] leading-[0.98] tracking-[-0.025em] md:text-[56px] lg:text-[64px]">
+            {project.title}
+          </h1>
 
-  // Handle keyboard navigation in lightbox
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!lightboxOpen) return;
-      
-      if (e.key === 'Escape') setLightboxOpen(false);
-      if (e.key === 'ArrowLeft') navigateLightbox('prev');
-      if (e.key === 'ArrowRight') navigateLightbox('next');
-    };
+          <p className="mt-6 max-w-[430px] text-[14px] leading-[1.75] text-white/90 md:text-[15px]">
+            {project.challenge}
+          </p>
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [lightboxOpen]);
+          <a
+            href="#gallery"
+            className="mt-7 inline-flex items-center gap-5 bg-[#B89451] px-5 py-3.5 text-[10px] font-semibold tracking-[0.08em] transition-colors hover:bg-[#9E7C43]"
+          >
+            VIEW PROJECT GALLERY <ArrowRight size={14} strokeWidth={1.5} />
+          </a>
+        </div>
+      </div>
 
-  // Format budget display
-  const formatBudget = (budget: string) => {
-    return budget.replace('-', ' - ').replace('k', 'K').replace('under', 'Under ').replace('over', 'Over ');
-  };
+      <a
+        href="#gallery"
+        aria-label="View all project photos"
+        className="absolute bottom-8 right-8 z-10 hidden h-[88px] w-[88px] flex-col items-center justify-center rounded-full border border-[#B89451] bg-black/25 text-center transition-colors hover:bg-black/45 md:flex md:bottom-10 md:right-12"
+      >
+        <Camera size={20} strokeWidth={1.2} />
+        <span className="mt-2 text-[8px] font-semibold leading-[1.2] tracking-[0.08em]">
+          VIEW ALL
+          <br />
+          PHOTOS
+        </span>
+      </a>
+    </section>
+  );
+}
 
-  // Get year from completion date
-  const completionYear = project.completionDate 
-    ? new Date(project.completionDate).getFullYear() 
-    : new Date().getFullYear();
+/* ----------  Overview / facts  ---------- */
+
+function ProjectOverview({ project }: { project: ProjectDetailData }) {
+  return (
+    <section className="border-b border-[#DDD8CF] bg-[#F5F2EC]">
+      <div className="mx-auto grid max-w-[1440px] gap-8 px-6 py-7 md:px-10 lg:grid-cols-[1.05fr_2fr] lg:px-14 lg:py-8">
+        <div className="max-w-[360px]">
+          <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#876B45]">
+            Project Overview
+          </p>
+          <p className="mt-3 text-[12px] leading-[1.8] text-[#383530] md:text-[13px]">
+            {project.challenge}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 border-[#DDD8CF] md:grid-cols-4 lg:border-l">
+          <ProjectFact
+            icon="map-pin"
+            label="Location"
+            value={project.location || "—"}
+          />
+          <ProjectFact
+            icon="tags"
+            label="Category"
+            value={project.categoryLabel}
+          />
+          <ProjectFact
+            icon="calendar-days"
+            label="Completed"
+            value={project.completionDate}
+          />
+          <ProjectFact
+            icon="ruler"
+            label="Size"
+            value={
+              project.squareFootage ? `${project.squareFootage} sq ft` : "—"
+            }
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProjectFact({
+  icon,
+  label,
+  value,
+}: {
+  icon: "map-pin" | "tags" | "calendar-days" | "ruler";
+  label: string;
+  value: string;
+}) {
+  const Icon =
+    icon === "map-pin"
+      ? MapPin
+      : icon === "tags"
+        ? Tags
+        : icon === "calendar-days"
+          ? CalendarDays
+          : Ruler;
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Hero Section */}
-      <section className="relative h-[70vh] min-h-[500px] z-0">
-        <div className="absolute inset-0">
-          <img
-            src={urlForImage(project.heroImage).width(1920).height(1080).quality(90).url()}
-            alt={project.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        </div>
-        
-        <div className="relative z-10 h-full flex items-end">
-          <div className="max-w-7xl mx-auto px-6 pb-12 w-full">
-            <div className="max-w-4xl">
-              <div className="flex items-center gap-3 text-white/90 mb-4">
-                <span className="capitalize">{project.category.replace('-', ' ')}</span>
-                <span>•</span>
-                <span>{project.location}</span>
-                <span>•</span>
-                <span>{completionYear}</span>
-              </div>
-              
-              <h1 className="font-serif text-4xl md:text-6xl text-white mb-6">
-                {project.title}
-              </h1>
-              
-              <p className="text-xl text-white/90 max-w-2xl">
-                {project.challenge}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="flex min-h-[108px] flex-col items-center justify-center border-r border-[#DDD8CF] px-4 text-center last:border-r-0">
+      <Icon size={24} strokeWidth={1.1} className="text-[#967445]" aria-hidden="true" />
+      <span className="mt-3 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#4B4842]">
+        {label}
+      </span>
+      <span className="mt-2 text-[11px] text-[#4B4842]">{value}</span>
+    </div>
+  );
+}
 
-      {/* Project Stats Bar */}
-      <section className="bg-white border-b border-stone-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {project.squareFootage && (
-              <div>
-                <p className="text-sm text-stone-500 mb-1">Square Footage</p>
-                <p className="text-lg font-semibold text-stone-900">
-                  {project.squareFootage.toLocaleString()} sq ft
-                </p>
-              </div>
-            )}
-            
-            {project.budget && (
-              <div>
-                <p className="text-sm text-stone-500 mb-1">Budget Range</p>
-                <p className="text-lg font-semibold text-stone-900">
-                  {formatBudget(project.budget)}
-                </p>
-              </div>
-            )}
-            
-            {project.timeline && (
-              <div>
-                <p className="text-sm text-stone-500 mb-1">Timeline</p>
-                <p className="text-lg font-semibold text-stone-900">
-                  {project.timeline}
-                </p>
-              </div>
-            )}
-            
-            <div>
-              <p className="text-sm text-stone-500 mb-1">Completion</p>
-              <p className="text-lg font-semibold text-stone-900">
-                {completionYear}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+/* ----------  Story  ---------- */
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-16">
-        {/* Challenge & Solution Section */}
-        <section className="grid md:grid-cols-2 gap-12 mb-20">
-          <div>
-            <h2 className="font-serif text-3xl text-stone-900 mb-6">The Challenge</h2>
-            <p className="text-lg text-stone-600 leading-relaxed">
+function ProjectStory({ project }: { project: ProjectDetailData }) {
+  return (
+    <section className="bg-[#F5F2EC]">
+      <div className="mx-auto max-w-[1440px] px-6 py-8 md:px-10 md:py-10 lg:px-14">
+        <div className="grid items-center gap-8 lg:grid-cols-[0.8fr_1.7fr] lg:gap-12">
+          <div className="max-w-[320px]">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-[#876B45]">
+              About the Project
+            </p>
+
+            <h2 className="mt-3 font-serif text-[34px] leading-[1.05] tracking-[-0.02em] md:text-[42px]">
+              The Story
+            </h2>
+
+            <p className="mt-5 text-[12px] leading-[1.8] text-[#4A4741] md:text-[13px]">
               {project.challenge}
             </p>
-          </div>
-          
-          <div>
-            <h2 className="font-serif text-3xl text-stone-900 mb-6">Our Solution</h2>
-            <p className="text-lg text-stone-600 leading-relaxed">
-              {project.solution}
-            </p>
-          </div>
-        </section>
 
-        {/* Before/After Gallery */}
-        {beforeImage && afterImage && (
-          <section className="mb-20">
-            <h2 className="font-serif text-3xl text-stone-900 mb-8 text-center">Transformation</h2>
-            <div className="max-w-4xl mx-auto">
-              <BeforeAfterSlider
-                beforeImage={beforeImage}
-                afterImage={afterImage}
-                caption="Drag the slider to see the transformation"
-              />
-            </div>
-          </section>
-        )}
-
-        {/* Process Section */}
-        {project.process && (
-          <section className="mb-20">
-            <h2 className="font-serif text-3xl text-stone-900 mb-6">The Process</h2>
-            <p className="text-lg text-stone-600 leading-relaxed max-w-4xl">
-              {project.process}
-            </p>
-          </section>
-        )}
-
-        {/* Technical Details */}
-        {(project.materials || project.colorPalette || project.furniture) && (
-          <section className="mb-20">
-            <h2 className="font-serif text-3xl text-stone-900 mb-8">Design Details</h2>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Materials */}
-              {project.materials && project.materials.length > 0 && (
-                <div>
-                  <h3 className="text-xl font-semibold text-stone-900 mb-4">Materials</h3>
-                  <ul className="space-y-2">
-                    {project.materials.map((material: string, index: number) => (
-                      <li key={index} className="text-stone-600 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-stone-400 rounded-full"></span>
-                        {material}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Color Palette */}
-              {project.colorPalette && project.colorPalette.length > 0 && (
-                <div>
-                  <h3 className="text-xl font-semibold text-stone-900 mb-4">Color Palette</h3>
-                  <div className="flex gap-4 flex-wrap">
-                    {project.colorPalette.map((color: string, index: number) => (
-                      <div key={index} className="text-center">
-                        <div 
-                          className="w-16 h-16 rounded-full border-2 border-white shadow-lg mb-2"
-                          style={{ backgroundColor: color }}
-                        />
-                        <span className="text-xs text-stone-500">{color}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Furniture */}
-              {project.furniture && project.furniture.length > 0 && (
-                <div>
-                  <h3 className="text-xl font-semibold text-stone-900 mb-4">Key Pieces</h3>
-                  <ul className="space-y-2">
-                    {project.furniture.map((piece: string, index: number) => (
-                      <li key={index} className="text-stone-600 flex items-center gap-2">
-                        <span className="w-2 h-2 bg-stone-400 rounded-full"></span>
-                        {piece}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* Gallery Section */}
-        {project.gallery && project.gallery.length > 0 && (
-          <section className="mb-20">
-            <h2 className="font-serif text-3xl text-stone-900 mb-8">Project Gallery</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {project.gallery.map((image: any, index: number) => (
-                <div 
-                  key={image.asset._id} 
-                  className="group relative overflow-hidden rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
-                  onClick={() => openLightbox(index)}
-                >
-                  <div className="aspect-[4/3] overflow-hidden">
-                    <img
-                      src={urlForImage(image.asset).width(600).height(450).quality(90).url()}
-                      alt={image.caption || `${project.title} - Image ${index + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                  
-                  {/* Overlay on hover */}
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <div className="bg-white/90 backdrop-blur-sm p-3 rounded-full">
-                      <svg className="w-6 h-6 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Image category badge */}
-                  {image.category && (
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-stone-700 capitalize">
-                        {image.category}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Caption */}
-                  {image.caption && (
-                    <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/50 to-transparent">
-                      <p className="text-white text-sm">{image.caption}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Client Testimonial */}
-        {project.testimonial && (
-          <section className="mb-20">
-            <div className="bg-stone-100 rounded-2xl p-8 md:p-12 text-center">
-              <div className="max-w-3xl mx-auto">
-                <div className="flex justify-center mb-6">
-                  {[...Array(project.testimonial.rating || 5)].map((_, i) => (
-                    <svg key={i} className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                
-                <blockquote className="text-2xl text-stone-700 mb-6 italic">
-                  "{project.testimonial.review}"
-                </blockquote>
-                
-                <cite className="text-stone-600">
-                  <span className="font-semibold not-italic">{project.testimonial.clientName}</span>
-                  {project.testimonial.clientLocation && (
-                    <span className="ml-2">• {project.testimonial.clientLocation}</span>
-                  )}
-                </cite>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Project Details Sidebar */}
-        <section className="grid lg:grid-cols-3 gap-12 mb-20">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-12">
-            {project.process && (
-              <div>
-                <h2 className="font-serif text-3xl text-stone-900 mb-6">Our Process</h2>
-                <p className="text-lg text-stone-600 leading-relaxed">
-                  {project.process}
-                </p>
-              </div>
-            )}
-
-            {project.materials && project.materials.length > 0 && (
-              <div>
-                <h3 className="font-serif text-2xl text-stone-900 mb-4">Materials & Finishes</h3>
-                <div className="flex flex-wrap gap-3">
-                  {project.materials.map((material: string, index: number) => (
-                    <span
-                      key={index}
-                      className="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm"
-                    >
-                      {material}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {project.furniture && project.furniture.length > 0 && (
-              <div>
-                <h3 className="font-serif text-2xl text-stone-900 mb-4">Key Furniture Pieces</h3>
-                <ul className="space-y-2">
-                  {project.furniture.map((piece: string, index: number) => (
-                    <li key={index} className="flex items-center text-stone-600">
-                      <svg className="w-4 h-4 text-stone-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {piece}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-8">
-            {/* Project Info Card */}
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <h3 className="font-serif text-xl text-stone-900 mb-4">Project Details</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-stone-500 mb-1">Category</p>
-                  <p className="font-medium text-stone-900 capitalize">
-                    {project.category.replace('-', ' ')}
-                  </p>
-                </div>
-                
-                {project.style && project.style.length > 0 && (
-                  <div>
-                    <p className="text-sm text-stone-500 mb-1">Style</p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.style.map((style: string, index: number) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-stone-100 text-stone-700 rounded-full text-sm capitalize"
-                        >
-                          {style}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                <div>
-                  <p className="text-sm text-stone-500 mb-1">Location</p>
-                  <p className="font-medium text-stone-900">{project.location}</p>
-                </div>
-                
-                {project.timeline && (
-                  <div>
-                    <p className="text-sm text-stone-500 mb-1">Timeline</p>
-                    <p className="font-medium text-stone-900">{project.timeline}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* CTA Card */}
-            <div className="bg-stone-900 text-white rounded-xl p-6">
-              <h3 className="font-serif text-xl mb-3">Ready to Start?</h3>
-              <p className="text-stone-300 text-sm mb-4">
-                Let's discuss how we can bring your vision to life.
-              </p>
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 bg-white text-stone-900 px-6 py-3 rounded-lg font-medium hover:bg-stone-100 transition-colors w-full justify-center"
-              >
-                Get In Touch
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Related Projects */}
-        {project.relatedProjects && project.relatedProjects.length > 0 && (
-          <section className="mb-20">
-            <h2 className="font-serif text-3xl text-stone-900 mb-8">Related Projects</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {project.relatedProjects.map((relatedProject: any) => (
-                <Link
-                  key={relatedProject._id}
-                  to={`/projects/${relatedProject.slug.current}`}
-                  className="group block"
-                >
-                  <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-                    <div className="aspect-[4/3] overflow-hidden">
-                      <img
-                        src={urlForImage(relatedProject.heroImage).width(600).height(450).quality(90).url()}
-                        alt={relatedProject.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-stone-900 group-hover:text-stone-700 transition-colors">
-                        {relatedProject.title}
-                      </h3>
-                      <p className="text-sm text-stone-500 mt-1">
-                        {relatedProject.location} • {relatedProject.category.replace('-', ' ')}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
-
-      {/* Lightbox Modal */}
-      {lightboxOpen && project.gallery && (
-        <div 
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-          onClick={() => setLightboxOpen(false)}
-        >
-          <div className="relative max-w-6xl max-h-full" onClick={(e) => e.stopPropagation()}>
-            {/* Close button */}
-            <button
-              onClick={() => setLightboxOpen(false)}
-              className="absolute -top-12 right-0 text-white hover:text-stone-300 transition-colors"
+            <a
+              href="#design-approach"
+              className="mt-6 inline-flex items-center gap-4 border border-[#A78345] px-5 py-3 text-[9px] font-semibold uppercase tracking-[0.13em] text-[#745B39] transition-colors hover:bg-[#A78345] hover:text-white"
             >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              The Design Approach <ArrowRight size={13} strokeWidth={1.3} />
+            </a>
+          </div>
 
-            {/* Main image */}
-            <div className="relative">
-              <img
-                src={urlForImage(project.gallery[currentImageIndex].asset).width(1600).height(900).quality(90).url()}
-                alt={project.gallery[currentImageIndex].caption || `Image ${currentImageIndex + 1}`}
-                className="max-w-full max-h-[80vh] object-contain"
-              />
-              
-              {/* Navigation arrows */}
-              <button
-                onClick={() => navigateLightbox('prev')}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              
-              <button
-                onClick={() => navigateLightbox('next')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+          <figure className="overflow-hidden">
+            <img
+              src={project.storyImage}
+              alt={`${project.title} — interior view`}
+              loading="lazy"
+              className="aspect-[1.7/1] w-full object-cover"
+            />
+          </figure>
+        </div>
+      </div>
+    </section>
+  );
+}
 
-            {/* Image counter and caption */}
-            <div className="text-center mt-4 text-white">
-              <p className="text-sm mb-2">
-                {currentImageIndex + 1} / {project.gallery.length}
-              </p>
-              {project.gallery[currentImageIndex].caption && (
-                <p className="text-lg">
-                  {project.gallery[currentImageIndex].caption}
-                </p>
-              )}
-            </div>
+/* ----------  Gallery + lightbox  ---------- */
+
+function ProjectGallery({ images }: { images: ProjectDetailData["gallery"] }) {
+  const [active, setActive] = useState<number | null>(null);
+  const close = () => setActive(null);
+  const previous = () =>
+    setActive((i) => (i === null ? null : (i - 1 + images.length) % images.length));
+  const next = () =>
+    setActive((i) => (i === null ? null : (i + 1) % images.length));
+
+  useEffect(() => {
+    if (active === null) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+      if (event.key === "ArrowLeft") previous();
+      if (event.key === "ArrowRight") next();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [active]);
+
+  return (
+    <>
+      <section id="gallery" className="bg-[#F5F2EC] px-4 pb-8 md:px-6 lg:px-10">
+        <div className="mx-auto max-w-[1360px]">
+          <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-5 md:overflow-visible">
+            {images.map((image, index) => (
+              <button
+                key={image.url}
+                type="button"
+                onClick={() => setActive(index)}
+                className="group relative min-w-[205px] overflow-hidden focus-visible:ring-2 focus-visible:ring-[#A9854D] md:min-w-0"
+                aria-label={`Open project photo ${index + 1}`}
+              >
+                <img
+                  src={image.url}
+                  alt={image.caption}
+                  loading="lazy"
+                  className="aspect-[1.05/1] w-full object-cover transition-transform duration-500 group-hover:scale-[1.025]"
+                />
+              </button>
+            ))}
           </div>
         </div>
+      </section>
+
+      {active !== null && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Project photo viewer"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+          onClick={close}
+        >
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close photo viewer"
+            className="absolute right-5 top-5 p-2 text-white transition-colors hover:text-[#C09A5A]"
+          >
+            <X size={26} strokeWidth={1.2} />
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              previous();
+            }}
+            aria-label="Previous photo"
+            className="absolute left-3 top-1/2 -translate-y-1/2 p-3 text-white transition-colors hover:text-[#C09A5A] md:left-8"
+          >
+            <ChevronLeft size={30} strokeWidth={1.1} />
+          </button>
+
+          <figure
+            className="flex max-h-[88vh] flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={withParams(images[active].url.split("?")[0], 1920, 1080)}
+              alt={images[active].caption}
+              className="max-h-[82vh] max-w-[92vw] object-contain"
+            />
+            {images[active].caption && (
+              <figcaption className="mt-3 max-w-[92vw] text-center text-[10px] tracking-[0.12em] text-white/75">
+                {images[active].caption}
+              </figcaption>
+            )}
+          </figure>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              next();
+            }}
+            aria-label="Next photo"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-3 text-white transition-colors hover:text-[#C09A5A] md:right-8"
+          >
+            <ChevronRight size={30} strokeWidth={1.1} />
+          </button>
+
+          <span className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.12em] text-white/75">
+            {active + 1} / {images.length}
+          </span>
+        </div>
       )}
-    </div>
+    </>
+  );
+}
+
+/* ----------  Highlights  ---------- */
+
+function ProjectHighlights({ project }: { project: ProjectDetailData }) {
+  return (
+    <section
+      id="design-approach"
+      className="border-t border-[#DDD8CF] bg-[#F5F2EC]"
+    >
+      <div className="mx-auto grid max-w-[1440px] lg:grid-cols-3">
+        <HighlightBlock
+          icon="sparkles"
+          eyebrow="Our Solution"
+          description={project.solution}
+        />
+
+        <HighlightBlock
+          icon="lightbulb"
+          eyebrow="The Process"
+          description={project.process}
+        />
+
+        <article className="px-6 py-7 md:px-10 lg:px-8">
+          <div className="flex gap-5">
+            <div className="shrink-0 pt-0.5 text-[#967445]">
+              <Sparkles size={25} strokeWidth={1.05} />
+            </div>
+
+            <div>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[#4B4842]">
+                Materials & Finishes
+              </p>
+
+              {project.colorPalette.length > 0 && (
+                <div className="mt-3 flex items-center gap-2">
+                  {project.colorPalette.map((hex) => (
+                    <span
+                      key={hex}
+                      title={hex}
+                      aria-label={hex}
+                      className="h-8 w-8 rounded-full border border-black/10"
+                      style={{ backgroundColor: hex }}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <p className="mt-4 text-[11px] leading-[1.75] text-[#4C4943]">
+                {project.materials.length > 0
+                  ? project.materials.join(", ")
+                  : "—"}
+              </p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function HighlightBlock({
+  icon,
+  eyebrow,
+  description,
+}: {
+  icon: "lightbulb" | "sparkles";
+  eyebrow: string;
+  description: string;
+}) {
+  return (
+    <article className="border-b border-[#DDD8CF] px-6 py-7 md:px-10 lg:border-b-0 lg:border-r lg:px-8">
+      <div className="flex gap-5">
+        <div className="shrink-0 pt-0.5 text-[#967445]">
+          {icon === "sparkles" ? (
+            <Sparkles size={25} strokeWidth={1.05} />
+          ) : (
+            <Lightbulb size={25} strokeWidth={1.05} />
+          )}
+        </div>
+
+        <div>
+          <p className="text-[9px] font-semibold uppercase tracking-[0.17em] text-[#4B4842]">
+            {eyebrow}
+          </p>
+          <p className="mt-3 text-[11px] leading-[1.75] text-[#4C4943]">
+            {description || "—"}
+          </p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+/* ----------  CTA  ---------- */
+
+function ProjectCta() {
+  return (
+    <section className="relative overflow-hidden bg-[#0B0B0A] text-white">
+      <img
+        src={servicesCtaImage}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        className="absolute right-0 top-0 h-full w-[44%] object-cover opacity-55"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-r from-[#0B0B0A] via-[#0B0B0A]/95 to-[#0B0B0A]/25"
+      />
+
+      <div className="relative mx-auto max-w-[1440px] px-6 py-9 md:px-10 lg:px-14 lg:py-10">
+        <div className="max-w-[560px]">
+          <h2 className="font-serif text-[30px] leading-[1.1] md:text-[36px]">
+            Have a Project in Mind?
+          </h2>
+
+          <p className="mt-2 text-[12px] text-white/85 md:text-[13px]">
+            Let's create a space that reflects your vision and inspires.
+          </p>
+
+          <div className="mt-5">
+            <PrimaryButton href="/contact">GET IN TOUCH</PrimaryButton>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -15,6 +15,7 @@ const aboutLinks = [
   ["BLOG", "/blog"],
   ["TEAM", "/team"],
   ["TESTIMONIALS", "/testimonials"],
+  ["FAQ", "/faq"],
   ["CONTACT", "/contact"],
 ] as const;
 
@@ -25,7 +26,7 @@ export function SiteHeader({
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50 border-b border-white/10 bg-black/10 text-white backdrop-blur-[2px]">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/10 text-white backdrop-blur-[2px]">
       <div className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between px-6 md:px-10 xl:px-[66px]">
         <SiteLogo variant="about" />
 

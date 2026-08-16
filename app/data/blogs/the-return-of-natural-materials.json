@@ -1,0 +1,99 @@
+{
+  "id": "article-3",
+  "slug": "the-return-of-natural-materials",
+  "category": "Design Trends",
+  "categorySlug": "design-trends",
+  "title": "The Return of Natural Materials",
+  "excerpt": "From stone to rattan, natural materials are bringing authenticity and calm back into modern homes.",
+  "date": "April 10, 2024",
+  "readTime": "6 min read",
+  "featured": false,
+  "image": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/aedb15b805047b47c8a57f60f5bfcbcd43c6223e-1600x896.jpg?w=1280&h=800&fit=crop&crop=center&auto=format&q=85",
+    "alt": "The Return of Natural Materials — card"
+  },
+  "heroImage": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/66b4be69732bb13b17d36d429ab9b18e553a27df-1600x896.jpg?w=1920&h=1080&fit=crop&crop=center&auto=format&q=85",
+    "alt": "The Return of Natural Materials — hero"
+  },
+  "leadImage": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/1193a163f32020430a7ce44043b669b6e7e9b0ea-1600x896.jpg?w=1280&h=640&fit=crop&crop=center&auto=format&q=85",
+    "alt": "The Return of Natural Materials — lead"
+  },
+  "intro": [
+    "Kitchens are more than just functional spaces—they’re the heart of the home. And when it comes to design, bold patterns can transform a kitchen from ordinary to unforgettable.",
+    "The key is balance. By pairing strong patterns with natural materials, neutral tones, and thoughtful details, you can create a space that feels both dynamic and timeless."
+  ],
+  "sections": [
+    {
+      "number": 1,
+      "title": "Start with a Statement",
+      "paragraphs": [
+        "Whether it’s a geometric tile backsplash, a dramatic stone countertop, or patterned floor tiles, choose one element to set the tone. Let it be the hero."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/e6a3e6164a2a279cf856684e60c29eee5420df8d-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "The Return of Natural Materials — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/d35ba744e3df15046cfa1cc494d90ef7913af5fa-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "The Return of Natural Materials — inline"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Balance with Neutrals",
+      "paragraphs": [
+        "To keep the space from feeling overwhelming, ground bold patterns with neutral cabinetry, warm wood tones, and natural textures."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/ca85bc79b51c1bb8c3df0eda13abbe914a6ba6c3-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "The Return of Natural Materials — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/d4847e27b429c6800aaa8bf0fa9ba78897636981-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "The Return of Natural Materials — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/037865f3edad8c2a6ad2e5651dfe38934a1157bc-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "The Return of Natural Materials — inline"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Layer in Texture",
+      "paragraphs": [
+        "Mix materials like wood, stone, metal, and ceramics to add depth and interest. Texture helps tie patterns into the overall design seamlessly."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/ee054a49c2d6e000397539e5639b8507fad3f376-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "The Return of Natural Materials — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/0a69a78c022f7ac49e21c7829f54ed6b1f98458f-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "The Return of Natural Materials — inline"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/f2503f9c2b85856ba674342cd29d6050ee4d9a73-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "The Return of Natural Materials — inline"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Keep It Personal",
+      "paragraphs": [
+        "Bold patterns should reflect your personality and lifestyle. Choose designs that make you feel good every time you walk into the room.",
+        "When done right, bold patterns don’t just decorate a kitchen—they define it."
+      ],
+      "images": []
+    }
+  ],
+  "metaTitle": "The Return of Natural Materials | Whitefire Interior",
+  "metaDescription": "From stone to rattan, natural materials are bringing authenticity and calm back into modern homes."
+}

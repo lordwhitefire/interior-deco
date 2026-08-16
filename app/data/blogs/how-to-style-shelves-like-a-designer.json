@@ -1,0 +1,99 @@
+{
+  "id": "article-6",
+  "slug": "how-to-style-shelves-like-a-designer",
+  "category": "Design Advice",
+  "categorySlug": "design-advice",
+  "title": "How to Style Shelves Like a Designer",
+  "excerpt": "A step-by-step guide to styling shelves with balance, personality, and purpose.",
+  "date": "March 7, 2024",
+  "readTime": "5 min read",
+  "featured": false,
+  "image": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/0bb0589b101f73f695431464028393e773241735-1600x896.jpg?w=1280&h=800&fit=crop&crop=center&auto=format&q=85",
+    "alt": "Brooklyn Brownstone Kitchen interior — card photograph"
+  },
+  "heroImage": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/63436ab6c0f8ad15c05a222a59b9ef17bb4aaaaa-1600x896.jpg?w=1920&h=1080&fit=crop&crop=center&auto=format&q=85",
+    "alt": "Brooklyn Brownstone Kitchen interior — hero photograph"
+  },
+  "leadImage": {
+    "src": "https://cdn.sanity.io/images/pzhistba/production/ec68f5f3c99c97f82787c2e3ab1f706ca483fb49-1600x896.jpg?w=1280&h=640&fit=crop&crop=center&auto=format&q=85",
+    "alt": "Brooklyn Brownstone Kitchen interior — lead photograph"
+  },
+  "intro": [
+    "Kitchens are more than just functional spaces—they’re the heart of the home. And when it comes to design, bold patterns can transform a kitchen from ordinary to unforgettable.",
+    "The key is balance. By pairing strong patterns with natural materials, neutral tones, and thoughtful details, you can create a space that feels both dynamic and timeless."
+  ],
+  "sections": [
+    {
+      "number": 1,
+      "title": "Start with a Statement",
+      "paragraphs": [
+        "Whether it’s a geometric tile backsplash, a dramatic stone countertop, or patterned floor tiles, choose one element to set the tone. Let it be the hero."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/8493f71913510b2d4b04476c4bdc3a3f4afcb904-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Brooklyn Brownstone Kitchen interior — inline photograph"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/b9fb6bd390d16c8daae69ed5542e70640e016610-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Brooklyn Brownstone Kitchen interior — inline photograph"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Balance with Neutrals",
+      "paragraphs": [
+        "To keep the space from feeling overwhelming, ground bold patterns with neutral cabinetry, warm wood tones, and natural textures."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/d004b3d7e3a0bd9b55f8fe9749e41889fc3520ae-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Melbourne Laneway Café interior — inline photograph"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/4f35a44283018d5d370632c4151f1c272de2e020-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Melbourne Laneway Café interior — inline photograph"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/c01482a91b203851c8f2651c92a69015fd1360c3-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Melbourne Laneway Café interior — inline photograph"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Layer in Texture",
+      "paragraphs": [
+        "Mix materials like wood, stone, metal, and ceramics to add depth and interest. Texture helps tie patterns into the overall design seamlessly."
+      ],
+      "images": [
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/dce5f0779f8b1d36bd78fa094d2d1edf61ef37fd-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Melbourne Laneway Café interior — inline photograph"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/bcdda9d79aafe3f78b2b4275fbd7f381ae29856d-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Melbourne Laneway Café interior — inline photograph"
+        },
+        {
+          "src": "https://cdn.sanity.io/images/pzhistba/production/be9bbc0f509380be74d191a684d9ff00926a8e9d-1600x896.jpg?w=1024&h=1024&fit=crop&crop=center&auto=format&q=85",
+          "alt": "Melbourne Laneway Café interior — inline photograph"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Keep It Personal",
+      "paragraphs": [
+        "Bold patterns should reflect your personality and lifestyle. Choose designs that make you feel good every time you walk into the room.",
+        "When done right, bold patterns don’t just decorate a kitchen—they define it."
+      ],
+      "images": []
+    }
+  ],
+  "metaTitle": "How to Style Shelves Like a Designer | Whitefire Interior",
+  "metaDescription": "A step-by-step guide to styling shelves with balance, personality, and purpose."
+}
