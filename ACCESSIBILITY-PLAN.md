@@ -62,4 +62,5 @@
 - [x] All implementation steps done; tsc/lint/build clean; 49/49 sitemap URLs 200;
       single header/footer/main with `id="main"`; search icon gone; tabs wired;
       contact labels linked
-- [ ] Manual keyboard walkthrough (browser) + commit to main
+- [x] Committed to main (`4247a95`)
+- [ ] Manual keyboard walkthrough (browser) — owner
