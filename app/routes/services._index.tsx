@@ -22,6 +22,7 @@ export interface ServicesHeroData {
   ctaLabel: string;
   ctaHref: string;
   image: string;
+  imageAlt: string;
 }
 
 export interface ServicesPageData {
@@ -45,7 +46,7 @@ function ServicesHero({ data }: { data: ServicesHeroData }) {
     <section className="relative isolate min-h-[430px] overflow-hidden bg-[#1a1815] text-white sm:min-h-[500px] lg:min-h-[540px]">
       <img
         src={data.image}
-        alt="Warm contemporary interior with a large sectional sofa"
+        alt={data.imageAlt}
         className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
         fetchPriority="high"
       />

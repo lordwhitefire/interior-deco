@@ -214,7 +214,8 @@ export async function getServicesIndexData() {
       description: config?.servicesHeroDescription ?? "",
       ctaLabel: config?.servicesHeroCtaLabel ?? "",
       ctaHref: config?.servicesHeroCtaHref ?? "",
-      image: "",
+      image: img(config?.servicesHeroImage, 1920, 1080),
+      imageAlt: config?.servicesHeroImageAlt ?? "",
     },
     intro: {
       eyebrow: config?.servicesIntroEyebrow ?? "",
