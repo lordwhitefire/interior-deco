@@ -7,6 +7,9 @@ import { useLoaderData } from "@remix-run/react";
 import groq from "groq";
 import { createClient } from "@sanity/client";
 import imageUrlBuilder from "@sanity/image-url";
+import { Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
 import {
   ArrowRight,
   Armchair,
@@ -524,9 +527,16 @@ function HomeStudioStatement({ image }: { image?: string | null }) {
   );
 }
 
-function TestimonialsTrustSection({ logos }: { logos?: ClientLogo[] }) {
-  const [active, setActive] = useState(0);
-  const testimonials = [mockTestimonial];
+function TestimonialsTrustSection({
+  logos,
+  testimonials,
+}: {
+  logos?: ClientLogo[];
+  testimonials: Testimonial[];
+}) {
+  const [swiper, setSwiper] = useState<SwiperType | null>(null);
+  const items = testimonials.length > 0 ? testimonials : [mockTestimonial];
+  const swipable = items.length > 1;
   const hasLogos = Boolean(logos && logos.length > 0);
 
   return (
@@ -548,16 +558,35 @@ function TestimonialsTrustSection({ logos }: { logos?: ClientLogo[] }) {
               “
             </span>
 
-            <div>
-              <p className="max-w-[330px] text-sm leading-6 text-[#37332E]">
-                {testimonials[active].quote}
-              </p>
-              <p className="mt-5 text-xs font-semibold text-[#2C2925]">
-                — {testimonials[active].clientName}
-              </p>
-              <p className="mt-1 text-[11px] text-[#777066]">
-                {testimonials[active].location}
-              </p>
+            <div className="w-full max-w-[330px]">
+              <Swiper
+                modules={[Autoplay]}
+                loop={swipable}
+                speed={500}
+                autoplay={
+                  swipable
+                    ? { delay: 6000, disableOnInteraction: false, pauseOnMouseEnter: true }
+                    : false
+                }
+                onSwiper={setSwiper}
+                className="w-full"
+              >
+                {items.map((testimonial) => (
+                  <SwiperSlide key={testimonial.id} className="!h-[260px]">
+                    <div className="flex h-full flex-col overflow-hidden">
+                      <p className="text-sm leading-6 text-[#37332E]">
+                        {testimonial.quote}
+                      </p>
+                      <p className="mt-5 text-xs font-semibold text-[#2C2925]">
+                        — {testimonial.clientName}
+                      </p>
+                      <p className="mt-1 text-[11px] text-[#777066]">
+                        {testimonial.location}
+                      </p>
+                    </div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
           </div>
 
@@ -565,22 +594,16 @@ function TestimonialsTrustSection({ logos }: { logos?: ClientLogo[] }) {
             <button
               type="button"
               aria-label="Previous testimonial"
-              onClick={() =>
-                setActive((value) =>
-                  value === 0 ? testimonials.length - 1 : value - 1
-                )
-              }
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#2C2925]/20"
+              onClick={() => swiper?.slidePrev()}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#2C2925]/20 transition-colors hover:bg-[#2C2925]/5"
             >
               <ChevronLeft size={15} />
             </button>
             <button
               type="button"
               aria-label="Next testimonial"
-              onClick={() =>
-                setActive((value) => (value + 1) % testimonials.length)
-              }
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#2C2925]/20"
+              onClick={() => swiper?.slideNext()}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#2C2925]/20 transition-colors hover:bg-[#2C2925]/5"
             >
               <ChevronRight size={15} />
             </button>
@@ -855,11 +878,14 @@ function NewsletterCTA({ image }: { image?: string | null }) {
 
 export async function loader() {
   try {
-    const [heroDoc, stylishDoc, clientsDoc] = await Promise.all([
+    const [heroDoc, stylishDoc, clientsDoc, testimonialsDoc] = await Promise.all([
       sanityClient.fetch(groq`*[_type == "hero"][0]{images}`),
       sanityClient.fetch(groq`*[_type == "stylish"][0]{images}`),
       sanityClient.fetch(
         groq`*[_type == "client"] | order(id asc){id, name, logo}`
+      ),
+      sanityClient.fetch(
+        groq`*[_type == "testimonial"] | order(date desc){_id, clientName, clientLocation, review}`
       ),
     ]);
 
@@ -879,23 +905,33 @@ export async function loader() {
       const logo = baseLogos[index % baseLogos.length];
       return { ...logo, id: `${logo.id}-${index}` };
     });
+    const testimonials: Testimonial[] = (testimonialsDoc ?? [])
+      .slice(0, 6)
+      .map((t: any) => ({
+        id: t._id,
+        quote: t.review ?? "",
+        clientName: t.clientName ?? "",
+        location: t.clientLocation ?? "",
+      }));
 
     return json({
       heroImages,
       studioImage,
       clientLogos,
+      testimonials,
     });
   } catch {
     return json({
       heroImages: [],
       studioImage: null,
       clientLogos: [],
+      testimonials: [],
     });
   }
 }
 
 export default function HomePage() {
-  const { heroImages, studioImage, clientLogos } =
+  const { heroImages, studioImage, clientLogos, testimonials } =
     useLoaderData<typeof loader>();
 
   return (
@@ -906,7 +942,7 @@ export default function HomePage() {
         <main>
           <ServicesSection />
           <HomeStudioStatement image={studioImage} />
-          <TestimonialsTrustSection logos={clientLogos} />
+          <TestimonialsTrustSection logos={clientLogos} testimonials={testimonials} />
           <FeaturedProjectsSection />
           <HomeStats />
           <LatestArticlesSection />
