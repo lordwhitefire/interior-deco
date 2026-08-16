@@ -35,6 +35,30 @@ export const links = () => [
   { rel: 'stylesheet', href: '/vendor/swiper-bundle.min.css' },
 ];
 
+export const headers = () => {
+  return {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy':
+      'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+    'Strict-Transport-Security': 'max-age=63072000; includeSubDomains',
+    'Content-Security-Policy': [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https://cdn.sanity.io",
+      "font-src 'self'",
+      "connect-src 'self'",
+      'frame-src https://www.google.com https://maps.google.com',
+      "frame-ancestors 'none'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ].join('; '),
+  };
+};
+
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',

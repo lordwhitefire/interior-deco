@@ -74,9 +74,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (isHoneypotFilled(formData)) return json({ ok: true });
 
-  const { allowed } = rateLimit(clientIp(request));
-  if (!allowed) return rateLimited();
-
   const fullName = get("fullName");
   const email = parseEmail(get("email"));
   const phone = get("phone");
@@ -95,6 +92,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     errors.message = "Please write a message.";
   if (Object.keys(errors).length > 0)
     return json({ ok: false, errors }, { status: 400 });
+
+  const { allowed } = rateLimit(clientIp(request));
+  if (!allowed) return rateLimited();
 
   try {
     await createDoc("contactSubmission", {
@@ -524,6 +524,8 @@ function SocialLink({
 }
 
 function StudioMapSection({ info }: { info: ContactInfoData }) {
+  if (!info.mapEmbedUrl) return null;
+
   return (
     <section aria-labelledby="map-heading" className="relative">
       <h2 id="map-heading" className="sr-only">

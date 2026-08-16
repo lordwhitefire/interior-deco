@@ -94,15 +94,15 @@ export async function handleNewsletterAction(
 
   if (isHoneypotFilled(formData)) return json({ ok: true });
 
-  const { allowed } = rateLimit(clientIp(request));
-  if (!allowed) return rateLimited();
-
   const email = parseEmail(get("email"));
   if (!EMAIL_PATTERN.test(email) || email.length > FIELD_LIMITS.email)
     return fieldError("email", "Please enter a valid email address.");
 
   if (!get("consent"))
     return fieldError("consent", "Please agree to receive emails.");
+
+  const { allowed } = rateLimit(clientIp(request));
+  if (!allowed) return rateLimited();
 
   try {
     const existing = await writeClient.fetch<{ _id: string } | null>(
