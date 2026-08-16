@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
@@ -88,7 +89,7 @@ export default function TeamIndexRoute() {
 function TeamHero({ image, imageAlt }: { image: string; imageAlt: string }) {
   return (
     <section className="relative min-h-[397px] overflow-hidden bg-[#080807] text-white lg:min-h-[500px]">
-      <img
+      <ResponsiveImage
         src={image}
         alt={imageAlt}
         className="absolute inset-0 h-full w-full object-cover object-[68%_52%]"
@@ -180,7 +181,7 @@ function TeamCard({ member }: { member: StaffMember }) {
         to={`/team/${member.slug}`}
         className="relative block aspect-[0.84] overflow-hidden bg-[#ddd8d0]"
       >
-        <img
+        <ResponsiveImage
           src={member.photoUrl ?? ""}
           alt={`Portrait of ${member.fullName}`}
           loading="lazy"
@@ -272,7 +273,7 @@ function ProjectCTA({ cta }: { cta: TeamIndexData["projectCta"] }) {
   return (
     <section className="relative grid min-h-[186px] grid-cols-1 overflow-hidden bg-[#0e0e0c] text-white lg:grid-cols-[58%_42%]">
       <div className="relative min-h-[230px] lg:min-h-[300px]">
-        <img
+        <ResponsiveImage
           src={cta.image}
           alt={cta.imageAlt}
           loading="lazy"

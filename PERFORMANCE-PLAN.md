@@ -88,4 +88,8 @@ Problems:
 
 ## Status
 
-- [ ] Implementation (waiting for "go")
+- [x] All implementation done; tsc clean; build clean; 49/49 local URLs 200
+- [x] Lighthouse after: desktop 99 (LCP 0.6s, was 1.5s), mobile 92 (LCP 2.7s, was 3.9s)
+- [x] No jsDelivr requests; swiper local; srcset + WebP/AVIF live on all images
+- [ ] Manual visual confirmation in browser (owner) — screenshots captured, model cannot view them
+- Note: lint now surfaces a pre-existing backlog (was masked by a broken eslint TS resolver + cache); resolver fixed with `eslint-import-resolver-typescript@3.6.3`. Backlog cleanup is a separate task.

@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -158,7 +159,7 @@ export default function BlogRoute() {
 function BlogHero({ hero }: { hero: { src: string; alt: string } }) {
   return (
     <section className="relative flex min-h-[350px] items-end overflow-hidden bg-[#111] pt-[68px] lg:min-h-[390px]">
-      <img
+      <ResponsiveImage
         src={hero.src}
         alt={hero.alt}
         fetchPriority="high"
@@ -195,7 +196,7 @@ function ArticleCard({ article }: { article: Article }) {
     <article className="group overflow-hidden border border-[#DDD8D0] bg-[#FAF8F4]">
       <Link to={`/blog/${article.slug}`} className="block focus:outline-none">
         <div className="overflow-hidden">
-          <img
+          <ResponsiveImage
             src={article.image.src}
             alt={article.image.alt}
             loading="lazy"
@@ -325,7 +326,7 @@ function FeaturedPostCard({ article }: { article: Article }) {
     <article className="border border-[#DDD8D0] bg-[#FAF8F4]">
       <Link to={`/blog/${article.slug}`} className="group block">
         <div className="overflow-hidden">
-          <img
+          <ResponsiveImage
             src={article.image.src}
             alt={article.image.alt}
             loading="lazy"
@@ -470,7 +471,7 @@ function BlogPhilosophyCTA({
     <section className="bg-[#F7F4EE]">
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 lg:h-[200px] lg:grid-cols-[46%_54%]">
         <div className="h-[200px] overflow-hidden lg:h-full">
-          <img
+          <ResponsiveImage
             src={philosophy.image.src}
             alt={philosophy.image.alt}
             loading="lazy"

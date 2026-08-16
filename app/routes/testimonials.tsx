@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
@@ -92,7 +93,7 @@ function TestimonialsHero({
 }) {
   return (
     <section className="relative isolate min-h-[330px] overflow-hidden bg-[#0d0d0c]">
-      <img
+      <ResponsiveImage
         src={hero.image.src}
         alt={hero.image.alt}
         className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
@@ -197,7 +198,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 
         <div className="flex items-center gap-3">
           {testimonial.clientImage ? (
-            <img
+            <ResponsiveImage
               src={testimonial.clientImage}
               alt={testimonial.clientImageAlt ?? ""}
               className="h-[50px] w-[50px] shrink-0 rounded-full object-cover"
@@ -311,7 +312,7 @@ function ConsultationCTA({
   return (
     <section className="grid min-h-[285px] bg-[#171717] lg:grid-cols-[55%_45%]">
       <div className="relative min-h-[230px] overflow-hidden">
-        <img
+        <ResponsiveImage
           src={cta.image.src}
           alt={cta.image.alt}
           className="h-full w-full object-cover object-center"

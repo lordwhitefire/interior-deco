@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
@@ -155,7 +156,7 @@ export default function BlogDetailRoute() {
 
           <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-12 px-6 py-8 sm:px-8 md:py-12 lg:grid-cols-[minmax(0,2.15fr)_minmax(280px,0.95fr)] lg:gap-14 lg:px-0">
             <article className="min-w-0">
-              <img
+              <ResponsiveImage
                 src={article.leadImage.src}
                 alt={article.leadImage.alt}
                 className="aspect-[16/8] w-full object-cover"
@@ -189,7 +190,7 @@ export default function BlogDetailRoute() {
 function BlogDetailHero({ article, author }: { article: BlogArticle; author: { name: string; bio: string } }) {
   return (
     <section className="relative min-h-[350px] overflow-hidden bg-black text-white">
-      <img
+      <ResponsiveImage
         src={article.heroImage.src}
         alt={article.heroImage.alt}
         className="absolute inset-0 h-full w-full object-cover"
@@ -289,7 +290,7 @@ function BlogArticleBody({ article }: { article: BlogArticle }) {
                 ].join(" ")}
               >
                 {section.images.map((image) => (
-                  <img
+                  <ResponsiveImage
                     key={image.src}
                     src={image.src}
                     alt={image.alt}
@@ -383,7 +384,7 @@ function PreviousNextPosts({
         to={`/blog/${previousPost.slug}`}
         className="group flex items-center gap-3"
       >
-        <img
+        <ResponsiveImage
           src={previousPost.image.src}
           alt={previousPost.image.alt}
           className="h-[54px] w-[68px] object-cover"
@@ -415,7 +416,7 @@ function PreviousNextPosts({
           </span>
         </span>
 
-        <img
+        <ResponsiveImage
           src={nextPost.image.src}
           alt={nextPost.image.alt}
           className="h-[54px] w-[68px] object-cover"
@@ -508,7 +509,7 @@ function BlogSidebar({
               to={`/blog/${post.slug}`}
               className="group flex gap-3"
             >
-              <img
+              <ResponsiveImage
                 src={post.image.src}
                 alt={post.image.alt}
                 className="h-[56px] w-[66px] shrink-0 object-cover"

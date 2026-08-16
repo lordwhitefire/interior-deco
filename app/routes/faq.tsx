@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
@@ -137,7 +138,7 @@ export default function FaqRoute() {
               />
               <ContactPromptCard />
               <div className="hidden aspect-[4/5] overflow-hidden md:block">
-                <img
+                <ResponsiveImage
                   src={sidebarImage}
                   alt={sidebarImageAlt}
                   className="h-full w-full object-cover object-center"
@@ -163,7 +164,7 @@ function FaqHero({ hero, heroImageAlt }: { hero?: string | null; heroImageAlt?: 
   return (
     <section className="relative isolate min-h-[330px] overflow-hidden bg-[#0d0d0c]">
       {hero && (
-        <img
+        <ResponsiveImage
           src={hero}
           alt={heroImageAlt ?? "Whitefire Interior studio — frequently asked questions"}
           className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
@@ -415,7 +416,7 @@ function ConsultationCTA({
   return (
     <section className="grid min-h-[285px] bg-[#171717] lg:grid-cols-2">
       <div className="relative min-h-[230px] overflow-hidden">
-        <img
+        <ResponsiveImage
           src={image}
           alt={imageAlt}
           className="h-full w-full object-cover object-center"

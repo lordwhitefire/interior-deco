@@ -1,6 +1,7 @@
 // app/routes/about.tsx
 // About page implemented from whitefire-about-ui-implementation.md (§7),
 // copy verbatim from §22, content now served from Sanity (aboutPage doc).
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import { json } from "@remix-run/node";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -125,7 +126,7 @@ function StorySection({ data }: { data: AboutPageData["story"] }) {
         </div>
 
         <figure className="overflow-hidden">
-          <img
+          <ResponsiveImage
             src={data.image.src}
             alt={data.image.alt}
             className="h-[285px] w-full object-cover object-center md:h-[305px]"
@@ -223,7 +224,7 @@ function ApproachSection({ data }: { data: AboutPageData["approach"] }) {
     <section id="our-approach" className="relative overflow-hidden bg-[#F8F6F1]">
       <div className="grid lg:grid-cols-2">
         <figure className="min-h-[310px] overflow-hidden">
-          <img
+          <ResponsiveImage
             src={data.image.src}
             alt={data.image.alt}
             className="h-full min-h-[310px] w-full object-cover object-center"

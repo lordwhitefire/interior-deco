@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type { MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
@@ -44,7 +45,7 @@ export async function loader({}: LoaderFunctionArgs) {
 function ServicesHero({ data }: { data: ServicesHeroData }) {
   return (
     <section className="relative isolate min-h-[430px] overflow-hidden bg-[#1a1815] text-white sm:min-h-[500px] lg:min-h-[540px]">
-      <img
+      <ResponsiveImage
         src={data.image}
         alt={data.imageAlt}
         className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
@@ -120,7 +121,7 @@ function ServiceCard({ item }: { item: ServiceItem }) {
     <article className="group overflow-hidden border border-[#DDD8D0] bg-[#F8F6F2] transition-shadow duration-300 hover:shadow-[0_10px_30px_rgba(35,30,24,0.08)]">
       <a href={item.href} className="block h-full">
         <div className="relative aspect-[1.48/1] overflow-hidden">
-          <img
+          <ResponsiveImage
             src={item.image}
             alt=""
             loading="lazy"
@@ -160,7 +161,7 @@ function ServicesCTA({ image, imageAlt }: { image: string; imageAlt: string }) {
     <section className="bg-[#171511] text-white">
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[30%_42%_28%]">
         <div className="min-h-[300px] overflow-hidden">
-          <img
+          <ResponsiveImage
             src={image}
             alt={imageAlt}
             loading="lazy"

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
+import { lazy, Suspense } from "react";
 import { json } from "@remix-run/node";
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
@@ -10,8 +11,6 @@ import {
   Boxes,
   Building2,
   ChefHat,
-  ChevronLeft,
-  ChevronRight,
   Hammer,
   LayoutGrid,
   Minus,
@@ -22,9 +21,10 @@ import {
   Trophy,
   UtensilsCrossed,
 } from "lucide-react";
-import { Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import type { Swiper as SwiperType } from "swiper";
+
+const ClientTestimonials = lazy(() =>
+  import("~/components/whitefire/ClientTestimonials")
+);
 
 import { SectionEyebrow } from "~/components/whitefire/SectionEyebrow";
 import { seo } from "~/utils/seo";
@@ -174,7 +174,7 @@ function HomeHero({
 }) {
   return (
     <section className="relative min-h-[620px] overflow-hidden bg-[#171716] sm:min-h-[680px] lg:min-h-[720px]">
-      <img
+      <ResponsiveImage
         src={image ?? hero.image?.src ?? ""}
         alt={hero.image?.alt ?? ""}
         className="absolute inset-0 h-full w-full object-cover"
@@ -287,7 +287,7 @@ function HomeStudioStatement({
     <section className="bg-[#171716] text-white">
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
         <div className="relative min-h-[390px] overflow-hidden lg:min-h-[460px]">
-          <img
+          <ResponsiveImage
             src={image ?? ""}
             alt="Elegant interior seating area"
             loading="lazy"
@@ -336,78 +336,19 @@ function TestimonialsTrustSection({
   clientsTitle: string;
   brandsEyebrow: string;
 }) {
-  const [swiper, setSwiper] = useState<SwiperType | null>(null);
-  const items = testimonials.length > 0 ? testimonials : [];
-  const swipable = items.length > 1;
   const hasLogos = logos.length > 0;
 
   return (
     <section className="bg-[#F7F4EE]">
       <div className="mx-auto grid max-w-[1280px] lg:grid-cols-[0.9fr_1.5fr]">
         <div className="px-8 py-16 lg:border-r lg:border-[#25221E]/15 lg:px-12 lg:py-20">
-          <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#9A7A4A]">
-            {clientsEyebrow}
-          </p>
-
-          <h2 className="mt-4 max-w-[300px] font-serif text-[36px] leading-[1.02] text-[#211F1B]">
-            {clientsTitle}
-          </h2>
-
-          <div className="mt-9 flex items-start gap-5">
-            <span className="font-serif text-5xl leading-none text-[#5B554B]">
-              “
-            </span>
-
-            <div className="w-full max-w-[330px]">
-              <Swiper
-                modules={[Autoplay]}
-                loop={swipable}
-                speed={500}
-                autoplay={
-                  swipable
-                    ? { delay: 6000, disableOnInteraction: false, pauseOnMouseEnter: true }
-                    : false
-                }
-                onSwiper={setSwiper}
-                className="w-full"
-              >
-                {items.map((testimonial) => (
-                  <SwiperSlide key={testimonial.id} className="!h-[260px]">
-                    <div className="flex h-full flex-col overflow-hidden">
-                      <p className="text-sm leading-6 text-[#37332E]">
-                        {testimonial.quote}
-                      </p>
-                      <p className="mt-5 text-xs font-semibold text-[#2C2925]">
-                        — {testimonial.clientName}
-                      </p>
-                      <p className="mt-1 text-[11px] text-[#777066]">
-                        {testimonial.location}
-                      </p>
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-          </div>
-
-          <div className="mt-8 flex gap-3">
-            <button
-              type="button"
-              aria-label="Previous testimonial"
-              onClick={() => swiper?.slidePrev()}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#2C2925]/20 transition-colors hover:bg-[#2C2925]/5"
-            >
-              <ChevronLeft size={15} />
-            </button>
-            <button
-              type="button"
-              aria-label="Next testimonial"
-              onClick={() => swiper?.slideNext()}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#2C2925]/20 transition-colors hover:bg-[#2C2925]/5"
-            >
-              <ChevronRight size={15} />
-            </button>
-          </div>
+          <Suspense fallback={null}>
+            <ClientTestimonials
+              testimonials={testimonials}
+              clientsEyebrow={clientsEyebrow}
+              clientsTitle={clientsTitle}
+            />
+          </Suspense>
         </div>
 
         <div className="px-8 py-16 lg:px-12 lg:py-20">
@@ -422,7 +363,7 @@ function TestimonialsTrustSection({
                 className="flex min-h-[42px] items-center justify-center"
               >
                 {hasLogos ? (
-                  <img
+                  <ResponsiveImage
                     src={logo.src}
                     alt={logo.alt}
                     loading="lazy"
@@ -448,7 +389,7 @@ function ProjectCard({ project }: { project: ProjectCardData }) {
       href={project.href}
       className="group relative block aspect-[1.28/1] overflow-hidden bg-[#DDD6CA]"
     >
-      <img
+      <ResponsiveImage
         src={project.image.src}
         alt={project.image.alt}
         loading="lazy"
@@ -539,7 +480,7 @@ function ArticleCard({ article }: { article: ArticleCardData }) {
       className="group block border border-[#25221E]/15 bg-[#F7F4EE]"
     >
       <div className="aspect-[1.8/1] overflow-hidden">
-        <img
+        <ResponsiveImage
           src={article.image.src}
           alt={article.image.alt}
           loading="lazy"
@@ -605,7 +546,7 @@ function NewsletterCTA({ image }: { image?: string | null }) {
 
   return (
     <section className="relative overflow-hidden bg-[#332B24] text-white">
-      <img
+      <ResponsiveImage
         src={image ?? ""}
         alt="Warmly lit interior with decorative objects"
         loading="lazy"

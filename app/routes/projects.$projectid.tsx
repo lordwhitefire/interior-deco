@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import { useEffect, useState } from "react";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -148,7 +149,7 @@ export default function ProjectDetailRoute() {
 function ProjectHero({ project }: { project: ProjectDetailData }) {
   return (
     <section className="relative min-h-[560px] overflow-hidden bg-[#0B0B0A] text-white">
-      <img
+      <ResponsiveImage
         src={project.heroImage}
         alt={project.heroImageAlt}
         fetchPriority="high"
@@ -309,7 +310,7 @@ function ProjectStory({ project }: { project: ProjectDetailData }) {
           </div>
 
           <figure className="overflow-hidden">
-            <img
+            <ResponsiveImage
               src={project.storyImage}
               alt={`${project.title} — interior view`}
               loading="lazy"
@@ -356,7 +357,7 @@ function ProjectGallery({ images }: { images: ProjectDetailData["gallery"] }) {
                 className="group relative min-w-[205px] overflow-hidden focus-visible:ring-2 focus-visible:ring-[#A9854D] md:min-w-0"
                 aria-label={`Open project photo ${index + 1}`}
               >
-                <img
+                <ResponsiveImage
                   src={image.url}
                   alt={image.caption}
                   loading="lazy"
@@ -401,7 +402,7 @@ function ProjectGallery({ images }: { images: ProjectDetailData["gallery"] }) {
             className="flex max-h-[88vh] flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
+            <ResponsiveImage
               src={withParams(images[active].url.split("?")[0], 1920, 1080)}
               alt={images[active].caption}
               className="max-h-[82vh] max-w-[92vw] object-contain"
@@ -531,7 +532,7 @@ function HighlightBlock({
 function ProjectCta({ image }: { image: string }) {
   return (
     <section className="relative overflow-hidden bg-[#0B0B0A] text-white">
-      <img
+      <ResponsiveImage
         src={image}
         alt=""
         aria-hidden="true"

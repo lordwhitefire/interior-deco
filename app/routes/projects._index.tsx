@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -192,7 +193,7 @@ function PortfolioHero({
 }) {
   return (
     <section className="relative isolate min-h-[390px] overflow-hidden bg-[#17130f] text-white sm:min-h-[430px] lg:min-h-[440px]">
-      <img
+      <ResponsiveImage
         src={image}
         alt={imageAlt}
         className="absolute inset-0 h-full w-full object-cover object-[58%_center]"
@@ -400,7 +401,7 @@ function PortfolioCard({
         className="group grid grid-cols-[120px_1fr] gap-4 border border-[#DDD7CF] bg-[#F8F6F3] p-2 transition-colors hover:border-[#A48656] sm:grid-cols-[220px_1fr] sm:gap-6"
       >
         <div className="aspect-[4/3] overflow-hidden">
-          <img
+          <ResponsiveImage
             src={project.image}
             alt={project.imageAlt}
             loading={priority ? "eager" : "lazy"}
@@ -437,7 +438,7 @@ function PortfolioCard({
       href={`/projects/${project.slug}`}
       className="group relative block aspect-[4/3] overflow-hidden bg-[#24211E] outline-none focus-visible:ring-2 focus-visible:ring-[#A9854D] focus-visible:ring-offset-2"
     >
-      <img
+      <ResponsiveImage
         src={project.image}
         alt={project.imageAlt}
         loading={priority ? "eager" : "lazy"}
@@ -566,7 +567,7 @@ function PortfolioEmptyState({ onReset }: { onReset: () => void }) {
 function ConsultationCta({ image }: { image: string }) {
   return (
     <section className="relative overflow-hidden bg-[#171716] text-white">
-      <img
+      <ResponsiveImage
         src={image}
         alt=""
         aria-hidden="true"

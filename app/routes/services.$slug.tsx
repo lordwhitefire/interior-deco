@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -121,7 +122,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 function ServiceHero({ data }: { data: ServiceHeroData }) {
   return (
     <section className="relative isolate min-h-[610px] overflow-hidden bg-[#171614] text-white sm:min-h-[640px] lg:min-h-[680px]">
-      <img
+      <ResponsiveImage
         src={data.image}
         alt={data.imageAlt}
         className="absolute inset-0 h-full w-full object-cover object-center"
@@ -207,7 +208,7 @@ function ServiceInclusions({
         </div>
 
         <div className="min-h-[360px] lg:min-h-[390px]">
-          <img
+          <ResponsiveImage
             src={image}
             alt={imageAlt}
             className="h-full w-full object-cover"
@@ -290,7 +291,7 @@ function ServiceGalleryStrip({
 function ConsultationCta({ data }: { data: ServiceCtaData }) {
   return (
     <section className="relative overflow-hidden bg-[#171716] text-white">
-      <img
+      <ResponsiveImage
         src={data.image}
         alt={data.imageAlt}
         aria-hidden="true"

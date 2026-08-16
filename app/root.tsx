@@ -31,7 +31,7 @@ export const meta: MetaFunction = () => {
 export const links = () => [
   { rel: 'stylesheet', href: tailwindStyles },
   { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
-  { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css' },
+  { rel: 'stylesheet', href: '/vendor/swiper-bundle.min.css' },
 ];
 
 const organizationJsonLd = {

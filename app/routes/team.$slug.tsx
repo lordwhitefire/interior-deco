@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
@@ -130,7 +131,7 @@ function TeamMemberHero({ member }: { member: LoadedMember }) {
 
   return (
     <section className="relative min-h-[286px] overflow-hidden bg-[#080807] text-white lg:min-h-[390px]">
-      <img
+      <ResponsiveImage
         src={member.heroImage?.src ?? ""}
         alt={member.heroImage?.alt ?? ""}
         className="absolute inset-0 h-full w-full object-cover object-[68%_52%]"
@@ -215,7 +216,7 @@ function ProfileSection({
     <section className="bg-[#f5f3ef] px-6 py-12 sm:px-8 lg:px-12 xl:px-14">
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-10 md:grid-cols-[43%_57%] md:gap-[45px] lg:gap-[55px]">
         <div className="mx-auto aspect-[0.88] w-full max-w-[520px] overflow-hidden bg-[#ddd8d0] md:mx-0">
-          <img
+          <ResponsiveImage
             src={member.photoUrl ?? ""}
             alt={`Portrait of ${member.fullName}`}
             loading="lazy"
@@ -336,7 +337,7 @@ function FeaturedProjects({ member }: { member: LoadedMember }) {
                 to={project.href}
                 className="block aspect-[16/8] overflow-hidden bg-[#ddd8d0]"
               >
-                <img
+                <ResponsiveImage
                   src={project.image}
                   alt={project.imageAlt}
                   loading="lazy"
@@ -490,7 +491,7 @@ function ConsultationCTA({
 }) {
   return (
     <section className="relative min-h-[134px] overflow-hidden bg-[#0a0a09] text-white">
-      <img
+      <ResponsiveImage
         src={cta.image.src}
         alt={cta.image.alt}
         loading="lazy"

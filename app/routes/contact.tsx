@@ -1,3 +1,4 @@
+import ResponsiveImage from "~/components/whitefire/ResponsiveImage";
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
@@ -149,7 +150,7 @@ function ContactHero({
 }) {
   return (
     <section className="relative isolate min-h-[330px] overflow-hidden bg-[#0d0d0c]">
-      <img
+      <ResponsiveImage
         src={hero.image.src}
         alt={hero.image.alt}
         className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
