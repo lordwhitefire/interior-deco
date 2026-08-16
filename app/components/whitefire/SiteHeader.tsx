@@ -1,10 +1,9 @@
-import { useState } from "react";
-import { Menu, Search, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 import { SiteLogo } from "./SiteLogo";
 
 interface SiteHeaderProps {
   activePath?: string;
-  showSearch?: boolean;
 }
 
 const aboutLinks = [
@@ -21,9 +20,19 @@ const aboutLinks = [
 
 export function SiteHeader({
   activePath = "/",
-  showSearch = true,
 }: SiteHeaderProps) {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 mx-auto max-w-[1440px] border-b border-white/10 bg-black/10 text-white backdrop-blur-[2px]">
@@ -67,22 +76,13 @@ export function SiteHeader({
           >
             GET IN TOUCH
           </a>
-
-          {showSearch && (
-            <a
-              href="/search"
-              aria-label="Search"
-              className="text-white transition-colors hover:text-[#B08A5A]"
-            >
-              <Search size={17} strokeWidth={1.2} />
-            </a>
-          )}
         </div>
 
         <button
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
+          aria-controls="mobile-menu"
           onClick={() => setOpen((value) => !value)}
           className="lg:hidden"
         >
@@ -91,7 +91,10 @@ export function SiteHeader({
       </div>
 
       {open && (
-        <div className="border-t border-white/10 bg-[#11100F]/95 px-6 py-5 backdrop-blur-md lg:hidden">
+        <div
+          id="mobile-menu"
+          className="border-t border-white/10 bg-[#11100F]/95 px-6 py-5 backdrop-blur-md lg:hidden"
+        >
           <nav aria-label="Mobile navigation" className="flex flex-col">
             {aboutLinks.map(([label, href]) => (
               <a

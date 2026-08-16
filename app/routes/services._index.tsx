@@ -3,8 +3,6 @@ import { json } from "@remix-run/node";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { ArrowRight } from "lucide-react";
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { seo } from "~/utils/seo";
 import { getServicesIndexData } from "~/lib/content";
 
@@ -233,7 +231,6 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#292725]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <SiteHeader activePath="/services" />
 
         <main>
           <ServicesHero data={data.hero} />
@@ -242,8 +239,7 @@ export default function ServicesPage() {
           <ServicesCTA image={data.cta.image} imageAlt={data.cta.imageAlt} />
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }

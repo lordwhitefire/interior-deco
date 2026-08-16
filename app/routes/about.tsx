@@ -6,8 +6,6 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { CircleCheck, Leaf, ShieldCheck, UserRound } from "lucide-react";
 
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { SectionEyebrow } from "~/components/whitefire/SectionEyebrow";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
 import { seo } from "~/utils/seo";
@@ -309,7 +307,6 @@ export function AboutPage() {
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#292725]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <SiteHeader activePath="/about" />
 
         <main>
           <AboutHero data={data.hero} />
@@ -319,8 +316,7 @@ export function AboutPage() {
           <AboutClosingCTA data={data.closingCta} />
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }

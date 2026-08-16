@@ -2,9 +2,7 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { CalendarDays, ChevronRight, Star, Users } from "lucide-react";
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { seo } from "~/utils/seo";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { getTestimonialsPageData } from "~/lib/content";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -68,7 +66,6 @@ export default function TestimonialsRoute() {
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <SiteHeader activePath="/testimonials" />
 
         <main>
           <TestimonialsHero hero={data.hero} />
@@ -78,8 +75,7 @@ export default function TestimonialsRoute() {
           <ConsultationCTA cta={data.cta} />
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }

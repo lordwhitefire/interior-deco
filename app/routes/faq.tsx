@@ -3,9 +3,7 @@ import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ChevronRight, Minus, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { seo } from "~/utils/seo";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { getFaqPageData } from "~/lib/content";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -125,7 +123,6 @@ export default function FaqRoute() {
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <SiteHeader activePath="/faq" />
 
         <main>
           <FaqHero hero={hero} heroImageAlt={heroImageAlt} />
@@ -157,8 +154,7 @@ export default function FaqRoute() {
           <ConsultationCTA image={ctaImage} imageAlt={ctaImageAlt} />
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }

@@ -9,8 +9,6 @@ import {
   Grid2X2,
   List,
 } from "lucide-react";
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { seo } from "~/utils/seo";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
 import { getProjectsIndexData, getSiteConfig, img } from "~/lib/content";
@@ -115,7 +113,6 @@ export default function ProjectsPage() {
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#292725]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <SiteHeader activePath="/projects" />
 
         <main>
           <PortfolioHero
@@ -141,6 +138,10 @@ export default function ProjectsPage() {
 
               {visible.length > 0 ? (
                 <div
+                  id="projects-panel"
+                  role="tabpanel"
+                  aria-labelledby={tabId(category)}
+                  tabIndex={0}
                   className={
                     viewMode === "grid"
                       ? "mt-4 grid grid-cols-1 gap-2.5 md:grid-cols-2 xl:grid-cols-3"
@@ -175,8 +176,7 @@ export default function ProjectsPage() {
           <ConsultationCta image={data.ctaImage} />
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }
@@ -244,6 +244,9 @@ function PortfolioHero({
 
 /* ----------  Toolbar  ---------- */
 
+const tabId = (option: string) =>
+  `projects-tab-${option.toLowerCase().replace(/\s+/g, "-")}`;
+
 function PortfolioToolbar({
   category,
   sort,
@@ -259,21 +262,48 @@ function PortfolioToolbar({
   onSortChange: (value: Sort) => void;
   onViewModeChange: (value: ViewMode) => void;
 }) {
+  function handleTabKeyDown(
+    event: React.KeyboardEvent<HTMLDivElement>,
+    currentIndex: number
+  ) {
+    let nextIndex = -1;
+
+    if (event.key === "ArrowRight")
+      nextIndex = (currentIndex + 1) % CATEGORIES.length;
+    else if (event.key === "ArrowLeft")
+      nextIndex = (currentIndex - 1 + CATEGORIES.length) % CATEGORIES.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = CATEGORIES.length - 1;
+
+    if (nextIndex === -1) return;
+
+    event.preventDefault();
+    const next = CATEGORIES[nextIndex];
+    onCategoryChange(next);
+    document.getElementById(tabId(next))?.focus();
+  }
+
   return (
     <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
       <div
         className="-mx-1 flex overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="tablist"
         aria-label="Project categories"
+        onKeyDown={(event) =>
+          handleTabKeyDown(event, CATEGORIES.indexOf(category))
+        }
       >
         {CATEGORIES.map((option) => {
           const active = category === option;
           return (
             <button
               key={option}
+              id={tabId(option)}
               type="button"
               role="tab"
               aria-selected={active}
+              aria-controls="projects-panel"
+              tabIndex={active ? 0 : -1}
               onClick={() => onCategoryChange(option)}
               className={[
                 "shrink-0 px-4 py-2.5 text-[9px] font-semibold tracking-[0.04em] transition-colors sm:px-5",
@@ -507,7 +537,13 @@ function PortfolioPagination({
 
 function PortfolioEmptyState({ onReset }: { onReset: () => void }) {
   return (
-    <div className="my-8 border border-[#D5CEC6] bg-[#F8F6F3] px-6 py-16 text-center">
+    <div
+      id="projects-panel"
+      role="tabpanel"
+      aria-labelledby={tabId("All Projects")}
+      tabIndex={0}
+      className="my-8 border border-[#D5CEC6] bg-[#F8F6F3] px-6 py-16 text-center"
+    >
       <p className="font-serif text-2xl text-[#25221E]">No projects found.</p>
 
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#6B655D]">

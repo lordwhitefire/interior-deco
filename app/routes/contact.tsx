@@ -12,9 +12,7 @@ import {
   Phone,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { seo } from "~/utils/seo";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { getContactPageData } from "~/lib/content";
 import {
   EMAIL_PATTERN,
@@ -120,7 +118,6 @@ export default function ContactRoute() {
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <SiteHeader activePath="/contact" />
 
         <main>
           <ContactHero hero={data.hero} />
@@ -135,8 +132,7 @@ export default function ContactRoute() {
           <WorkWithUs />
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }
@@ -370,6 +366,7 @@ function FormField({
   className?: string;
 }) {
   const errorId = `error-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  const inputId = `field-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   const shared = [
     "w-full border bg-[#f7f5f1] px-[15px] text-[12px] text-[#171615] transition-colors focus:border-[#b58a52] focus:outline-none",
     error ? "border-[#a45a4a]" : "border-[#d8d4cc]",
@@ -377,12 +374,16 @@ function FormField({
 
   return (
     <div className={className}>
-      <label className="mb-2 block text-[9px] font-semibold uppercase tracking-[0.12em] text-[#3a3836]">
+      <label
+        htmlFor={inputId}
+        className="mb-2 block text-[9px] font-semibold uppercase tracking-[0.12em] text-[#3a3836]"
+      >
         {label}
       </label>
 
       {type === "textarea" ? (
         <textarea
+          id={inputId}
           rows={4}
           value={value}
           onChange={(event) => onChange(event.target.value)}
@@ -392,6 +393,7 @@ function FormField({
         />
       ) : (
         <input
+          id={inputId}
           type={type}
           autoComplete={autoComplete}
           value={value}

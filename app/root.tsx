@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/node';
 
@@ -94,6 +95,8 @@ const localBusinessJsonLd = {
 };
 
 export default function Root() {
+  const location = useLocation();
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -104,9 +107,11 @@ export default function Root() {
         <JsonLd data={localBusinessJsonLd} />
       </head>
       <body className="min-h-screen flex flex-col bg-neutral-100 text-gray-800">
-        <main className="flex-grow">
+        <SiteHeader activePath={location.pathname} />
+        <main id="main" className="flex-grow">
           <Outlet />
         </main>
+        <SiteFooter />
         <ScrollRestoration />
         <Scripts />
       </body>

@@ -9,8 +9,6 @@ import {
   ShieldCheck,
   UsersRound,
 } from "lucide-react";
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { seo } from "~/utils/seo";
 import { getTeamIndexData } from "~/lib/content";
 
@@ -73,7 +71,6 @@ export default function TeamIndexRoute() {
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <SiteHeader activePath="/team" />
 
         <main>
           <TeamHero image={data.heroImage} imageAlt={data.heroImageAlt} />
@@ -83,8 +80,7 @@ export default function TeamIndexRoute() {
           <ProjectCTA cta={data.projectCta} />
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }

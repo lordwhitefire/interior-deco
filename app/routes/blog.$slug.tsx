@@ -21,8 +21,6 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { Breadcrumbs } from "~/components/whitefire/Breadcrumbs";
 import { CREATOR, JsonLd, seo } from "~/utils/seo";
 import {
@@ -129,7 +127,6 @@ export default function BlogDetailRoute() {
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#1F1D1A]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <SiteHeader activePath="/blog" />
         <JsonLd
           data={{
             "@context": "https://schema.org",
@@ -182,8 +179,7 @@ export default function BlogDetailRoute() {
           </div>
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }

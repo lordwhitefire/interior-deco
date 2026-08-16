@@ -26,8 +26,6 @@ import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperType } from "swiper";
 
-import { SiteHeader } from "~/components/whitefire/SiteHeader";
-import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { SectionEyebrow } from "~/components/whitefire/SectionEyebrow";
 import { seo } from "~/utils/seo";
 import { NewsletterForm } from "~/components/whitefire/NewsletterForm";
@@ -184,8 +182,6 @@ function HomeHero({
       />
       <div className="absolute inset-0 bg-black/45" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-black/10" />
-
-      <SiteHeader activePath="/" />
 
       <div className="relative mx-auto flex min-h-[620px] max-w-[1440px] items-center px-6 pt-24 sm:min-h-[680px] sm:px-8 lg:min-h-[720px] lg:px-20 lg:pt-12">
         <div className="max-w-[590px]">
@@ -706,8 +702,7 @@ export default function HomePage() {
           <NewsletterCTA image={data.heroImages[1]} />
         </main>
 
-        <SiteFooter />
-      </div>
+        </div>
     </div>
   );
 }
