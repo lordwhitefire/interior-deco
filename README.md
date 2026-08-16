@@ -128,14 +128,13 @@ Everything — header, main content, and footer — is capped at **1440px** and 
 <main id="main" className="mx-auto w-full max-w-[1440px] flex-grow">
 ```
 
-On viewports wider than 1440px, the margins become an **ambient environment**: the body renders a fixed, full-viewport background image (`public/ambient-bg.jpg`, `background-attachment: fixed`) with a dark fallback (`#10100F`) while loading. The effect is warm reflected interior lighting around a framed stage, not a stretched layout.
+On viewports wider than 1440px, the margins are the warm cream (`#F5EFE2`) — the same light surface used inside the routes — so the page reads as one continuous surface.
 
 ### Color direction
 
 | Token | Value | Usage |
 |---|---|---|
-| Ambient base | `#10100F` | Body fallback behind the stage |
-| Ambient image | `ambient-bg.jpg` | Warm bronze/cream background behind everything |
+| Cream | `#F5EFE2` | Body background and page surfaces |
 | Ivory surface | `#F7F4EE` | Main content surfaces |
 | Beige | `#E8E2D8` | Section/page backgrounds |
 | Charcoal | `#151514` / `#171716` | Footer, stats, dark sections |

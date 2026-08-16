@@ -9,11 +9,6 @@
   }
 
   body {
-    background-color: #10100f;
-    background-image: url("/ambient-bg.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-color: #f5efe2;
   }
 }
