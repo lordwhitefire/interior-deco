@@ -35,7 +35,7 @@ export function SiteHeader({
   }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 mx-auto max-w-[1440px] border-b border-white/10 bg-black/10 text-white backdrop-blur-[2px]">
+    <header className="fixed inset-x-0 top-0 z-50 mx-auto max-w-[1440px] border-b border-white/10 bg-black/30 text-white backdrop-blur-sm">
       <div className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between px-6 md:px-10 xl:px-[66px]">
         <SiteLogo variant="about" />
 
