@@ -1,6 +1,7 @@
 import { useState } from "react";
-import type { MetaFunction } from "@remix-run/node";
-import { Form, Link, useSearchParams } from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import {
   ArrowRight,
   Search,
@@ -8,23 +9,53 @@ import {
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { seo } from "~/utils/seo";
-import {
-  articles,
-  blogHero,
-  categories,
-  featuredArticle,
-  philosophy,
-  type Article,
-  type BlogCategory,
-} from "~/data/blogMock";
+import { getBlogIndexData } from "~/lib/content";
 
-export const meta: MetaFunction = () => {
+export interface Article {
+  id: string;
+  slug: string;
+  category: string;
+  categorySlug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  readTime: string;
+  featured: boolean;
+  image: { src: string; alt: string };
+  href: string;
+}
+
+export interface BlogCategory {
+  name: string;
+  slug: string;
+  count: number;
+}
+
+export interface BlogIndexData {
+  blogHero: { src: string; alt: string };
+  categories: BlogCategory[];
+  articles: Article[];
+  featuredArticle: Article | null;
+  philosophy: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    href: string;
+    image: { src: string; alt: string };
+  };
+}
+
+export async function loader({}: LoaderFunctionArgs) {
+  return json(await getBlogIndexData());
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return seo({
     title: "Blog | Whitefire Interior",
     description:
       "Design inspiration, interior trends, and expert advice from Whitefire Interior for creating timeless, thoughtful spaces.",
     path: "/blog",
-    image: blogHero.src,
+    image: data?.blogHero.src,
   });
 };
 
@@ -32,6 +63,7 @@ const PAGE_SIZE = 6;
 const TOTAL_PAGES = 3;
 
 export default function BlogRoute() {
+  const data = useLoaderData<typeof loader>() as BlogIndexData;
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") ?? "";
   const category = searchParams.get("category") ?? "all";
@@ -40,6 +72,7 @@ export default function BlogRoute() {
     TOTAL_PAGES
   );
 
+  const articles = data.articles;
   const filtered = articles.filter((article) => {
     if (category !== "all" && article.categorySlug !== category) return false;
     if (query.trim()) {
@@ -63,7 +96,7 @@ export default function BlogRoute() {
         <SiteHeader activePath="/blog" />
 
         <main>
-          <BlogHero />
+          <BlogHero hero={data.blogHero} />
 
           <section
             aria-labelledby="latest-articles-heading"
@@ -91,18 +124,20 @@ export default function BlogRoute() {
                 <BlogSearch initialQuery={query} />
 
                 <BlogCategories
-                  categories={categories}
+                  categories={data.categories}
                   activeCategory={category}
                 />
 
-                <FeaturedPostCard article={featuredArticle} />
+                {data.featuredArticle && (
+                  <FeaturedPostCard article={data.featuredArticle} />
+                )}
 
                 <NewsletterCTA />
               </aside>
             </div>
           </section>
 
-          <BlogPhilosophyCTA />
+          <BlogPhilosophyCTA philosophy={data.philosophy} />
         </main>
 
         <SiteFooter />
@@ -113,12 +148,12 @@ export default function BlogRoute() {
 
 /* ----------  Hero  ---------- */
 
-function BlogHero() {
+function BlogHero({ hero }: { hero: { src: string; alt: string } }) {
   return (
     <section className="relative flex min-h-[350px] items-end overflow-hidden bg-[#111] pt-[68px] lg:min-h-[390px]">
       <img
-        src={blogHero.src}
-        alt={blogHero.alt}
+        src={hero.src}
+        alt={hero.alt}
         fetchPriority="high"
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
@@ -471,7 +506,17 @@ function BlogPagination({
 
 /* ----------  Philosophy CTA  ---------- */
 
-function BlogPhilosophyCTA() {
+function BlogPhilosophyCTA({
+  philosophy,
+}: {
+  philosophy: {
+    eyebrow: string;
+    title: string;
+    body: string;
+    href: string;
+    image: { src: string; alt: string };
+  };
+}) {
   return (
     <section className="bg-[#F7F4EE]">
       <div className="mx-auto grid max-w-[1440px] grid-cols-1 lg:h-[200px] lg:grid-cols-[46%_54%]">

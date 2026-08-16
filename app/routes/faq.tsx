@@ -3,23 +3,16 @@ import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ChevronRight, Minus, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import { createClient } from "@sanity/client";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { seo } from "~/utils/seo";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
-import sitepages from "~/data/sitepages.json";
+import { getFaqPageData } from "~/lib/content";
 
-const sanity = createClient({
-  projectId: "pzhistba",
-  dataset: "production",
-  apiVersion: "2023-12-01",
-  useCdn: true,
-});
-
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return seo({
-    title: "FAQ | Whitefire Interior",
+    title: data?.seoTitle || "FAQ | Whitefire Interior",
     description:
+      data?.seoDescription ||
       "Everything you need to know about our design process, pricing, timelines, consultations, and project-specific details.",
     path: "/faq",
   });
@@ -39,33 +32,20 @@ interface FaqItem {
   category: string;
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const faqPage = await sanity.fetch(
-    `*[_type == "faqPage"][0]{ "hero": heroBackgroundImage.asset->url }`
-  );
-  const categoriesRaw = await sanity.fetch(
-    `*[_type == "faqCategory"] | order(_createdAt asc) { _id, title }`
-  );
-  const itemsRaw = await sanity.fetch(
-    `*[_type == "faqItem"] | order(displayOrder asc) {
-      _id,
-      question,
-      answer,
-      "category": category->title
-    }`
-  );
+export const loader = async ({}: LoaderFunctionArgs) => {
+  const data = await getFaqPageData();
 
-  const items: FaqItem[] = (itemsRaw ?? [])
-    .filter((i: any) => i.question && i.answer)
-    .map((i: any) => ({
+  const items: FaqItem[] = (data.items ?? [])
+    .filter((i) => i.question && i.answer)
+    .map((i) => ({
       id: i._id,
       question: i.question,
       answer: i.answer,
-      category: i.category ?? "General Questions",
+      category: i.category,
     }));
 
-  const categoryOrder: string[] = (categoriesRaw ?? [])
-    .map((c: any) => c.title)
+  const categoryOrder: string[] = (data.categories ?? [])
+    .map((c) => c.title)
     .filter((title: string) => title !== "Service & Process");
   for (const item of items) {
     if (!categoryOrder.includes(item.category)) item.category = "General Questions";
@@ -82,15 +62,31 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     };
   });
 
-  const hero =
-    faqPage?.hero &&
-    `${faqPage.hero}?w=1920&h=880&fit=crop&crop=center&auto=format&q=85`;
-
-  return json({ items, categories, hero });
+  return json({
+    items,
+    categories,
+    hero: data.page.heroImage,
+    heroImageAlt: data.page.heroImageAlt,
+    sidebarImage: data.page.sidebarImage,
+    sidebarImageAlt: data.page.sidebarImageAlt,
+    ctaImage: data.page.ctaImage,
+    ctaImageAlt: data.page.ctaImageAlt,
+    seoTitle: data.page.seoTitle,
+    seoDescription: data.page.seoDescription,
+  });
 };
 
 export default function FaqRoute() {
-  const { items, categories, hero } = useLoaderData<typeof loader>();
+  const {
+    items,
+    categories,
+    hero,
+    heroImageAlt,
+    sidebarImage,
+    sidebarImageAlt,
+    ctaImage,
+    ctaImageAlt,
+  } = useLoaderData<typeof loader>();
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
 
@@ -132,7 +128,7 @@ export default function FaqRoute() {
         <SiteHeader activePath="/faq" />
 
         <main>
-          <FaqHero hero={hero} />
+          <FaqHero hero={hero} heroImageAlt={heroImageAlt} />
 
           <section className="mx-auto grid max-w-[1320px] grid-cols-1 gap-10 bg-[#F7F4EE] px-6 py-10 sm:px-8 md:grid-cols-[230px_1px_1fr] md:gap-[14px] md:py-12 lg:px-12">
             <div className="flex flex-col gap-8 md:pr-1">
@@ -145,8 +141,8 @@ export default function FaqRoute() {
               <ContactPromptCard />
               <div className="hidden aspect-[4/5] overflow-hidden md:block">
                 <img
-                  src={sitepages.faq.sidebar.src}
-                  alt={sitepages.faq.sidebar.alt}
+                  src={sidebarImage}
+                  alt={sidebarImageAlt}
                   className="h-full w-full object-cover object-center"
                   loading="lazy"
                 />
@@ -158,7 +154,7 @@ export default function FaqRoute() {
             <FaqContent groups={groups} openItems={openItems} onToggle={toggleItem} />
           </section>
 
-          <ConsultationCTA />
+          <ConsultationCTA image={ctaImage} imageAlt={ctaImageAlt} />
         </main>
 
         <SiteFooter />
@@ -167,13 +163,13 @@ export default function FaqRoute() {
   );
 }
 
-function FaqHero({ hero }: { hero?: string | null }) {
+function FaqHero({ hero, heroImageAlt }: { hero?: string | null; heroImageAlt?: string }) {
   return (
     <section className="relative isolate min-h-[330px] overflow-hidden bg-[#0d0d0c]">
       {hero && (
         <img
           src={hero}
-          alt="Whitefire Interior studio — frequently asked questions"
+          alt={heroImageAlt ?? "Whitefire Interior studio — frequently asked questions"}
           className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
           fetchPriority="high"
         />
@@ -413,13 +409,19 @@ function AccordionItem({
   );
 }
 
-function ConsultationCTA() {
+function ConsultationCTA({
+  image,
+  imageAlt,
+}: {
+  image: string;
+  imageAlt: string;
+}) {
   return (
     <section className="grid min-h-[285px] bg-[#171717] lg:grid-cols-2">
       <div className="relative min-h-[230px] overflow-hidden">
         <img
-          src={sitepages.faq.cta.src}
-          alt={sitepages.faq.cta.alt}
+          src={image}
+          alt={imageAlt}
           className="h-full w-full object-cover object-center"
           loading="lazy"
         />

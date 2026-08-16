@@ -1,19 +1,12 @@
 import type { MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { ArrowRight } from "lucide-react";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { seo } from "~/utils/seo";
-
-import servicesHeroImage from "~/assets/images/living_design.jpg";
-import livingSpacesImage from "~/assets/images/services-hero-living-spaces.jpg";
-import kitchensDiningImage from "~/assets/images/services-hero-kitchens-dining.jpg";
-import bedroomsRetreatsImage from "~/assets/images/services-hero-bedrooms-retreats.jpg";
-import workspacesImage from "~/assets/images/services-hero-workspaces.jpg";
-import hospitalityRetailImage from "~/assets/images/services-hero-hospitality-retail.jpg";
-import boutiqueTransitionalImage from "~/assets/images/services-hero-boutique-transitional.jpg";
-import minimalistScandinavianImage from "~/assets/images/services-hero-minimalist-scandinavian.jpg";
-import compactMicroSpacesImage from "~/assets/images/services-hero-compact-micro-spaces.jpg";
-import servicesCtaImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
+import { getServicesIndexData } from "~/lib/content";
 
 export interface ServiceItem {
   id: string;
@@ -41,101 +34,13 @@ export interface ServicesPageData {
     description: string;
   };
   services: ServiceItem[];
+  cta: { image: string; imageAlt: string };
 }
 
-const mockServicesPageData: ServicesPageData = {
-  hero: {
-    eyebrow: "OUR SERVICES",
-    title: "Designing Spaces That Inspire",
-    description:
-      "From concept to completion, we offer tailored interior design services that blend aesthetics, functionality, and your unique lifestyle.",
-    ctaLabel: "SCHEDULE A CONSULTATION",
-    ctaHref: "/contact",
-    image: servicesHeroImage,
-  },
-
-  intro: {
-    eyebrow: "WHAT WE DO",
-    title: "Comprehensive Interior Design Services",
-    description:
-      "Every space has potential. Our services are designed to bring out the best in your space with thoughtful planning, curated materials, and expert craftsmanship.",
-  },
-
-services: [
-    {
-      id: "living-spaces",
-      number: "01",
-      title: "Living Spaces",
-      description:
-        "Warm, layered living rooms designed for everyday comfort — from Malibu oceanfront to a Norwegian lakeside cabin.",
-      image: livingSpacesImage,
-      href: "/services/living-spaces",
-    },
-    {
-      id: "kitchens-dining",
-      number: "02",
-      title: "Kitchens & Dining",
-      description:
-        "Considered kitchens that balance craftsmanship, storage, and the ritual of gathering.",
-      image: kitchensDiningImage,
-      href: "/services/kitchens-dining",
-    },
-    {
-      id: "bedrooms-retreats",
-      number: "03",
-      title: "Bedrooms & Retreats",
-      description:
-        "Calm, restorative retreats — coastal, alpine, and urban bedrooms designed for deep rest.",
-      image: bedroomsRetreatsImage,
-      href: "/services/bedrooms-retreats",
-    },
-    {
-      id: "workspaces",
-      number: "04",
-      title: "Workspaces",
-      description:
-        "Productive, people-first workplaces — from tech HQs to micro home offices.",
-      image: workspacesImage,
-      href: "/services/workspaces",
-    },
-    {
-      id: "hospitality-retail",
-      number: "05",
-      title: "Hospitality & Retail",
-      description:
-        "Memorable hospitality and retail interiors that turn visitors into regulars.",
-      image: hospitalityRetailImage,
-      href: "/services/hospitality-retail",
-    },
-    {
-      id: "boutique-transitional",
-      number: "06",
-      title: "Boutique & Transitional",
-      description:
-        "Refined transitional interiors with brass, marble, and velvet detailing.",
-      image: boutiqueTransitionalImage,
-      href: "/services/boutique-transitional",
-    },
-    {
-      id: "minimalist-scandinavian",
-      number: "07",
-      title: "Minimalist & Scandinavian",
-      description:
-        "Quiet, material-led spaces rooted in simplicity, light, and natural texture.",
-      image: minimalistScandinavianImage,
-      href: "/services/minimalist-scandinavian",
-    },
-    {
-      id: "compact-micro-spaces",
-      number: "08",
-      title: "Compact & Micro Spaces",
-      description:
-        "Smart, space-efficient design for micro lofts and compact homes.",
-      image: compactMicroSpacesImage,
-      href: "/services/compact-micro-spaces",
-    },
-  ],
-};
+export async function loader({}: LoaderFunctionArgs) {
+  const data = await getServicesIndexData();
+  return json(data);
+}
 
 function ServicesHero({ data }: { data: ServicesHeroData }) {
   return (
@@ -156,9 +61,7 @@ function ServicesHero({ data }: { data: ServicesHeroData }) {
           </p>
 
           <h1 className="max-w-[530px] font-serif text-[48px] leading-[0.98] tracking-[-0.02em] sm:text-[60px] lg:text-[66px]">
-            Designing Spaces
-            <br />
-            That Inspire
+            {data.title}
           </h1>
 
           <p className="mt-6 max-w-[470px] text-sm leading-6 text-white/90 sm:text-[15px]">
@@ -253,14 +156,14 @@ function ServiceCard({ item }: { item: ServiceItem }) {
   );
 }
 
-function ServicesCTA() {
+function ServicesCTA({ image, imageAlt }: { image: string; imageAlt: string }) {
   return (
     <section className="bg-[#171511] text-white">
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[30%_42%_28%]">
         <div className="min-h-[300px] overflow-hidden">
           <img
-            src={servicesCtaImage}
-            alt="Decorative interior styling with a vase and branches"
+            src={image}
+            alt={imageAlt}
             loading="lazy"
             className="h-full w-full object-cover object-center opacity-90"
           />
@@ -325,7 +228,7 @@ function CTAValue({ title, text }: { title: string; text: string }) {
 }
 
 export default function ServicesPage() {
-  const data = mockServicesPageData;
+  const data = useLoaderData<typeof loader>() as ServicesPageData;
 
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#292725]">
@@ -336,7 +239,7 @@ export default function ServicesPage() {
           <ServicesHero data={data.hero} />
           <ServicesIntroduction data={data.intro} />
           <ServicesGrid items={data.services} />
-          <ServicesCTA />
+          <ServicesCTA image={data.cta.image} imageAlt={data.cta.imageAlt} />
         </main>
 
         <SiteFooter />
@@ -345,7 +248,7 @@ export default function ServicesPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return seo({
     title: "Services | Whitefire Interior",
     description:

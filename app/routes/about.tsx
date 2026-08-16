@@ -1,7 +1,9 @@
 // app/routes/about.tsx
 // About page implemented from whitefire-about-ui-implementation.md (§7),
-// copy verbatim from §22, images as local assets (user-generated).
-import type { MetaFunction } from "@remix-run/node";
+// copy verbatim from §22, content now served from Sanity (aboutPage doc).
+import { json } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { CircleCheck, Leaf, ShieldCheck, UserRound } from "lucide-react";
 
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
@@ -9,11 +11,7 @@ import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { SectionEyebrow } from "~/components/whitefire/SectionEyebrow";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
 import { seo } from "~/utils/seo";
-
-import aboutHeroImage from "~/assets/images/about_hero_dark_living_room_fireplace.jpg";
-import aboutStoryImage from "~/assets/images/about_story_console_vase_dome_lamp.jpg";
-import aboutApproachImage from "~/assets/images/about_approach_three_designers_worktable.jpg";
-import aboutClosingImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
+import { getAboutPageData } from "~/lib/content";
 
 export interface AboutValue {
   id: string;
@@ -69,113 +67,15 @@ export interface AboutPageData {
   };
 }
 
-const mockAboutPageData: AboutPageData = {
-  hero: {
-    eyebrow: "ABOUT WHITEFIRE INTERIOR",
-    title: "Thoughtful Design. Meaningful Spaces.",
-    description:
-      "Whitefire Interior is a luxury interior design studio dedicated to creating timeless, functional spaces that elevate everyday living.",
-    ctaLabel: "OUR APPROACH",
-    ctaHref: "#our-approach",
-    image: {
-      src: aboutHeroImage,
-      alt: "Warm luxury living room with dark wood cabinetry, fireplace, neutral seating and greenery.",
-    },
-  },
+const mockAboutPageData: AboutPageData | null = null;
 
-  story: {
-    eyebrow: "OUR STORY",
-    title: "Designing with Purpose, Delivering with Passion.",
-    paragraphs: [
-      "Founded with a passion for artistry and a commitment to excellence, Whitefire Interior has completed projects across residential, commercial, and hospitality spaces.",
-      "We believe good design goes beyond aesthetics—it’s about how a space makes you feel and supports how you live and work.",
-    ],
-    image: {
-      src: aboutStoryImage,
-      alt: "Sophisticated interior console with vase, greenery, lamp and architectural artwork.",
-    },
-  },
-
-  values: {
-    eyebrow: "OUR VALUES",
-    items: [
-      {
-        id: "timeless-design",
-        title: "Timeless Design",
-        description:
-          "We create enduring spaces that stand the test of time in both style and quality.",
-        icon: "timeless",
-      },
-      {
-        id: "sustainability",
-        title: "Sustainability",
-        description:
-          "We prioritize responsible choices and sustainable materials wherever possible.",
-        icon: "sustainability",
-      },
-      {
-        id: "client-centered",
-        title: "Client-Centered",
-        description:
-          "Your vision is our guide. We listen, collaborate, and bring your ideas to life.",
-        icon: "client",
-      },
-      {
-        id: "excellence",
-        title: "Excellence",
-        description:
-          "We are committed to the highest standards in every detail of our work.",
-        icon: "excellence",
-      },
-    ],
-  },
-
-  approach: {
-    eyebrow: "OUR APPROACH",
-    title: "A Collaborative Journey from Concept to Creation",
-    description:
-      "Our process is immersive and tailored to each client. From the initial consultation to the final reveal, we ensure a seamless experience and exceptional results.",
-    image: {
-      src: aboutApproachImage,
-      alt: "Three interior designers collaborating over plans and material samples at a design studio table.",
-    },
-    steps: [
-      {
-        id: "discover",
-        title: "Discover",
-        description: "Understanding your needs and vision",
-      },
-      {
-        id: "design",
-        title: "Design",
-        description: "Curating concepts and material palettes",
-      },
-      {
-        id: "develop",
-        title: "Develop",
-        description: "Bringing ideas to life with precision",
-      },
-      {
-        id: "deliver",
-        title: "Deliver",
-        description: "Flawless execution and final installation",
-      },
-    ],
-  },
-
-  closingCta: {
-    eyebrow: "LET’S CREATE SOMETHING BEAUTIFUL",
-    title: "Ready to Start Your Project?",
-    description:
-      "We’d love to hear about your vision and help you create a space that inspires.",
-    ctaLabel: "GET IN TOUCH",
-    ctaHref: "/contact",
-    image: {
-      src: aboutClosingImage,
-      alt: "Dark luxury interior with round table, vase, artwork and neutral seating.",
-    },
-  },
-};
+export async function loader({}: LoaderFunctionArgs) {
+  const data = await getAboutPageData();
+  if (!data) {
+    throw new Response("About page not found", { status: 404 });
+  }
+  return json(data);
+}
 
 function AboutHero({ data }: { data: AboutPageData["hero"] }) {
   return (
@@ -404,7 +304,7 @@ function AboutClosingCTA({
 }
 
 export function AboutPage() {
-  const data = mockAboutPageData;
+  const data = useLoaderData<typeof loader>() as AboutPageData;
 
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#292725]">
@@ -429,10 +329,11 @@ export default function AboutRoute() {
   return <AboutPage />;
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return seo({
-    title: "About Whitefire Interior | Luxury Interior Design",
+    title: data?.metaTitle || "About Whitefire Interior | Luxury Interior Design",
     description:
+      data?.metaDescription ||
       "Discover Whitefire Interior, a luxury interior design studio creating timeless, functional spaces with thoughtful design and exceptional craftsmanship.",
     path: "/about",
     image:

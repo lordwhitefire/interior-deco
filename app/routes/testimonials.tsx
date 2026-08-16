@@ -2,27 +2,19 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { CalendarDays, ChevronRight, Star, Users } from "lucide-react";
-import { createClient } from "@sanity/client";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { seo } from "~/utils/seo";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
-import sitepages from "~/data/sitepages.json";
-import projectsData from "~/data/projects.json";
+import { getTestimonialsPageData } from "~/lib/content";
 
-const sanity = createClient({
-  projectId: "pzhistba",
-  dataset: "production",
-  apiVersion: "2023-12-01",
-  useCdn: true,
-});
-
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return seo({
-    title: "Testimonials | Whitefire Interior",
+    title: data?.metaTitle || "Testimonials | Whitefire Interior",
     description:
+      data?.metaDescription ||
       "Discover what Whitefire Interior clients say about their interior design projects and experiences.",
     path: "/testimonials",
-    image: sitepages.testimonials.hero.src,
+    image: data?.hero.image.src,
   });
 };
 
@@ -44,55 +36,34 @@ interface TrustStat {
   icon: "armchair" | "users" | "star" | "calendar";
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const testimonials = await sanity.fetch(
-    `*[_type == "testimonial"] | order(date desc) {
-      _id,
-      clientName,
-      clientLocation,
-      rating,
-      review,
-      date,
-      "clientImage": clientImage.asset->url
-    }`
-  );
+interface TestimonialsPageData {
+  metaTitle: string;
+  metaDescription: string;
+  hero: {
+    eyebrow: string;
+    title: string[];
+    description: string;
+    image: { src: string; alt: string };
+  };
+  intro: { eyebrow: string; title: string; description: string };
+  testimonials: Testimonial[];
+  stats: TrustStat[];
+  cta: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    ctaLabel: string;
+    ctaHref: string;
+    image: { src: string; alt: string };
+  };
+}
 
-  const projectsByLocation = new Map<string, string>();
-  for (const [slug, project] of Object.entries(projectsData)) {
-    projectsByLocation.set(project.location.toLowerCase(), slug);
-  }
-
-  const items: Testimonial[] = (testimonials ?? [])
-    .slice(0, 6)
-    .map((t: any) => {
-      const slug = projectsByLocation.get((t.clientLocation ?? "").toLowerCase());
-      const project = slug ? (projectsData as any)[slug] : null;
-      return {
-        id: t._id,
-        quote: t.review ?? "",
-        clientName: t.clientName ?? "",
-        projectName: project?.title ?? "",
-        location: t.clientLocation ?? "",
-        clientImage: t.clientImage
-          ? `${t.clientImage}?w=100&h=100&fit=crop&crop=center&auto=format&q=85`
-          : undefined,
-        clientImageAlt: `Portrait of ${t.clientName ?? "client"}`,
-        projectSlug: slug,
-      };
-    });
-
-  const stats: TrustStat[] = [
-    { id: "projects", value: "18+", label: "Projects Completed", icon: "armchair" },
-    { id: "clients", value: "18+", label: "Happy Clients", icon: "users" },
-    { id: "rating", value: "5/5", label: "Average Rating", icon: "star" },
-    { id: "experience", value: "8", label: "Team Members", icon: "calendar" },
-  ];
-
-  return json({ testimonials: items, stats });
+export const loader = async ({}: LoaderFunctionArgs) => {
+  return json(await getTestimonialsPageData());
 };
 
 export default function TestimonialsRoute() {
-  const { testimonials, stats } = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>() as TestimonialsPageData;
 
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
@@ -100,11 +71,11 @@ export default function TestimonialsRoute() {
         <SiteHeader activePath="/testimonials" />
 
         <main>
-          <TestimonialsHero />
-          <Intro />
-          <TestimonialGrid testimonials={testimonials} />
-          <TrustStats stats={stats} />
-          <ConsultationCTA />
+          <TestimonialsHero hero={data.hero} />
+          <Intro intro={data.intro} />
+          <TestimonialGrid testimonials={data.testimonials} />
+          <TrustStats stats={data.stats} />
+          <ConsultationCTA cta={data.cta} />
         </main>
 
         <SiteFooter />
@@ -113,12 +84,21 @@ export default function TestimonialsRoute() {
   );
 }
 
-function TestimonialsHero() {
+function TestimonialsHero({
+  hero,
+}: {
+  hero: {
+    eyebrow: string;
+    title: string[];
+    description: string;
+    image: { src: string; alt: string };
+  };
+}) {
   return (
     <section className="relative isolate min-h-[330px] overflow-hidden bg-[#0d0d0c]">
       <img
-        src={sitepages.testimonials.hero.src}
-        alt={sitepages.testimonials.hero.alt}
+        src={hero.image.src}
+        alt={hero.image.alt}
         className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
         fetchPriority="high"
       />
@@ -130,20 +110,21 @@ function TestimonialsHero() {
       <div className="mx-auto flex min-h-[330px] max-w-[1440px] items-start px-6 py-[64px] sm:px-10 lg:px-[62px]">
         <div className="max-w-[430px] text-white">
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#b48a4a]">
-            TESTIMONIALS
+            {hero.eyebrow}
           </p>
 
           <h1 className="font-serif text-[40px] leading-[1.13] tracking-[-0.02em] sm:text-[44px]">
-            Kind Words.
-            <br />
-            Beautiful Spaces.
+            {hero.title.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
           </h1>
 
           <div className="my-6 h-px w-[52px] bg-[#b48a4a]" />
 
           <p className="max-w-[370px] text-[14px] leading-7 text-white/90 sm:text-[15px]">
-            We're honored to work with incredible clients and bring their
-            visions to life.
+            {hero.description}
           </p>
         </div>
       </div>
@@ -151,25 +132,28 @@ function TestimonialsHero() {
   );
 }
 
-function Intro() {
+function Intro({
+  intro,
+}: {
+  intro: { eyebrow: string; title: string; description: string };
+}) {
   return (
     <header className="mx-auto max-w-[700px] px-6 pt-9 text-center sm:px-8 lg:px-12">
       <p className="text-[10px] font-semibold uppercase tracking-[0.19em] text-[#a8783e]">
-        CLIENT TESTIMONIALS
+        {intro.eyebrow}
       </p>
 
       <h2
         id="testimonials-heading"
         className="mt-3 font-serif text-[28px] leading-tight tracking-[-0.02em] sm:text-[31px]"
       >
-        What Our Clients Say
+        {intro.title}
       </h2>
 
       <div className="mx-auto my-4 h-px w-[46px] bg-[#b48a4a]" />
 
       <p className="mx-auto max-w-[650px] text-[13px] leading-6 text-[#292929] sm:text-[14px]">
-        From concept to completion, we're passionate about creating spaces that
-        reflect our clients' stories and elevate their everyday.
+        {intro.description}
       </p>
     </header>
   );
@@ -316,13 +300,24 @@ function StatIcon({ type }: { type: TrustStat["icon"] }) {
   }
 }
 
-function ConsultationCTA() {
+function ConsultationCTA({
+  cta,
+}: {
+  cta: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    ctaLabel: string;
+    ctaHref: string;
+    image: { src: string; alt: string };
+  };
+}) {
   return (
     <section className="grid min-h-[285px] bg-[#171717] lg:grid-cols-[55%_45%]">
       <div className="relative min-h-[230px] overflow-hidden">
         <img
-          src={sitepages.testimonials.cta.src}
-          alt={sitepages.testimonials.cta.alt}
+          src={cta.image.src}
+          alt={cta.image.alt}
           className="h-full w-full object-cover object-center"
           loading="lazy"
         />
@@ -332,23 +327,22 @@ function ConsultationCTA() {
       <div className="flex items-center px-7 py-10 text-white sm:px-10 lg:px-12">
         <div className="max-w-[470px]">
           <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#b48a4a]">
-            READY TO CREATE YOUR OWN STORY?
+            {cta.eyebrow}
           </p>
 
           <h2 className="mt-3 font-serif text-[26px] leading-[1.18] tracking-[-0.02em] sm:text-[29px]">
-            Let's Design Something Beautiful
+            {cta.title}
           </h2>
 
           <p className="mt-3 max-w-[390px] text-[13px] leading-6 text-white/85">
-            We'd love to hear about your project and help bring your vision to
-            life.
+            {cta.description}
           </p>
 
           <Link
-            to="/contact"
+            to={cta.ctaHref}
             className="mt-5 inline-flex min-h-[43px] items-center gap-4 bg-[#b58a52] px-5 text-[9px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#c39b69] focus:outline-none focus:ring-2 focus:ring-[#b58a52] focus:ring-offset-2 focus:ring-offset-[#171717]"
           >
-            SCHEDULE A CONSULTATION
+            {cta.ctaLabel}
             <ChevronRight size={15} strokeWidth={1.5} aria-hidden="true" />
           </Link>
         </div>

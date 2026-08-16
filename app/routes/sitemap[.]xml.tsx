@@ -1,8 +1,11 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { SITE_URL } from "~/utils/seo";
-import projectsData from "~/data/projects.json";
-import { articles } from "~/data/blogMock";
-import staffData from "~/data/team/staff.json";
+import {
+  getBlogSlugs,
+  getProjectSlugs,
+  getServiceSlugs,
+  getStaffSlugs,
+} from "~/lib/content";
 
 const serviceSlugs = [
   "bedrooms-retreats",
@@ -15,7 +18,15 @@ const serviceSlugs = [
   "workspaces",
 ];
 
-export const loader: LoaderFunction = () => {
+export const loader: LoaderFunction = async () => {
+  const [projectSlugs, articleSlugs, memberSlugs, serviceSlugsLive] =
+    await Promise.all([
+      getProjectSlugs(),
+      getBlogSlugs(),
+      getStaffSlugs(),
+      getServiceSlugs(),
+    ]);
+
   const paths = [
     "/",
     "/about",
@@ -26,10 +37,12 @@ export const loader: LoaderFunction = () => {
     "/testimonials",
     "/faq",
     "/contact",
-    ...Object.keys(projectsData).map((slug) => `/projects/${slug}`),
-    ...articles.map((article) => `/blog/${article.slug}`),
-    ...Object.keys(staffData.members).map((slug) => `/team/${slug}`),
-    ...serviceSlugs.map((slug) => `/services/${slug}`),
+    ...projectSlugs.map((slug) => `/projects/${slug}`),
+    ...articleSlugs.map((slug) => `/blog/${slug}`),
+    ...memberSlugs.map((slug) => `/team/${slug}`),
+    ...(serviceSlugsLive.length > 0 ? serviceSlugsLive : serviceSlugs).map(
+      (slug) => `/services/${slug}`
+    ),
   ];
 
   const urls = paths

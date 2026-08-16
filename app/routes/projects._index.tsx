@@ -9,19 +9,11 @@ import {
   Grid2X2,
   List,
 } from "lucide-react";
-import { createClient } from "@sanity/client";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { seo } from "~/utils/seo";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
-import servicesCtaImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
-
-const sanityClient = createClient({
-  projectId: "pzhistba",
-  dataset: "production",
-  apiVersion: "2023-12-01",
-  useCdn: true,
-});
+import { getProjectsIndexData, getSiteConfig, img } from "~/lib/content";
 
 const CATEGORIES = [
   "All Projects",
@@ -48,11 +40,6 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const HERO_SLUG = "london-mayfair-townhouse";
 
-function withParams(url: string, w: number, h: number) {
-  const sep = url.includes("?") ? "&" : "?";
-  return `${url}${sep}w=${w}&h=${h}&fit=crop&crop=center&auto=format&q=85`;
-}
-
 export interface ProjectCardData {
   slug: string;
   title: string;
@@ -64,38 +51,14 @@ export interface ProjectCardData {
 }
 
 export async function loader({}: LoaderFunctionArgs) {
-  const projects = await sanityClient.fetch(
-    `*[_type == "projectPage"] {
-      "slug": slug.current,
-      title,
-      location,
-      category,
-      completionDate,
-      "thumb": thumbnail.asset->url
-    } | order(completionDate desc)`
-  );
-
-  const heroDoc = await sanityClient.fetch(
-    `*[_type == "projectPage" && slug.current == $slug][0] {
-      "hero": heroImage.asset->url
-    }`,
-    { slug: HERO_SLUG }
-  );
-
-  const cards: ProjectCardData[] = (projects ?? []).map((p: any) => ({
-    slug: p.slug,
-    title: p.title,
-    location: p.location || "",
-    category: p.category || "",
-    completionDate: p.completionDate || null,
-    image: p.thumb ? withParams(p.thumb, 1280, 960) : "",
-    imageAlt: `${p.title}${p.location ? ` — ${p.location}` : ""}`,
-  }));
+  const [data, config] = await Promise.all([
+    getProjectsIndexData(),
+    getSiteConfig(),
+  ]);
 
   return json({
-    heroImage: heroDoc?.hero ? withParams(heroDoc.hero, 1920, 880) : "",
-    heroImageAlt: "London Mayfair Townhouse — premium transitional living room",
-    projects: cards,
+    ...data,
+    ctaImage: img(config?.servicesCtaImage, 1600, 900),
   });
 }
 
@@ -209,7 +172,7 @@ export default function ProjectsPage() {
             </div>
           </section>
 
-          <ConsultationCta />
+          <ConsultationCta image={data.ctaImage} />
         </main>
 
         <SiteFooter />
@@ -564,11 +527,11 @@ function PortfolioEmptyState({ onReset }: { onReset: () => void }) {
 
 /* ----------  CTA  ---------- */
 
-function ConsultationCta() {
+function ConsultationCta({ image }: { image: string }) {
   return (
     <section className="relative overflow-hidden bg-[#171716] text-white">
       <img
-        src={servicesCtaImage}
+        src={image}
         alt=""
         aria-hidden="true"
         className="absolute inset-0 h-full w-full object-cover object-center opacity-35"

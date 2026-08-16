@@ -1,8 +1,14 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { CREATOR, SITE_URL } from "~/utils/seo";
-import projectsData from "~/data/projects.json";
-import { articles } from "~/data/blogMock";
-import staffData from "~/data/team/staff.json";
+import {
+  getBlogSlugs,
+  getProjectSlugs,
+  getServiceSlugs,
+  getStaffSlugs,
+  getProjectsIndexData,
+  getBlogIndexData,
+  getTeamIndexData,
+} from "~/lib/content";
 
 const serviceSlugs = [
   "bedrooms-retreats",
@@ -15,10 +21,30 @@ const serviceSlugs = [
   "workspaces",
 ];
 
-const projectEntries = Object.entries(projectsData as Record<string, { title: string; location: string }>);
-const memberEntries = Object.values(staffData.members as Record<string, { fullName: string; role: string }>);
+export const loader: LoaderFunction = async () => {
+  const [projectSlugs, articleSlugs, memberSlugs, serviceSlugsLive, projects, articles, team] =
+    await Promise.all([
+      getProjectSlugs(),
+      getBlogSlugs(),
+      getStaffSlugs(),
+      getServiceSlugs(),
+      getProjectsIndexData(),
+      getBlogIndexData(),
+      getTeamIndexData(),
+    ]);
 
-export const loader: LoaderFunction = () => {
+  const projectBySlug = new Map<string, { slug: string; title: string; location: string }>(
+    projects.projects.map((p) => [p.slug, p] as const)
+  );
+  const articleBySlug = new Map<string, { slug: string; title: string; excerpt: string }>(
+    articles.articles.map((a) => [a.slug, a] as const)
+  );
+  const memberBySlug = new Map<string, { slug: string; fullName: string; role: string }>(
+    (team.shownMembers as { slug: string; fullName: string; role: string }[]).map((m) => [m.slug, m] as const)
+  );
+
+  const usedServiceSlugs = serviceSlugsLive.length > 0 ? serviceSlugsLive : serviceSlugs;
+
   const body = `# Whitefire Interior
 
 > Whitefire Interior is an Amsterdam-based interior design studio creating beautiful, functional spaces for homes and businesses — residential and commercial projects across the Netherlands and internationally.
@@ -28,22 +54,31 @@ The site is organized as: a home page, an about page, a services overview with d
 ## Services
 
 - [Services overview](${SITE_URL}/services): All services offered by the studio
-${serviceSlugs.map((slug) => `- [${slug.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ")}](${SITE_URL}/services/${slug}): Detail page for this service`).join("\n")}
+${usedServiceSlugs.map((slug) => `- [${slug.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ")}](${SITE_URL}/services/${slug}): Detail page for this service`).join("\n")}
 
 ## Projects
 
-- [Projects portfolio](${SITE_URL}/projects): All 18 completed projects
-${projectEntries.map(([slug, p]) => `- [${p.title}](${SITE_URL}/projects/${slug})${p.location ? `: ${p.title} project in ${p.location}` : ""}`).join("\n")}
+- [Projects portfolio](${SITE_URL}/projects): All ${projectSlugs.length} completed projects
+${projectSlugs.map((slug) => {
+  const p = projectBySlug.get(slug);
+  return `- [${p?.title ?? slug}](${SITE_URL}/projects/${slug})${p?.location ? `: ${p.title} project in ${p.location}` : ""}`;
+}).join("\n")}
 
 ## Blog
 
 - [Blog index](${SITE_URL}/blog): Design inspiration and advice articles
-${articles.map((a) => `- [${a.title}](${SITE_URL}/blog/${a.slug}): ${a.excerpt}`).join("\n")}
+${articleSlugs.map((slug) => {
+  const a = articleBySlug.get(slug);
+  return `- [${a?.title ?? slug}](${SITE_URL}/blog/${slug}): ${a?.excerpt ?? "Article"}`;
+}).join("\n")}
 
 ## Team
 
 - [Our team](${SITE_URL}/team): Meet the studio's designers
-${memberEntries.map((m) => `- [${m.fullName}](${SITE_URL}/team/${m.slug}): ${m.role}`).join("\n")}
+${memberSlugs.map((slug) => {
+  const m = memberBySlug.get(slug);
+  return `- [${m?.fullName ?? slug}](${SITE_URL}/team/${slug}): ${m?.role ?? "Designer profile"}`;
+}).join("\n")}
 
 ## About and Contact
 

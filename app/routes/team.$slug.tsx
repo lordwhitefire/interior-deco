@@ -1,4 +1,5 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import {
   ArrowRight,
@@ -21,43 +22,38 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
-import {
-  approachFixture,
-  consultationCta,
-  memberBySlug,
-  profileFixture,
-  teamMembers,
-} from "~/data/teamMock";
 import { JsonLd, seo } from "~/utils/seo";
+import { getTeamMemberData } from "~/lib/content";
 
-export const loader = ({ params }: LoaderFunctionArgs) => {
-  const member = memberBySlug(params.slug ?? "");
-  if (!member) {
+export async function loader({ params }: LoaderFunctionArgs) {
+  const data = await getTeamMemberData(params.slug ?? "");
+
+  if (!data) {
     throw new Response("Not Found", { status: 404 });
   }
 
-  const index = teamMembers.findIndex((m) => m.slug === member.slug);
-  const previous = teamMembers[(index - 1 + teamMembers.length) % teamMembers.length];
-  const next = teamMembers[(index + 1) % teamMembers.length];
+  return json(data);
+}
 
-  return { member, previous, next };
-};
-
-export const meta: MetaFunction = ({ data }) => {
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data?.member) {
     return [{ title: "Team Member | Whitefire Interior" }];
   }
   const member = data.member;
   return seo({
-    title: member.metaTitle,
-    description: member.metaDescription,
+    title: member.metaTitle || `${member.fullName} | Whitefire Interior`,
+    description:
+      member.metaDescription ||
+      member.bio ||
+      "Meet a member of the Whitefire Interior team.",
     path: `/team/${member.slug}`,
     image: member.photoUrl,
   });
 };
 
 export default function TeamMemberRoute() {
-  const { member, previous, next } = useLoaderData<typeof loader>();
+  const { member, previous, next, profileFixture, approachFixture, consultationCta } =
+    useLoaderData<typeof loader>() as TeamMemberData;
 
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
@@ -84,11 +80,11 @@ export default function TeamMemberRoute() {
 
         <main>
           <TeamMemberHero member={member} />
-          <ProfileSection member={member} />
+          <ProfileSection member={member} profileFixture={profileFixture} />
           <FeaturedProjects member={member} />
-          <ApproachSection member={member} />
-          <TeamMemberPager previous={previous} next={next} />
-          <ConsultationCTA />
+          <ApproachSection member={member} approachFixture={approachFixture} />
+          {previous && next && <TeamMemberPager previous={previous} next={next} />}
+          <ConsultationCTA cta={consultationCta} />
         </main>
 
         <SiteFooter />
@@ -97,8 +93,16 @@ export default function TeamMemberRoute() {
   );
 }
 
-type LoadedMember = ReturnType<typeof memberBySlug> & {
-  heroImage: { src: string; alt: string };
+type LoadedMember = {
+  slug: string;
+  fullName: string;
+  role: string;
+  bio: string;
+  photoUrl: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  social: { platform: string; url: string }[];
+  heroImage: { src: string; alt: string } | null;
   featuredProjects: {
     slug: string;
     title: string;
@@ -106,9 +110,23 @@ type LoadedMember = ReturnType<typeof memberBySlug> & {
     image: string;
     imageAlt: string;
     href: string;
-  }[];
-  metaTitle: string;
-  metaDescription: string;
+}[];
+};
+
+type TeamMemberData = {
+  member: LoadedMember;
+  previous: LoadedMember | null;
+  next: LoadedMember | null;
+  profileFixture: ProfileFixture;
+  approachFixture: ApproachFixture;
+  consultationCta: {
+    eyebrow: string;
+    headline: string;
+    description: string;
+    image: { src: string; alt: string };
+    buttonLabel: string;
+    buttonHref: string;
+  };
 };
 
 function TeamMemberHero({ member }: { member: LoadedMember }) {
@@ -117,8 +135,8 @@ function TeamMemberHero({ member }: { member: LoadedMember }) {
   return (
     <section className="relative min-h-[286px] overflow-hidden bg-[#080807] text-white lg:min-h-[390px]">
       <img
-        src={member.heroImage.src}
-        alt={member.heroImage.alt}
+        src={member.heroImage?.src ?? ""}
+        alt={member.heroImage?.alt ?? ""}
         className="absolute inset-0 h-full w-full object-cover object-[68%_52%]"
         loading="eager"
         fetchPriority="high"
@@ -188,7 +206,13 @@ function SocialIcon({ platform }: { platform: string }) {
   return <span className="font-serif text-[11px]">P</span>;
 }
 
-function ProfileSection({ member }: { member: LoadedMember }) {
+function ProfileSection({
+  member,
+  profileFixture,
+}: {
+  member: LoadedMember;
+  profileFixture: ProfileFixture;
+}) {
   const firstName = member.fullName.split(" ")[0];
 
   return (
@@ -236,7 +260,24 @@ function ProfileSection({ member }: { member: LoadedMember }) {
   );
 }
 
-type ProfileFact = (typeof profileFixture.facts)[number];
+type ProfileFact = {
+  key: string;
+  label: string;
+  values: string[];
+  icon: string;
+};
+
+type ProfileFixture = {
+  headline: string;
+  paragraphs: string[];
+  facts: ProfileFact[];
+};
+
+type ApproachFixture = {
+  headline: string;
+  description: string;
+  steps: { id: string; title: string; description: string; icon: string }[];
+};
 
 function ProfileFactRow({ fact }: { fact: ProfileFact }) {
   const Icon =
@@ -325,7 +366,13 @@ function FeaturedProjects({ member }: { member: LoadedMember }) {
   );
 }
 
-function ApproachSection({ member }: { member: LoadedMember }) {
+function ApproachSection({
+  member,
+  approachFixture,
+}: {
+  member: LoadedMember;
+  approachFixture: ApproachFixture;
+}) {
   const firstName = member.fullName.split(" ")[0];
 
   return (
@@ -433,12 +480,23 @@ function TeamMemberPager({
   );
 }
 
-function ConsultationCTA() {
+function ConsultationCTA({
+  cta,
+}: {
+  cta: {
+    eyebrow: string;
+    headline: string;
+    description: string;
+    image: { src: string; alt: string };
+    buttonLabel: string;
+    buttonHref: string;
+  };
+}) {
   return (
     <section className="relative min-h-[134px] overflow-hidden bg-[#0a0a09] text-white">
       <img
-        src={consultationCta.image.src}
-        alt={consultationCta.image.alt}
+        src={cta.image.src}
+        alt={cta.image.alt}
         loading="lazy"
         className="absolute inset-0 h-full w-full object-cover"
       />
@@ -450,18 +508,18 @@ function ConsultationCTA() {
       <div className="relative mx-auto flex min-h-[134px] max-w-[1440px] flex-col items-start justify-center px-7 py-8 sm:px-10 lg:flex-row lg:items-center lg:justify-between lg:px-14 xl:px-16">
         <div className="max-w-[340px]">
           <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#c28c43]">
-            {consultationCta.eyebrow}
+            {cta.eyebrow}
           </p>
           <h2 className="mt-1 font-serif text-[22px] leading-tight tracking-[-0.02em] sm:text-[24px]">
-            {consultationCta.headline}
+            {cta.headline}
           </h2>
         </div>
 
         <Link
-          to={consultationCta.buttonHref}
+          to={cta.buttonHref}
           className="mt-5 inline-flex items-center gap-3 bg-[#c2914e] px-4 py-3 text-[8px] font-bold uppercase tracking-[0.15em] text-white transition hover:bg-[#d0a15f] lg:mt-0"
         >
-          {consultationCta.buttonLabel}
+          {cta.buttonLabel}
           <ArrowRight size={13} strokeWidth={1.5} />
         </Link>
       </div>

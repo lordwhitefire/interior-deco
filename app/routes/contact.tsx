@@ -1,6 +1,6 @@
-import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import {
   ChevronRight,
   Clock3,
@@ -15,12 +15,44 @@ import { useEffect, useState } from "react";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { seo } from "~/utils/seo";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
-import sitepages from "~/data/sitepages.json";
+import { getContactPageData } from "~/lib/content";
 
-export const meta: MetaFunction = () => {
+export interface ContactInfoData {
+  eyebrow: string;
+  title: string;
+  description: string;
+  addressLines: string[];
+  phone: string;
+  email: string;
+  hoursLines: string[];
+  mapEmbedUrl: string;
+}
+
+export interface ContactPageData {
+  metaTitle: string;
+  metaDescription: string;
+  hero: {
+    eyebrow: string;
+    title: string[];
+    description: string;
+    image: { src: string; alt: string };
+  };
+  info: ContactInfoData;
+}
+
+export async function loader({}: LoaderFunctionArgs) {
+  const data = await getContactPageData();
+  if (!data) {
+    throw new Response("Contact page not found", { status: 404 });
+  }
+  return json(data);
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return seo({
-    title: "Contact | Whitefire Interior",
+    title: data?.metaTitle || "Contact | Whitefire Interior",
     description:
+      data?.metaDescription ||
       "Get in touch with the Whitefire Interior team. We'd love to hear from you about your next interior design project.",
     path: "/contact",
   });
@@ -33,36 +65,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return json({ ok: true });
 };
 
-const CONTACT_INFO = {
-  addressLines: ["101 Prinsengracht, Suite 3A", "1016 EA Amsterdam, Netherlands"],
-  phone: "+31 20 8765 4321",
-  email: "hello@whitefireinterior.com",
-  hoursLines: ["Monday – Friday: 9:00 AM – 6:00 PM", "Saturday: By Appointment", "Sunday: Closed"],
-};
-
-// Reused Google Maps embed (same mechanism as the existing real
-// contactInfo.googleMapsEmbedUrl — no API key). Points at the Amsterdam studio.
-const MAP_EMBED_URL =
-  "https://www.google.com/maps?q=101+Prinsengracht,+Amsterdam,+Netherlands&z=15&output=embed";
-
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ContactRoute() {
+  const data = useLoaderData<typeof loader>() as ContactPageData;
+
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
         <SiteHeader activePath="/contact" />
 
         <main>
-          <ContactHero />
+          <ContactHero hero={data.hero} />
 
           <section className="mx-auto grid max-w-[1320px] grid-cols-1 gap-10 px-6 py-10 sm:px-8 md:grid-cols-[1fr_1px_1fr] md:gap-[14px] md:py-12 lg:px-12">
             <ContactFormSection />
             <div aria-hidden="true" className="hidden w-px bg-[#d8d4ce] md:block" />
-            <ContactInformation />
+            <ContactInformation info={data.info} />
           </section>
 
-          <StudioMapSection />
+          <StudioMapSection info={data.info} />
           <WorkWithUs />
         </main>
 
@@ -72,12 +94,21 @@ export default function ContactRoute() {
   );
 }
 
-function ContactHero() {
+function ContactHero({
+  hero,
+}: {
+  hero: {
+    eyebrow: string;
+    title: string[];
+    description: string;
+    image: { src: string; alt: string };
+  };
+}) {
   return (
     <section className="relative isolate min-h-[330px] overflow-hidden bg-[#0d0d0c]">
       <img
-        src={sitepages.contact.hero.src}
-        alt={sitepages.contact.hero.alt}
+        src={hero.image.src}
+        alt={hero.image.alt}
         className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
         fetchPriority="high"
       />
@@ -89,20 +120,21 @@ function ContactHero() {
       <div className="mx-auto flex min-h-[330px] max-w-[1440px] items-start px-6 py-[64px] sm:px-10 lg:px-[62px]">
         <div className="max-w-[430px] text-white">
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#b48a4a]">
-            LET'S CREATE SOMETHING EXTRAORDINARY
+            {hero.eyebrow}
           </p>
 
           <h1 className="font-serif text-[40px] leading-[1.13] tracking-[-0.02em] sm:text-[44px]">
-            We'd Love to Hear
-            <br />
-            From You
+            {hero.title.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
           </h1>
 
           <div className="my-6 h-px w-[52px] bg-[#b48a4a]" />
 
           <p className="max-w-[370px] text-[14px] leading-7 text-white/90 sm:text-[15px]">
-            Whether you're dreaming of a full home renovation or a single-room
-            refresh, our team is ready to bring your vision to life.
+            {hero.description}
           </p>
         </div>
       </div>
@@ -302,14 +334,14 @@ function FormField({
   );
 }
 
-const INFO_ROWS = [
-  { id: "address", icon: MapPin, label: "Studio Address", lines: CONTACT_INFO.addressLines },
-  { id: "phone", icon: Phone, label: "Phone Number", lines: [CONTACT_INFO.phone] },
-  { id: "email", icon: Mail, label: "Email Address", lines: [CONTACT_INFO.email] },
-  { id: "hours", icon: Clock3, label: "Studio Hours", lines: CONTACT_INFO.hoursLines },
-];
+function ContactInformation({ info }: { info: ContactInfoData }) {
+  const INFO_ROWS = [
+    { id: "address", icon: MapPin, label: "Studio Address", lines: info.addressLines },
+    { id: "phone", icon: Phone, label: "Phone Number", lines: [info.phone] },
+    { id: "email", icon: Mail, label: "Email Address", lines: [info.email] },
+    { id: "hours", icon: Clock3, label: "Studio Hours", lines: info.hoursLines },
+  ];
 
-function ContactInformation() {
   return (
     <div className="min-w-0">
       <p className="text-[10px] font-semibold uppercase tracking-[0.19em] text-[#a8783e]">
@@ -404,7 +436,7 @@ function SocialLink({
   );
 }
 
-function StudioMapSection() {
+function StudioMapSection({ info }: { info: ContactInfoData }) {
   return (
     <section aria-labelledby="map-heading" className="relative">
       <h2 id="map-heading" className="sr-only">
@@ -413,7 +445,7 @@ function StudioMapSection() {
 
       <div className="relative h-[420px] w-full md:h-[460px]">
         <iframe
-          src={MAP_EMBED_URL}
+          src={info.mapEmbedUrl}
           title="Map showing Whitefire Interior studio at 101 Prinsengracht, Amsterdam"
           className="h-full w-full border-0"
           loading="lazy"
@@ -455,7 +487,7 @@ function StudioMapSection() {
             </h3>
 
             <p className="mt-3 text-[10px] leading-[1.7] text-white/80">
-              {CONTACT_INFO.addressLines.join(", ")}
+              {info.addressLines.join(", ")}
             </p>
 
             <a

@@ -19,23 +19,68 @@ import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { Breadcrumbs } from "~/components/whitefire/Breadcrumbs";
 import { CREATOR, JsonLd, seo } from "~/utils/seo";
 import {
-  articles,
-  author,
-  categories,
-  adjacentPosts,
-  recentPosts,
-} from "~/data/blogMock";
+  getBlogArticleData,
+  getBlogCategories,
+  getBlogRecentPosts,
+} from "~/lib/content";
+
+const AUTHOR = {
+  name: "Whitefire Interior",
+  bio: "A luxury interior design studio creating timeless, functional, and beautiful spaces.",
+};
+
+export interface BlogArticleImage {
+  src: string;
+  alt: string;
+}
+
+export interface BlogArticleSection {
+  number: string;
+  title: string;
+  paragraphs: string[];
+  images?: { src: string; alt: string }[];
+}
+
+export interface BlogArticle {
+  slug: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  readTime: string;
+  category: string;
+  categorySlug: string;
+  featured: boolean;
+  image: BlogArticleImage;
+  heroImage: BlogArticleImage;
+  leadImage: BlogArticleImage;
+  intro: string[];
+  sections: BlogArticleSection[];
+  metaTitle: string;
+  metaDescription: string;
+}
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { slug } = params;
 
-  const article = articles.find((item) => item.slug === slug);
+  const data = await getBlogArticleData(slug ?? "");
 
-  if (!article) {
+  if (!data) {
     throw new Response("Article not found", { status: 404 });
   }
 
-  return json({ article, ...adjacentPosts(article) });
+  const [categories, recentPosts] = await Promise.all([
+    getBlogCategories(),
+    getBlogRecentPosts(3),
+  ]);
+
+  return json({
+    article: data.article as BlogArticle,
+    previousPost: data.previousPost,
+    nextPost: data.nextPost,
+    categories,
+    recentPosts,
+    author: AUTHOR,
+  });
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -52,8 +97,25 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   });
 };
 
+type PostLink = {
+  slug: string;
+  title: string;
+  date: string;
+  image: { src: string; alt: string };
+};
+
+type BlogDetailData = {
+  article: BlogArticle;
+  previousPost: PostLink | null;
+  nextPost: PostLink | null;
+  categories: { slug: string; name: string; count: number }[];
+  recentPosts: PostLink[];
+  author: { name: string; bio: string };
+};
+
 export default function BlogDetailRoute() {
-  const { article, previousPost, nextPost } = useLoaderData<typeof loader>();
+  const { article, previousPost, nextPost, categories, recentPosts, author } =
+    useLoaderData<typeof loader>() as BlogDetailData;
 
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#1F1D1A]">
@@ -83,7 +145,7 @@ export default function BlogDetailRoute() {
         />
 
         <main>
-          <BlogDetailHero article={article} />
+          <BlogDetailHero article={article} author={author} />
 
           <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-12 px-6 py-8 sm:px-8 md:py-12 lg:grid-cols-[minmax(0,2.15fr)_minmax(280px,0.95fr)] lg:gap-14 lg:px-0">
             <article className="min-w-0">
@@ -99,10 +161,15 @@ export default function BlogDetailRoute() {
 
               <ShareBar title={article.title} />
 
-              <PreviousNextPosts previousPost={previousPost} nextPost={nextPost} />
+              {previousPost && nextPost && (
+                <PreviousNextPosts
+                  previousPost={previousPost}
+                  nextPost={nextPost}
+                />
+              )}
             </article>
 
-            <BlogSidebar />
+            <BlogSidebar categories={categories} recentPosts={recentPosts} author={author} />
           </div>
         </main>
 
@@ -114,7 +181,7 @@ export default function BlogDetailRoute() {
 
 /* ----------  Hero  ---------- */
 
-function BlogDetailHero({ article }: { article: (typeof articles)[number] }) {
+function BlogDetailHero({ article, author }: { article: BlogArticle; author: { name: string; bio: string } }) {
   return (
     <section className="relative min-h-[350px] overflow-hidden bg-black text-white">
       <img
@@ -179,7 +246,7 @@ function BlogDetailHero({ article }: { article: (typeof articles)[number] }) {
 
 /* ----------  Article body  ---------- */
 
-function BlogArticleBody({ article }: { article: (typeof articles)[number] }) {
+function BlogArticleBody({ article }: { article: BlogArticle }) {
   return (
     <div className="pt-5">
       {article.intro.map((paragraph) => (
@@ -299,8 +366,8 @@ function PreviousNextPosts({
   previousPost,
   nextPost,
 }: {
-  previousPost: { slug: string; title: string; date: string; image: { src: string; alt: string } };
-  nextPost: { slug: string; title: string; date: string; image: { src: string; alt: string } };
+  previousPost: PostLink;
+  nextPost: PostLink;
 }) {
   return (
     <nav
@@ -356,7 +423,15 @@ function PreviousNextPosts({
 
 /* ----------  Sidebar  ---------- */
 
-function BlogSidebar() {
+function BlogSidebar({
+  categories,
+  recentPosts,
+  author,
+}: {
+  categories: { slug: string; name: string; count: number }[];
+  recentPosts: PostLink[];
+  author: { name: string; bio: string };
+}) {
   return (
     <aside className="lg:pt-2">
       <section>

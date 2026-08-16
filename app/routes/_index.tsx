@@ -1,18 +1,9 @@
-// app/routes/_index.tsx
-// Home page implemented from Whitefire_Home_UI_Implementation_Package.md (§7),
-// with /mock/* image paths replaced by real repo assets.
-import React, { useState } from "react";
-import { json, type MetaFunction } from "@remix-run/node";
+import { useState } from "react";
+import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import groq from "groq";
-import { createClient } from "@sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
-import { Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import type { Swiper as SwiperType } from "swiper";
 import {
   ArrowRight,
-  Armchair,
   Award,
   BadgeCheck,
   BedDouble,
@@ -24,7 +15,6 @@ import {
   Hammer,
   LayoutGrid,
   Minus,
-  PanelsTopLeft,
   Play,
   Sofa,
   Sparkles,
@@ -32,56 +22,29 @@ import {
   Trophy,
   UtensilsCrossed,
 } from "lucide-react";
+import { Autoplay } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
 
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
-import { SectionHeading } from "~/components/whitefire/SectionHeading";
+import { SectionEyebrow } from "~/components/whitefire/SectionEyebrow";
 import { seo } from "~/utils/seo";
-
-import heroImage from "~/assets/images/living_design.jpg";
-import studioImage from "~/assets/images/Concept.jpg";
-import newsletterImage from "~/assets/images/Perfect.jpg";
-import projectsData from "~/data/projects.json";
-import { articles } from "~/data/blogMock";
-import bedroomsRetreats from "~/data/services/bedrooms-retreats.json";
-import boutiqueTransitional from "~/data/services/boutique-transitional.json";
-import compactMicroSpaces from "~/data/services/compact-micro-spaces.json";
-import hospitalityRetail from "~/data/services/hospitality-retail.json";
-import kitchensDining from "~/data/services/kitchens-dining.json";
-import livingSpaces from "~/data/services/living-spaces.json";
-import minimalistScandinavian from "~/data/services/minimalist-scandinavian.json";
-import workspaces from "~/data/services/workspaces.json";
-
-const sanityClient = createClient({
-  projectId: "pzhistba",
-  dataset: "production",
-  apiVersion: "2023-12-01",
-  useCdn: true,
-});
-
-const builder = imageUrlBuilder(sanityClient);
-
-function urlFor(source: any) {
-  return builder.image(source);
-}
+import { getHomePageData } from "~/lib/content";
+import { getSiteConfig } from "~/lib/content";
 
 interface ImageAsset {
   src: string;
   alt: string;
 }
 
-interface CTAData {
-  label: string;
-  href: string;
-}
-
 interface HeroData {
   eyebrow: string;
   title: string[];
   description: string;
-  primaryCta: CTAData;
-  showreel: CTAData;
-  image: ImageAsset;
+  primaryCta: { label: string; href: string };
+  showreel: { label: string; href: string };
+  image?: ImageAsset;
 }
 
 interface ServiceItem {
@@ -92,18 +55,18 @@ interface ServiceItem {
   icon: string;
 }
 
-interface Testimonial {
-  id: string;
-  quote: string;
-  clientName: string;
-  location: string;
-}
-
 interface ClientLogo {
   id: string;
   name: string;
   src: string;
   alt: string;
+}
+
+interface Testimonial {
+  id: string;
+  quote: string;
+  clientName: string;
+  location: string;
 }
 
 interface ProjectCardData {
@@ -130,263 +93,6 @@ interface ArticleCardData {
   href: string;
 }
 
-const mockHero: HeroData = {
-  eyebrow: "LUXURY INTERIOR DESIGN STUDIO",
-  title: ["Designing Spaces.", "Elevating Lives."],
-  description:
-    "We create timeless, functional and beautiful spaces that reflect who you are.",
-  primaryCta: {
-    label: "VIEW OUR PROJECTS",
-    href: "/projects",
-  },
-  showreel: {
-    label: "PLAY SHOWREEL",
-    href: "#showreel",
-  },
-  image: {
-    src: heroImage,
-    alt: "Luxury contemporary living room interior",
-  },
-};
-
-const mockServices: ServiceItem[] = [
-  {
-    id: "bedrooms-retreats",
-    title: bedroomsRetreats.hero.title,
-    description: bedroomsRetreats.hero.description,
-    href: "/services/bedrooms-retreats",
-    icon: "BedDouble",
-  },
-  {
-    id: "boutique-transitional",
-    title: boutiqueTransitional.hero.title,
-    description: boutiqueTransitional.hero.description,
-    href: "/services/boutique-transitional",
-    icon: "Store",
-  },
-  {
-    id: "compact-micro-spaces",
-    title: compactMicroSpaces.hero.title,
-    description: compactMicroSpaces.hero.description,
-    href: "/services/compact-micro-spaces",
-    icon: "Boxes",
-  },
-  {
-    id: "hospitality-retail",
-    title: hospitalityRetail.hero.title,
-    description: hospitalityRetail.hero.description,
-    href: "/services/hospitality-retail",
-    icon: "UtensilsCrossed",
-  },
-  {
-    id: "kitchens-dining",
-    title: kitchensDining.hero.title,
-    description: kitchensDining.hero.description,
-    href: "/services/kitchens-dining",
-    icon: "ChefHat",
-  },
-  {
-    id: "living-spaces",
-    title: livingSpaces.hero.title,
-    description: livingSpaces.hero.description,
-    href: "/services/living-spaces",
-    icon: "Sofa",
-  },
-  {
-    id: "minimalist-scandinavian",
-    title: minimalistScandinavian.hero.title,
-    description: minimalistScandinavian.hero.description,
-    href: "/services/minimalist-scandinavian",
-    icon: "Minus",
-  },
-  {
-    id: "workspaces",
-    title: workspaces.hero.title,
-    description: workspaces.hero.description,
-    href: "/services/workspaces",
-    icon: "Building2",
-  },
-];
-
-const mockProjects: ProjectCardData[] = [
-  {
-    id: "amsterdam-jordaan-flower-shop",
-    title: "Amsterdam Jordaan Flower Shop",
-    location: "Jordaan, Amsterdam",
-    image: {
-      src: projectsData["amsterdam-jordaan-flower-shop"].cardUrl,
-      alt: "Amsterdam Jordaan flower shop interior",
-    },
-    href: "/projects/amsterdam-jordaan-flower-shop",
-  },
-  {
-    id: "berlin-mitte-tech-hq",
-    title: "Berlin Mitte Tech HQ",
-    location: "Mitte, Berlin",
-    image: {
-      src: projectsData["berlin-mitte-tech-hq"].cardUrl,
-      alt: "Berlin Mitte tech headquarters interior",
-    },
-    href: "/projects/berlin-mitte-tech-hq",
-  },
-  {
-    id: "brooklyn-brownstone-kitchen",
-    title: "Brooklyn Brownstone Kitchen",
-    location: "Park Slope, Brooklyn",
-    image: {
-      src: projectsData["brooklyn-brownstone-kitchen"].cardUrl,
-      alt: "Brooklyn brownstone kitchen interior",
-    },
-    href: "/projects/brooklyn-brownstone-kitchen",
-  },
-  {
-    id: "chicago-warehouse-loft",
-    title: "Chicago Warehouse Loft",
-    location: "West Loop, Chicago",
-    image: {
-      src: projectsData["chicago-warehouse-loft"].cardUrl,
-      alt: "Chicago warehouse loft interior",
-    },
-    href: "/projects/chicago-warehouse-loft",
-  },
-  {
-    id: "copenhagen-nordhavn-showroom",
-    title: "Copenhagen Nordhavn Showroom",
-    location: "Nordhavn, Copenhagen",
-    image: {
-      src: projectsData["copenhagen-nordhavn-showroom"].cardUrl,
-      alt: "Copenhagen Nordhavn showroom interior",
-    },
-    href: "/projects/copenhagen-nordhavn-showroom",
-  },
-];
-
-const mockStats: StatItem[] = [
-  {
-    value: "350+",
-    label: "Projects Completed",
-    icon: "Building2",
-  },
-  {
-    value: "98%",
-    label: "Client Satisfaction",
-    icon: "BadgeCheck",
-  },
-  {
-    value: "12+",
-    label: "Years of Experience",
-    icon: "Award",
-  },
-  {
-    value: "20+",
-    label: "Design Awards",
-    icon: "Trophy",
-  },
-];
-
-const mockArticles: ArticleCardData[] = [
-  {
-    id: articles[0].slug,
-    category: articles[0].category,
-    title: articles[0].title,
-    date: articles[0].date,
-    readTime: articles[0].readTime,
-    image: articles[0].image,
-    href: `/blog/${articles[0].slug}`,
-  },
-  {
-    id: articles[1].slug,
-    category: articles[1].category,
-    title: articles[1].title,
-    date: articles[1].date,
-    readTime: articles[1].readTime,
-    image: articles[1].image,
-    href: `/blog/${articles[1].slug}`,
-  },
-  {
-    id: articles[2].slug,
-    category: articles[2].category,
-    title: articles[2].title,
-    date: articles[2].date,
-    readTime: articles[2].readTime,
-    image: articles[2].image,
-    href: `/blog/${articles[2].slug}`,
-  },
-];
-
-const mockTestimonial: Testimonial = {
-  id: "priya-sharma",
-  quote:
-    "Whitefire Interior transformed our apartment into a space that feels both luxurious and like home.",
-  clientName: "Priya Sharma",
-  location: "Mumbai, India",
-};
-
-const mockClientLogos: ClientLogo[] = [
-  { id: "dlf", name: "DLF", src: "/mock/logos/dlf.svg", alt: "DLF" },
-  {
-    id: "godrej",
-    name: "Godrej Properties",
-    src: "/mock/logos/godrej.svg",
-    alt: "Godrej Properties",
-  },
-  {
-    id: "oberoi",
-    name: "Oberoi Realty",
-    src: "/mock/logos/oberoi.svg",
-    alt: "Oberoi Realty",
-  },
-  {
-    id: "asian",
-    name: "Asian Paints",
-    src: "/mock/logos/asian-paints.svg",
-    alt: "Asian Paints",
-  },
-  {
-    id: "tata",
-    name: "Tata Housing",
-    src: "/mock/logos/tata.svg",
-    alt: "Tata Housing",
-  },
-  {
-    id: "prestige",
-    name: "Prestige Group",
-    src: "/mock/logos/prestige.svg",
-    alt: "Prestige Group",
-  },
-  {
-    id: "phoenix",
-    name: "Phoenix Marketcity",
-    src: "/mock/logos/phoenix.svg",
-    alt: "Phoenix Marketcity",
-  },
-  {
-    id: "brigade",
-    name: "Brigade",
-    src: "/mock/logos/brigade.svg",
-    alt: "Brigade",
-  },
-  { id: "dlf-2", name: "DLF", src: "/mock/logos/dlf.svg", alt: "DLF" },
-  {
-    id: "godrej-2",
-    name: "Godrej Properties",
-    src: "/mock/logos/godrej.svg",
-    alt: "Godrej Properties",
-  },
-  {
-    id: "oberoi-2",
-    name: "Oberoi Realty",
-    src: "/mock/logos/oberoi.svg",
-    alt: "Oberoi Realty",
-  },
-  {
-    id: "asian-2",
-    name: "Asian Paints",
-    src: "/mock/logos/asian-paints.svg",
-    alt: "Asian Paints",
-  },
-];
-
 function IconForService({ name }: { name: string }) {
   const className = "h-7 w-7 stroke-[1.2]";
 
@@ -394,7 +100,7 @@ function IconForService({ name }: { name: string }) {
     case "LayoutGrid":
       return <LayoutGrid className={className} />;
     case "Armchair":
-      return <Armchair className={className} />;
+      return <LayoutGrid className={className} />;
     case "Hammer":
       return <Hammer className={className} />;
     case "Sparkles":
@@ -416,7 +122,7 @@ function IconForService({ name }: { name: string }) {
     case "Building2":
       return <Building2 className={className} />;
     default:
-      return <PanelsTopLeft className={className} />;
+      return <LayoutGrid className={className} />;
   }
 }
 
@@ -435,12 +141,43 @@ function IconForStat({ name }: { name: string }) {
   }
 }
 
-function HomeHero({ image }: { image?: string | null }) {
+function SectionHeading({
+  eyebrow,
+  title,
+  align = "left",
+}: {
+  eyebrow: string;
+  title: string;
+  align?: "left" | "center";
+}) {
+  return (
+    <div className={align === "center" ? "text-center" : ""}>
+      <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#9A7A4A]">
+        {eyebrow}
+      </p>
+      <h2
+        className={`mt-4 font-serif text-[36px] leading-[1.02] text-[#211F1B] sm:text-[40px] ${
+          align === "center" ? "mx-auto max-w-[560px]" : "max-w-[560px]"
+        }`}
+      >
+        {title}
+      </h2>
+    </div>
+  );
+}
+
+function HomeHero({
+  image,
+  hero,
+}: {
+  image?: string | null;
+  hero: HeroData;
+}) {
   return (
     <section className="relative min-h-[620px] overflow-hidden bg-[#171716] sm:min-h-[680px] lg:min-h-[720px]">
       <img
-        src={image ?? mockHero.image.src}
-        alt={mockHero.image.alt}
+        src={image ?? hero.image?.src ?? ""}
+        alt={hero.image?.alt ?? ""}
         className="absolute inset-0 h-full w-full object-cover"
         fetchPriority="high"
       />
@@ -452,11 +189,11 @@ function HomeHero({ image }: { image?: string | null }) {
       <div className="relative mx-auto flex min-h-[620px] max-w-[1440px] items-center px-6 pt-24 sm:min-h-[680px] sm:px-8 lg:min-h-[720px] lg:px-20 lg:pt-12">
         <div className="max-w-[590px]">
           <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.24em] text-[#C3A56E]">
-            {mockHero.eyebrow}
+            {hero.eyebrow}
           </p>
 
           <h1 className="font-serif text-[48px] leading-[0.98] tracking-[-0.025em] text-white sm:text-[62px] lg:text-[72px]">
-            {mockHero.title.map((line) => (
+            {hero.title.map((line) => (
               <span key={line} className="block">
                 {line}
               </span>
@@ -464,26 +201,26 @@ function HomeHero({ image }: { image?: string | null }) {
           </h1>
 
           <p className="mt-6 max-w-[440px] text-sm leading-6 text-white/85 sm:text-[15px]">
-            {mockHero.description}
+            {hero.description}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-5">
             <a
-              href={mockHero.primaryCta.href}
+              href={hero.primaryCta.href}
               className="inline-flex items-center gap-2 bg-[#B89558] px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#A8844D]"
             >
-              {mockHero.primaryCta.label}
+              {hero.primaryCta.label}
               <ArrowRight size={14} />
             </a>
 
             <a
-              href={mockHero.showreel.href}
+              href={hero.showreel.href}
               className="group inline-flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.12em] text-white"
             >
               <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/70 transition-colors group-hover:bg-white group-hover:text-black">
                 <Play size={12} fill="currentColor" />
               </span>
-              {mockHero.showreel.label}
+              {hero.showreel.label}
             </a>
           </div>
         </div>
@@ -492,18 +229,22 @@ function HomeHero({ image }: { image?: string | null }) {
   );
 }
 
-function ServicesSection() {
+function ServicesSection({
+  services,
+  eyebrow,
+  title,
+}: {
+  services: ServiceItem[];
+  eyebrow: string;
+  title: string;
+}) {
   return (
     <section className="bg-[#F7F4EE] px-6 py-16 sm:px-8 lg:px-12 lg:py-20">
       <div className="mx-auto max-w-[1280px]">
-        <SectionHeading
-          eyebrow="WHAT WE DO"
-          title="Comprehensive Interior Design Services"
-          align="center"
-        />
+        <SectionHeading eyebrow={eyebrow} title={title} align="center" />
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-          {mockServices.map((service, index) => (
+          {services.map((service, index) => (
             <a
               key={service.id}
               href={service.href}
@@ -530,13 +271,27 @@ function ServicesSection() {
   );
 }
 
-function HomeStudioStatement({ image }: { image?: string | null }) {
+function HomeStudioStatement({
+  image,
+  eyebrow,
+  title,
+  body,
+  ctaLabel,
+  ctaHref,
+}: {
+  image?: string | null;
+  eyebrow: string;
+  title: string;
+  body: string;
+  ctaLabel: string;
+  ctaHref: string;
+}) {
   return (
     <section className="bg-[#171716] text-white">
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
         <div className="relative min-h-[390px] overflow-hidden lg:min-h-[460px]">
           <img
-            src={image ?? studioImage}
+            src={image ?? ""}
             alt="Elegant interior seating area"
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover"
@@ -547,26 +302,22 @@ function HomeStudioStatement({ image }: { image?: string | null }) {
         <div className="flex min-h-[390px] items-center bg-[#181817] px-8 py-14 sm:px-12 lg:min-h-[460px] lg:px-20">
           <div className="max-w-[480px]">
             <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#C3A56E]">
-              STYLISH SPACES
+              {eyebrow}
             </p>
 
             <h2 className="mt-4 font-serif text-[40px] leading-[1.02] sm:text-[48px]">
-              Where Aesthetics
-              <br />
-              Meet Function
+              {title}
             </h2>
 
             <p className="mt-6 max-w-[430px] text-sm leading-6 text-white/75">
-              We believe that great design is more than beautiful spaces. It's
-              about creating environments that inspire, support, and elevate
-              everyday living.
+              {body}
             </p>
 
             <a
-              href="/about"
+              href={ctaHref}
               className="mt-7 inline-flex border border-white/30 px-5 py-3 text-[9px] font-medium uppercase tracking-[0.14em] transition-colors hover:bg-white hover:text-black"
             >
-              About Our Studio
+              {ctaLabel}
             </a>
           </div>
         </div>
@@ -578,27 +329,31 @@ function HomeStudioStatement({ image }: { image?: string | null }) {
 function TestimonialsTrustSection({
   logos,
   testimonials,
+  clientsEyebrow,
+  clientsTitle,
+  brandsEyebrow,
 }: {
-  logos?: ClientLogo[];
+  logos: ClientLogo[];
   testimonials: Testimonial[];
+  clientsEyebrow: string;
+  clientsTitle: string;
+  brandsEyebrow: string;
 }) {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
-  const items = testimonials.length > 0 ? testimonials : [mockTestimonial];
+  const items = testimonials.length > 0 ? testimonials : [];
   const swipable = items.length > 1;
-  const hasLogos = Boolean(logos && logos.length > 0);
+  const hasLogos = logos.length > 0;
 
   return (
     <section className="bg-[#F7F4EE]">
       <div className="mx-auto grid max-w-[1280px] lg:grid-cols-[0.9fr_1.5fr]">
         <div className="px-8 py-16 lg:border-r lg:border-[#25221E]/15 lg:px-12 lg:py-20">
           <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#9A7A4A]">
-            CLIENTS LOVE US
+            {clientsEyebrow}
           </p>
 
           <h2 className="mt-4 max-w-[300px] font-serif text-[36px] leading-[1.02] text-[#211F1B]">
-            What Our Clients
-            <br />
-            Are Saying
+            {clientsTitle}
           </h2>
 
           <div className="mt-9 flex items-start gap-5">
@@ -660,11 +415,11 @@ function TestimonialsTrustSection({
 
         <div className="px-8 py-16 lg:px-12 lg:py-20">
           <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#9A7A4A]">
-            TRUSTED BY LEADING BRANDS
+            {brandsEyebrow}
           </p>
 
           <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
-            {(logos && logos.length > 0 ? logos : mockClientLogos).map((logo) => (
+            {(logos.length > 0 ? logos : []).map((logo) => (
               <div
                 key={logo.id}
                 className="flex min-h-[42px] items-center justify-center"
@@ -716,26 +471,33 @@ function ProjectCard({ project }: { project: ProjectCardData }) {
   );
 }
 
-function FeaturedProjectsSection() {
+function FeaturedProjectsSection({
+  projects,
+  eyebrow,
+  title,
+  ctaLabel,
+}: {
+  projects: ProjectCardData[];
+  eyebrow: string;
+  title: string;
+  ctaLabel: string;
+}) {
   return (
     <section className="bg-[#F7F4EE] px-6 py-16 sm:px-8 lg:px-12 lg:py-20">
       <div className="mx-auto max-w-[1280px]">
         <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-          <SectionHeading
-            eyebrow="FEATURED PROJECTS"
-            title="Spaces We're Proud Of"
-          />
+          <SectionHeading eyebrow={eyebrow} title={title} />
 
           <a
             href="/projects"
             className="inline-flex self-start border border-[#6C604F]/40 px-5 py-3 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#302C26] transition-colors hover:bg-[#302C26] hover:text-white sm:self-auto"
           >
-            View All Projects
+            {ctaLabel}
           </a>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          {mockProjects.map((project) => (
+          {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
@@ -744,11 +506,11 @@ function FeaturedProjectsSection() {
   );
 }
 
-function HomeStats() {
+function HomeStats({ stats }: { stats: StatItem[] }) {
   return (
     <section className="bg-[#171716] text-white">
       <div className="mx-auto grid max-w-[1280px] grid-cols-2 lg:grid-cols-4">
-        {mockStats.map((stat, index) => (
+        {stats.map((stat, index) => (
           <div
             key={stat.label}
             className={`flex flex-col items-center justify-center px-5 py-12 text-center ${
@@ -805,23 +567,33 @@ function ArticleCard({ article }: { article: ArticleCardData }) {
   );
 }
 
-function LatestArticlesSection() {
+function LatestArticlesSection({
+  articles,
+  eyebrow,
+  title,
+  ctaLabel,
+}: {
+  articles: ArticleCardData[];
+  eyebrow: string;
+  title: string;
+  ctaLabel: string;
+}) {
   return (
     <section className="bg-[#F7F4EE] px-6 py-16 sm:px-8 lg:px-12 lg:py-20">
       <div className="mx-auto max-w-[1280px]">
         <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-          <SectionHeading eyebrow="INSIGHTS & IDEAS" title="Latest Articles" />
+          <SectionHeading eyebrow={eyebrow} title={title} />
 
           <a
             href="/blog"
             className="inline-flex self-start border border-[#6C604F]/40 px-5 py-3 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#302C26] transition-colors hover:bg-[#302C26] hover:text-white sm:self-auto"
           >
-            View All Articles
+            {ctaLabel}
           </a>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {mockArticles.map((article) => (
+          {articles.map((article) => (
             <ArticleCard key={article.id} article={article} />
           ))}
         </div>
@@ -854,7 +626,7 @@ function NewsletterCTA({ image }: { image?: string | null }) {
   return (
     <section className="relative overflow-hidden bg-[#332B24] text-white">
       <img
-        src={image ?? newsletterImage}
+        src={image ?? ""}
         alt="Warmly lit interior with decorative objects"
         loading="lazy"
         className="absolute inset-0 h-full w-full object-cover"
@@ -925,76 +697,64 @@ function NewsletterCTA({ image }: { image?: string | null }) {
 }
 
 export async function loader() {
-  try {
-    const [heroDoc, stylishDoc, clientsDoc, testimonialsDoc] = await Promise.all([
-      sanityClient.fetch(groq`*[_type == "hero"][0]{images}`),
-      sanityClient.fetch(groq`*[_type == "stylish"][0]{images}`),
-      sanityClient.fetch(
-        groq`*[_type == "client"] | order(id asc){id, name, logo}`
-      ),
-      sanityClient.fetch(
-        groq`*[_type == "testimonial"] | order(date desc){_id, clientName, clientLocation, review}`
-      ),
-    ]);
+  const [home, config] = await Promise.all([getHomePageData(), getSiteConfig()]);
 
-    const heroImages: string[] = (heroDoc?.images ?? []).map((img: any) =>
-      urlFor(img).url()
-    );
-    const studioImage: string | null = stylishDoc?.images?.[0]
-      ? urlFor(stylishDoc.images[0]).url()
-      : null;
-    const baseLogos: ClientLogo[] = (clientsDoc ?? []).map((client: any) => ({
-      id: String(client.id),
-      name: client.name,
-      src: urlFor(client.logo).url(),
-      alt: client.name,
-    }));
-    const clientLogos: ClientLogo[] = Array.from({ length: 12 }, (_, index) => {
-      const logo = baseLogos[index % baseLogos.length];
-      return { ...logo, id: `${logo.id}-${index}` };
-    });
-    const testimonials: Testimonial[] = (testimonialsDoc ?? [])
-      .slice(0, 6)
-      .map((t: any) => ({
-        id: t._id,
-        quote: t.review ?? "",
-        clientName: t.clientName ?? "",
-        location: t.clientLocation ?? "",
-      }));
-
-    return json({
-      heroImages,
-      studioImage,
-      clientLogos,
-      testimonials,
-    });
-  } catch {
-    return json({
-      heroImages: [],
-      studioImage: null,
-      clientLogos: [],
-      testimonials: [],
-    });
-  }
+  return json({
+    ...home,
+    heroImageFallback: "",
+    newsletter: {
+      eyebrow: config?.newsletterEyebrow ?? "JOIN OUR COMMUNITY",
+      title: config?.newsletterTitle ?? "Design Inspiration Straight to Your Inbox",
+      body:
+        config?.newsletterBody ??
+        "Get the latest trends, project updates and exclusive design tips delivered to your inbox.",
+    },
+  });
 }
 
 export default function HomePage() {
-  const { heroImages, studioImage, clientLogos, testimonials } =
-    useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
 
   return (
     <div className="min-h-screen bg-[#E8E2D8]">
       <div className="mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
-        <HomeHero image={heroImages[0]} />
+        <HomeHero image={data.heroImages[0]} hero={data.hero as HeroData} />
 
         <main>
-          <ServicesSection />
-          <HomeStudioStatement image={studioImage} />
-          <TestimonialsTrustSection logos={clientLogos} testimonials={testimonials} />
-          <FeaturedProjectsSection />
-          <HomeStats />
-          <LatestArticlesSection />
-          <NewsletterCTA image={heroImages[1]} />
+          <ServicesSection
+            services={data.services}
+            eyebrow={data.servicesEyebrow}
+            title={data.servicesTitle}
+          />
+          <HomeStudioStatement
+            image={data.studioImage}
+            eyebrow={data.studioEyebrow}
+            title={data.studioTitle}
+            body={data.studioBody}
+            ctaLabel={data.studioCtaLabel}
+            ctaHref={data.studioCtaHref}
+          />
+          <TestimonialsTrustSection
+            logos={data.clientLogos}
+            testimonials={data.testimonials}
+            clientsEyebrow={data.clientsEyebrow}
+            clientsTitle={data.clientsTitle}
+            brandsEyebrow={data.brandsEyebrow}
+          />
+          <FeaturedProjectsSection
+            projects={data.projects}
+            eyebrow={data.projectsEyebrow}
+            title={data.projectsTitle}
+            ctaLabel={data.projectsCtaLabel}
+          />
+          <HomeStats stats={data.stats} />
+          <LatestArticlesSection
+            articles={data.articles}
+            eyebrow={data.articlesEyebrow}
+            title={data.articlesTitle}
+            ctaLabel={data.articlesCtaLabel}
+          />
+          <NewsletterCTA image={data.heroImages[1]} />
         </main>
 
         <SiteFooter />
@@ -1003,10 +763,12 @@ export default function HomePage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = ({ data }) => {
   return seo({
-    title: "Whitefire Interior — Amsterdam Interior Design Studio",
+    title:
+      (data as any)?.metaTitle || "Whitefire Interior — Amsterdam Interior Design Studio",
     description:
+      (data as any)?.metaDescription ||
       "Whitefire Interior — an Amsterdam interior design studio creating beautiful, functional spaces for homes and businesses.",
     path: "/",
     image:

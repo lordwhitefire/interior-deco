@@ -15,20 +15,12 @@ import {
   Tags,
   X,
 } from "lucide-react";
-import { createClient } from "@sanity/client";
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { JsonLd, seo } from "~/utils/seo";
 import { Breadcrumbs } from "~/components/whitefire/Breadcrumbs";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
-import servicesCtaImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
-
-const sanityClient = createClient({
-  projectId: "pzhistba",
-  dataset: "production",
-  apiVersion: "2023-12-01",
-  useCdn: true,
-});
+import { getProjectDetailData, getSiteConfig, img, withParams } from "~/lib/content";
 
 const CATEGORY_LABELS: Record<string, string> = {
   commercial: "Commercial",
@@ -37,11 +29,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   "home-office": "Home Office",
   bedroom: "Bedroom",
 };
-
-function withParams(url: string, w: number, h: number) {
-  const sep = url.includes("?") ? "&" : "?";
-  return `${url}${sep}w=${w}&h=${h}&fit=crop&crop=center&auto=format&q=85`;
-}
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -69,73 +56,31 @@ export interface ProjectDetailData {
   heroImageAlt: string;
   storyImage: string;
   gallery: { url: string; caption: string }[];
+  ctaImage: string;
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { projectid } = params;
 
-  const project = await sanityClient.fetch(
-    `*[_type == "projectPage" && slug.current == $slug][0] {
-      "slug": slug.current,
-      title,
-      location,
-      category,
-      completionDate,
-      squareFootage,
-      challenge,
-      solution,
-      process,
-      materials,
-      colorPalette,
-      metaTitle,
-      metaDescription,
-      "heroImage": heroImage.asset->url,
-      "thumbnail": thumbnail.asset->url,
-      "gallery": gallery[]{
-        "url": asset->url,
-        caption,
-        isFeatured
-      }
-    }`,
-    { slug: projectid }
-  );
+  const project = await getProjectDetailData(projectid ?? "");
 
   if (!project) {
     throw new Response("Project not found", { status: 404 });
   }
 
-  const categoryLabel = CATEGORY_LABELS[project.category] || project.category || "Project";
+  const config = await getSiteConfig();
 
-  const gallery = [...(project.gallery ?? [])]
-    .sort(
-      (a: any, b: any) =>
-        Number(b.isFeatured ?? false) - Number(a.isFeatured ?? false)
-    )
-    .slice(0, 5)
-    .map((g: any, index: number) => ({
-      url: g.url ? withParams(g.url, 640, 610) : "",
-      caption: g.caption || `Project photo ${index + 1}`,
-    }));
+  const categoryLabel =
+    CATEGORY_LABELS[project.category] || project.category || "Project";
 
   const data: ProjectDetailData = {
-    slug: project.slug,
-    title: project.title,
-    location: project.location || "",
-    category: project.category || "",
+    ...project,
     categoryLabel,
     completionDate: formatDate(project.completionDate),
-    squareFootage: project.squareFootage ?? null,
-    challenge: project.challenge || "",
-    solution: project.solution || "",
-    process: project.process || "",
-    materials: Array.isArray(project.materials) ? project.materials : [],
-    colorPalette: Array.isArray(project.colorPalette) ? project.colorPalette : [],
-    metaTitle: project.metaTitle || "",
-    metaDescription: project.metaDescription || "",
-    heroImage: project.heroImage ? withParams(project.heroImage, 1920, 880) : "",
-    heroImageAlt: `${project.title}${project.location ? ` — ${project.location}` : ""}`,
-    storyImage: project.thumbnail ? withParams(project.thumbnail, 1280, 754) : "",
-    gallery,
+    heroImageAlt:
+      project.heroImageAlt ||
+      `${project.title}${project.location ? ` — ${project.location}` : ""}`,
+    ctaImage: img(config?.servicesCtaImage, 1600, 1200),
   };
 
   return json(data);
@@ -193,7 +138,7 @@ export default function ProjectDetailRoute() {
           <ProjectStory project={project} />
           <ProjectGallery images={project.gallery} />
           <ProjectHighlights project={project} />
-          <ProjectCta />
+          <ProjectCta image={project.ctaImage} />
         </main>
 
         <SiteFooter />
@@ -587,11 +532,11 @@ function HighlightBlock({
 
 /* ----------  CTA  ---------- */
 
-function ProjectCta() {
+function ProjectCta({ image }: { image: string }) {
   return (
     <section className="relative overflow-hidden bg-[#0B0B0A] text-white">
       <img
-        src={servicesCtaImage}
+        src={image}
         alt=""
         aria-hidden="true"
         loading="lazy"

@@ -11,33 +11,7 @@ import { ServiceInclusionItem } from "~/components/whitefire/ServiceInclusionIte
 import { JsonLd, seo } from "~/utils/seo";
 import { TrustItem } from "~/components/whitefire/TrustItem";
 import { PrimaryButton } from "~/components/whitefire/PrimaryButton";
-import fs from "fs";
-
-/* ----------  Image imports  ---------- */
-
-import servicesHeroLivingSpacesImage from "~/assets/images/services-hero-living-spaces.jpg";
-import servicesHeroKitchensDiningImage from "~/assets/images/services-hero-kitchens-dining.jpg";
-import servicesHeroBedroomsRetreatsImage from "~/assets/images/services-hero-bedrooms-retreats.jpg";
-import servicesHeroWorkspacesImage from "~/assets/images/services-hero-workspaces.jpg";
-import servicesHeroHospitalityRetailImage from "~/assets/images/services-hero-hospitality-retail.jpg";
-import servicesHeroBoutiqueTransitionalImage from "~/assets/images/services-hero-boutique-transitional.jpg";
-import servicesHeroMinimalistScandinavianImage from "~/assets/images/services-hero-minimalist-scandinavian.jpg";
-import servicesHeroCompactMicroSpacesImage from "~/assets/images/services-hero-compact-micro-spaces.jpg";
-import aboutClosingImage from "~/assets/images/about_closing_dark_banner_table_vase.jpg";
-
-/* ----------  Image map  ---------- */
-
-const imageMap: Record<string, string> = {
-  "services-hero-living-spaces": servicesHeroLivingSpacesImage,
-  "services-hero-kitchens-dining": servicesHeroKitchensDiningImage,
-  "services-hero-bedrooms-retreats": servicesHeroBedroomsRetreatsImage,
-  "services-hero-workspaces": servicesHeroWorkspacesImage,
-  "services-hero-hospitality-retail": servicesHeroHospitalityRetailImage,
-  "services-hero-boutique-transitional": servicesHeroBoutiqueTransitionalImage,
-  "services-hero-minimalist-scandinavian": servicesHeroMinimalistScandinavianImage,
-  "services-hero-compact-micro-spaces": servicesHeroCompactMicroSpacesImage,
-  about_closing_dark_banner_table_vase: aboutClosingImage,
-};
+import { getServicePageData } from "~/lib/content";
 
 /* ----------  Types  ---------- */
 
@@ -112,78 +86,22 @@ export interface ServicePageData {
   trust: TrustItemData[];
 }
 
-/* ----------  Loader: load JSON by slug  ---------- */
-
-const VALID_SLUGS = [
-  "living-spaces",
-  "kitchens-dining",
-  "bedrooms-retreats",
-  "workspaces",
-  "hospitality-retail",
-  "boutique-transitional",
-  "minimalist-scandinavian",
-  "compact-micro-spaces",
-];
-
-const DATA_DIR = "app/data/services";
-const PROJECTS_JSON = "app/data/projects.json";
-
-function resolveImages(data: any) {
-  const resolve = (val: string): string => {
-    const key = val.replace(/\.[^.]+$/, "");
-    return imageMap[key] || val;
-  };
-
-  return {
-    ...data,
-    hero: {
-      ...data.hero,
-      image: resolve(data.hero.image),
-    },
-    cta: {
-      ...data.cta,
-      image: resolve(data.cta.image),
-    },
-  };
-}
+/* ----------  Loader: query Sanity by slug  ---------- */
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { slug } = params;
 
-  if (!slug || !VALID_SLUGS.includes(slug)) {
+  if (!slug) {
     throw redirect("/services");
   }
 
-  const filePath = `${DATA_DIR}/${slug}.json`;
+  const data = await getServicePageData(slug);
 
-  if (!fs.existsSync(filePath)) {
+  if (!data) {
     throw redirect("/services");
   }
 
-  const raw = fs.readFileSync(filePath, "utf-8");
-  const data = JSON.parse(raw);
-
-  const projects = JSON.parse(fs.readFileSync(PROJECTS_JSON, "utf-8"));
-
-  const gallery = (data.gallery as ServiceGalleryEntry[]).map((entry) => {
-    const project = projects[entry.project];
-    return {
-      title: entry.title,
-      image: project?.thumbUrl ?? "",
-      imageAlt: project ? `${project.title} — ${project.location}`.trim() : entry.title,
-      href: entry.href,
-    };
-  });
-
-  const inclusionsProject = projects[data.inclusionsProject as string];
-
-  const resolvedData = {
-    ...resolveImages(data),
-    inclusionsImage: inclusionsProject?.galleryFirstUrl ?? "",
-    gallery,
-  };
-
-  return json(resolvedData);
+  return json(data);
 }
 
 /* ----------  Meta  ---------- */
@@ -363,7 +281,7 @@ function ServiceGalleryStrip({
 
         <div className="mt-7 flex snap-x gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item) => (
-            <ProjectCard key={item.title} {...item} />
+            <ProjectCard key={item.title} {...item} alt={item.imageAlt} />
           ))}
         </div>
       </div>

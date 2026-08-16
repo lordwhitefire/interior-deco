@@ -1,5 +1,6 @@
-import type { MetaFunction } from "@remix-run/node";
-import { Link } from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
 import {
   ArrowRight,
   Leaf,
@@ -11,30 +12,75 @@ import {
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { seo } from "~/utils/seo";
-import { intro, projectCta, shownMembers, teamHero, values } from "~/data/teamMock";
+import { getTeamIndexData } from "~/lib/content";
 
-export const meta: MetaFunction = () => {
+export interface TeamIndexData {
+  heroImage: string;
+  heroImageAlt: string;
+  intro: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  values: {
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+  }[];
+  shownMembers: {
+    slug: string;
+    fullName: string;
+    role: string;
+    order: number;
+    featured: boolean;
+    bio: string;
+    photoUrl: string;
+    social?: { platform: string; url: string }[];
+  }[];
+  projectCta: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    image: string;
+    imageAlt: string;
+    buttonLabel: string;
+    buttonHref: string;
+  };
+  metaTitle: string;
+  metaDescription: string;
+}
+
+export async function loader({}: LoaderFunctionArgs) {
+  const data = await getTeamIndexData();
+  return json(data satisfies TeamIndexData);
+}
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
   return seo({
-    title: "Our Team | Whitefire Interior",
+    title: data?.metaTitle || "Our Team | Whitefire Interior",
     description:
+      data?.metaDescription ||
       "Meet the designers, planners, and creatives behind Whitefire Interior's timeless spaces.",
     path: "/team",
-    image: teamHero.src,
+    image: data?.heroImage,
   });
 };
 
 export default function TeamIndexRoute() {
+  const data = useLoaderData<typeof loader>() as TeamIndexData;
+
   return (
     <div className="min-h-screen bg-[#E8E2D8] font-sans text-[#171615]">
       <div className="relative mx-auto max-w-[1440px] overflow-hidden bg-[#F7F4EE] shadow-[0_0_0_1px_rgba(25,22,18,0.08)]">
         <SiteHeader activePath="/team" />
 
         <main>
-          <TeamHero />
-          <TeamIntroduction />
-          <TeamGrid />
-          <ValuesSection />
-          <ProjectCTA />
+          <TeamHero image={data.heroImage} imageAlt={data.heroImageAlt} />
+          <TeamIntroduction intro={data.intro} />
+          <TeamGrid members={data.shownMembers} />
+          <ValuesSection values={data.values} />
+          <ProjectCTA cta={data.projectCta} />
         </main>
 
         <SiteFooter />
@@ -43,12 +89,12 @@ export default function TeamIndexRoute() {
   );
 }
 
-function TeamHero() {
+function TeamHero({ image, imageAlt }: { image: string; imageAlt: string }) {
   return (
     <section className="relative min-h-[397px] overflow-hidden bg-[#080807] text-white lg:min-h-[500px]">
       <img
-        src={teamHero.src}
-        alt={teamHero.alt}
+        src={image}
+        alt={imageAlt}
         className="absolute inset-0 h-full w-full object-cover object-[68%_52%]"
         loading="eager"
         fetchPriority="high"
@@ -83,7 +129,11 @@ function TeamHero() {
   );
 }
 
-function TeamIntroduction() {
+function TeamIntroduction({
+  intro,
+}: {
+  intro: TeamIndexData["intro"];
+}) {
   return (
     <section className="bg-[#f5f3ef] px-6 pb-7 pt-8 text-center sm:px-8 lg:px-12 lg:pb-8 lg:pt-9">
       <div className="mx-auto max-w-[760px]">
@@ -108,14 +158,14 @@ function TeamIntroduction() {
   );
 }
 
-function TeamGrid() {
+function TeamGrid({ members }: { members: TeamIndexData["shownMembers"] }) {
   return (
     <section
       aria-label="Whitefire Interior team members"
       className="bg-[#f5f3ef] px-6 pb-7 sm:px-8 lg:px-12 lg:pb-8 xl:px-14"
     >
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {shownMembers.map((member) => (
+        {members.map((member) => (
           <TeamCard key={member.slug} member={member} />
         ))}
       </div>
@@ -123,10 +173,10 @@ function TeamGrid() {
   );
 }
 
-type StaffMember = (typeof shownMembers)[number];
+type StaffMember = TeamIndexData["shownMembers"][number];
 
 function TeamCard({ member }: { member: StaffMember }) {
-  const linkedIn = member.social.find((s) => s.platform === "linkedin");
+  const linkedIn = (member.social ?? []).find((s) => s.platform === "linkedin");
 
   return (
     <article className="group flex min-h-[380px] flex-col border border-[#ddd9d2] bg-[#f8f6f2] transition-colors duration-300 hover:border-[#b9935f] sm:min-h-[405px]">
@@ -172,7 +222,7 @@ function TeamCard({ member }: { member: StaffMember }) {
   );
 }
 
-function ValuesSection() {
+function ValuesSection({ values }: { values: TeamIndexData["values"] }) {
   return (
     <section className="border-t border-[#ebe7e0] bg-[#eeece8] px-6 py-7 sm:px-8 lg:px-12 lg:py-9">
       <div className="mx-auto max-w-[1320px]">
@@ -190,7 +240,7 @@ function ValuesSection() {
   );
 }
 
-type TeamValue = (typeof values)[number];
+type TeamValue = TeamIndexData["values"][number];
 
 function ValueItem({ value }: { value: TeamValue }) {
   const Icon =
@@ -222,13 +272,13 @@ function ValueItem({ value }: { value: TeamValue }) {
   );
 }
 
-function ProjectCTA() {
+function ProjectCTA({ cta }: { cta: TeamIndexData["projectCta"] }) {
   return (
     <section className="relative grid min-h-[186px] grid-cols-1 overflow-hidden bg-[#0e0e0c] text-white lg:grid-cols-[58%_42%]">
       <div className="relative min-h-[230px] lg:min-h-[300px]">
         <img
-          src={projectCta.image.src}
-          alt={projectCta.image.alt}
+          src={cta.image}
+          alt={cta.imageAlt}
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover object-[35%_55%]"
         />
@@ -241,22 +291,22 @@ function ProjectCTA() {
       <div className="relative flex items-center bg-[#0b0b09] px-7 py-9 sm:px-10 lg:px-10 xl:px-12">
         <div className="max-w-[430px]">
           <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#c28c43]">
-            {projectCta.eyebrow}
+            {cta.eyebrow}
           </p>
 
           <h2 className="mt-3 font-serif text-[26px] leading-tight tracking-[-0.02em] sm:text-[29px]">
-            {projectCta.title}
+            {cta.title}
           </h2>
 
           <p className="mt-3 max-w-[350px] text-[11px] leading-5 text-white/80">
-            {projectCta.description}
+            {cta.description}
           </p>
 
           <Link
-            to={projectCta.buttonHref}
+            to={cta.buttonHref}
             className="mt-5 inline-flex items-center gap-3 bg-[#c2914e] px-4 py-3 text-[8px] font-bold uppercase tracking-[0.15em] text-white transition hover:bg-[#d0a15f]"
           >
-            {projectCta.buttonLabel}
+            {cta.buttonLabel}
             <ArrowRight size={13} strokeWidth={1.5} />
           </Link>
         </div>
