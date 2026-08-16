@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { json } from "@remix-run/node";
-import type { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import {
   ArrowRight,
   Award,
@@ -30,8 +30,9 @@ import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { SectionEyebrow } from "~/components/whitefire/SectionEyebrow";
 import { seo } from "~/utils/seo";
-import { getHomePageData } from "~/lib/content";
-import { getSiteConfig } from "~/lib/content";
+import { NewsletterForm } from "~/components/whitefire/NewsletterForm";
+import { getHomePageData, getSiteConfig } from "~/lib/content";
+import { handleNewsletterAction, NewsletterActionData } from "~/lib/forms";
 
 interface ImageAsset {
   src: string;
@@ -603,25 +604,8 @@ function LatestArticlesSection({
 }
 
 function NewsletterCTA({ image }: { image?: string | null }) {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<
-    "idle" | "submitting" | "success" | "error"
-  >("idle");
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!email || !email.includes("@")) {
-      setStatus("error");
-      return;
-    }
-
-    setStatus("submitting");
-
-    window.setTimeout(() => {
-      setStatus("success");
-    }, 600);
-  }
+  const actionData =
+    useActionData<typeof action>() as NewsletterActionData | undefined;
 
   return (
     <section className="relative overflow-hidden bg-[#332B24] text-white">
@@ -649,51 +633,16 @@ function NewsletterCTA({ image }: { image?: string | null }) {
           delivered to your inbox.
         </p>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mx-auto mt-8 flex max-w-[620px] flex-col gap-2 sm:flex-row"
-          noValidate
-        >
-          <label htmlFor="newsletter-email" className="sr-only">
-            Email address
-          </label>
-
-          <input
-            id="newsletter-email"
-            type="email"
-            required
-            value={email}
-            onChange={(event) => {
-              setEmail(event.target.value);
-              if (status !== "idle") setStatus("idle");
-            }}
-            placeholder="Enter your email address"
-            aria-invalid={status === "error"}
-            className="min-h-12 flex-1 border border-white/20 bg-white px-4 text-sm text-[#25221E] outline-none placeholder:text-[#8B857B] focus:border-[#C3A56E]"
-          />
-
-          <button
-            type="submit"
-            disabled={status === "submitting"}
-            className="min-h-12 bg-[#B89558] px-7 text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors hover:bg-[#A8844D] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {status === "submitting" ? "Submitting..." : "Subscribe"}
-          </button>
-        </form>
-
-        <p
-          className="mt-4 min-h-5 text-[10px] text-white/60"
-          aria-live="polite"
-        >
-          {status === "error"
-            ? "Please enter a valid email address."
-            : status === "success"
-              ? "Thank you. You're subscribed."
-              : "We respect your privacy. Unsubscribe anytime."}
-        </p>
+        <div className="mx-auto mt-8 max-w-[620px]">
+          <NewsletterForm variant="home" actionData={actionData} />
+        </div>
       </div>
     </section>
   );
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  return handleNewsletterAction(request, "home-newsletter");
 }
 
 export async function loader() {

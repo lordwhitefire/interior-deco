@@ -1,7 +1,14 @@
-import { useState } from "react";
-import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import {
+  Link,
+  useActionData,
+  useLoaderData,
+} from "@remix-run/react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -23,6 +30,8 @@ import {
   getBlogCategories,
   getBlogRecentPosts,
 } from "~/lib/content";
+import { NewsletterForm } from "~/components/whitefire/NewsletterForm";
+import { handleNewsletterAction, NewsletterActionData } from "~/lib/forms";
 
 const AUTHOR = {
   name: "Whitefire Interior",
@@ -529,16 +538,8 @@ function BlogSidebar({
 }
 
 function BlogNewsletterCard() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "submitted">("idle");
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!email.trim()) return;
-
-    setStatus("submitted");
-  }
+  const actionData =
+    useActionData<typeof action>() as NewsletterActionData | undefined;
 
   return (
     <section className="bg-[#171717] px-5 py-6 text-white">
@@ -549,38 +550,17 @@ function BlogNewsletterCard() {
         expert insights delivered to your inbox.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-4">
-        <label htmlFor="newsletter-email" className="sr-only">
-          Your email address
-        </label>
-
-        <input
-          id="newsletter-email"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="Your email address"
-          required
-          className="w-full border border-white/15 bg-transparent px-3 py-3 text-[11px] text-white outline-none placeholder:text-white/45 focus:border-[#C39A52]"
-        />
-
-        <button
-          type="submit"
-          className="mt-2.5 w-full bg-[#B18A4A] px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[#C39A52] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-        >
-          Subscribe
-        </button>
-
-        {status === "submitted" && (
-          <p className="mt-3 text-[10px] text-[#D7B979]" role="status">
-            Thank you. Your subscription request has been received.
-          </p>
-        )}
-      </form>
+      <div className="mt-4">
+        <NewsletterForm variant="sidebar" actionData={actionData} />
+      </div>
 
       <p className="mt-3 text-[9px] leading-[1.5] text-white/55">
         We respect your privacy. Unsubscribe at any time.
       </p>
     </section>
   );
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  return handleNewsletterAction(request, "blog-newsletter");
 }

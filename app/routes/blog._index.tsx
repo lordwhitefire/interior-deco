@@ -1,7 +1,16 @@
-import { useState } from "react";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useActionData,
+  useLoaderData,
+  useSearchParams,
+} from "@remix-run/react";
 import {
   ArrowRight,
   Search,
@@ -9,7 +18,9 @@ import {
 import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { seo } from "~/utils/seo";
+import { NewsletterForm } from "~/components/whitefire/NewsletterForm";
 import { getBlogIndexData } from "~/lib/content";
+import { handleNewsletterAction, NewsletterActionData } from "~/lib/forms";
 
 export interface Article {
   id: string;
@@ -352,25 +363,8 @@ function FeaturedPostCard({ article }: { article: Article }) {
 }
 
 function NewsletterCTA() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<
-    "idle" | "submitting" | "success" | "error"
-  >("idle");
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!email.includes("@")) {
-      setStatus("error");
-      return;
-    }
-
-    setStatus("submitting");
-
-    window.setTimeout(() => {
-      setStatus("success");
-    }, 450);
-  }
+  const actionData =
+    useActionData<typeof action>() as NewsletterActionData | undefined;
 
   return (
     <section className="bg-[#181716] p-5 text-white">
@@ -381,60 +375,19 @@ function NewsletterCTA() {
         expert insights delivered to your inbox.
       </p>
 
-      {status === "success" ? (
-        <p
-          role="status"
-          className="mt-5 border border-[#B99658]/40 px-3 py-3 text-[10px] leading-5 text-[#D1B77E]"
-        >
-          Thank you. You’re on the list.
-        </p>
-      ) : (
-        <form onSubmit={handleSubmit} className="mt-5">
-          <label htmlFor="newsletter-email" className="sr-only">
-            Your email address
-          </label>
-
-          <input
-            id="newsletter-email"
-            type="email"
-            value={email}
-            onChange={(event) => {
-              setEmail(event.target.value);
-              if (status !== "idle") setStatus("idle");
-            }}
-            placeholder="Your email address"
-            className="h-9 w-full border border-white/15 bg-transparent px-3 text-[10px] text-white outline-none placeholder:text-white/40 focus:border-[#B99658] focus:ring-1 focus:ring-[#B99658]"
-            aria-invalid={status === "error"}
-            aria-describedby={
-              status === "error" ? "newsletter-error" : undefined
-            }
-          />
-
-          <button
-            type="submit"
-            disabled={status === "submitting"}
-            className="mt-2 flex h-9 w-full items-center justify-center bg-[#B99658] text-[9px] font-semibold uppercase tracking-[0.13em] text-[#171615] transition hover:bg-[#C5A86E] disabled:cursor-wait disabled:opacity-70"
-          >
-            {status === "submitting" ? "Subscribing..." : "Subscribe"}
-          </button>
-
-          {status === "error" && (
-            <p
-              id="newsletter-error"
-              role="alert"
-              className="mt-2 text-[9px] text-[#D6A7A0]"
-            >
-              Please enter a valid email address.
-            </p>
-          )}
-        </form>
-      )}
+      <div className="mt-5">
+        <NewsletterForm variant="sidebar" actionData={actionData} />
+      </div>
 
       <p className="mt-4 text-[9px] leading-5 text-white/55">
         We respect your privacy. Unsubscribe at any time.
       </p>
     </section>
   );
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  return handleNewsletterAction(request, "blog-newsletter");
 }
 
 /* ----------  Pagination  ---------- */

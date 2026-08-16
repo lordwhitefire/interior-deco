@@ -16,6 +16,18 @@ import { SiteHeader } from "~/components/whitefire/SiteHeader";
 import { seo } from "~/utils/seo";
 import { SiteFooter } from "~/components/whitefire/SiteFooter";
 import { getContactPageData } from "~/lib/content";
+import {
+  EMAIL_PATTERN,
+  FIELD_LIMITS,
+  clientIp,
+  createDoc,
+  isHoneypotFilled,
+  parseEmail,
+  parseForm,
+  rateLimit,
+  rateLimited,
+  serverError,
+} from "~/lib/forms";
 
 export interface ContactInfoData {
   eyebrow: string;
@@ -59,13 +71,48 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData();
-  const submission = Object.fromEntries(formData.entries());
-  console.log("Contact form submission:", submission);
-  return json({ ok: true });
-};
+  const { formData, get } = await parseForm(request);
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (isHoneypotFilled(formData)) return json({ ok: true });
+
+  const { allowed } = rateLimit(clientIp(request));
+  if (!allowed) return rateLimited();
+
+  const fullName = get("fullName");
+  const email = parseEmail(get("email"));
+  const phone = get("phone");
+  const subject = get("subject");
+  const message = get("message");
+
+  const errors: Record<string, string> = {};
+  if (!fullName || fullName.length > FIELD_LIMITS.fullName)
+    errors.fullName = "Please enter your name.";
+  if (!EMAIL_PATTERN.test(email) || email.length > FIELD_LIMITS.email)
+    errors.email = "Please enter a valid email address.";
+  if (phone.length > FIELD_LIMITS.phone) errors.phone = "Phone number is too long.";
+  if (!subject || subject.length > FIELD_LIMITS.subject)
+    errors.subject = "Please add a subject.";
+  if (!message || message.length > FIELD_LIMITS.message)
+    errors.message = "Please write a message.";
+  if (Object.keys(errors).length > 0)
+    return json({ ok: false, errors }, { status: 400 });
+
+  try {
+    await createDoc("contactSubmission", {
+      fullName,
+      email,
+      phone,
+      subject,
+      message,
+      source: "contact-form",
+      status: "new",
+    });
+    return json({ ok: true });
+  } catch (error) {
+    console.error("Contact submission error:", error);
+    return serverError();
+  }
+};
 
 export default function ContactRoute() {
   const data = useLoaderData<typeof loader>() as ContactPageData;
@@ -149,8 +196,15 @@ interface FormErrors {
   message?: string;
 }
 
+interface ContactActionData {
+  ok: boolean;
+  errors?: Record<string, string>;
+  error?: string;
+}
+
 function ContactFormSection() {
-  const actionData = useActionData<typeof action>();
+  const actionData =
+    useActionData<typeof action>() as ContactActionData | undefined;
   const [values, setValues] = useState({
     fullName: "",
     email: "",
@@ -204,6 +258,20 @@ function ContactFormSection() {
         onSubmit={handleSubmit}
         className="mt-6 grid grid-cols-1 gap-[17px] sm:grid-cols-2"
       >
+        <div
+          aria-hidden="true"
+          className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
+        >
+          <label htmlFor="contact-website">Website</label>
+          <input
+            id="contact-website"
+            name="website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+
         <FormField
           label="Full Name *"
           type="text"
@@ -267,6 +335,15 @@ function ContactFormSection() {
               className="mt-4 border border-[#c9bfb2] bg-[#efebe7] px-4 py-3 text-[12px] text-[#1f1f1f]"
             >
               Thank you. Your message has been received.
+            </p>
+          )}
+
+          {actionData?.error && (
+            <p
+              role="alert"
+              className="mt-4 border border-[#d8b4a8] bg-[#f7ece7] px-4 py-3 text-[12px] text-[#8c2f1d]"
+            >
+              {actionData.error}
             </p>
           )}
         </div>
