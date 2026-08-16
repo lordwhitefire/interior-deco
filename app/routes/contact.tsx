@@ -322,7 +322,14 @@ function ContactFormSection() {
           <p className="mt-4 flex items-start gap-2 text-[10px] leading-[1.6] text-[#6b665f]">
             <LockKeyhole size={13} strokeWidth={1.5} aria-hidden="true" className="mt-0.5 shrink-0" />
             Your information is safe with us. We'll never share your details
-            with anyone.
+            with anyone. By submitting, you agree to our{" "}
+            <a
+              href="/privacy"
+              className="underline underline-offset-2 transition-colors hover:text-[#9A7A4A]"
+            >
+              Privacy Policy
+            </a>
+            .
           </p>
 
           {actionData?.ok && (

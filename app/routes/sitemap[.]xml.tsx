@@ -37,6 +37,7 @@ export const loader: LoaderFunction = async () => {
     "/testimonials",
     "/faq",
     "/contact",
+    "/privacy",
     ...projectSlugs.map((slug) => `/projects/${slug}`),
     ...articleSlugs.map((slug) => `/blog/${slug}`),
     ...memberSlugs.map((slug) => `/team/${slug}`),

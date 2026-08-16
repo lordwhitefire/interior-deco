@@ -552,7 +552,11 @@ function BlogNewsletterCard() {
       </div>
 
       <p className="mt-3 text-[9px] leading-[1.5] text-white/55">
-        We respect your privacy. Unsubscribe at any time.
+        We respect your privacy. Read our{" "}
+        <a href="/privacy" className="underline underline-offset-2 hover:text-white/80">
+          Privacy Policy
+        </a>
+        . Unsubscribe anytime.
       </p>
     </section>
   );

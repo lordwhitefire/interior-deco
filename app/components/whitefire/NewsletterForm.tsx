@@ -46,7 +46,7 @@ export function NewsletterForm({ variant, actionData }: NewsletterFormProps) {
           ? "You’re already subscribed."
           : "Thank you. You’re subscribed."
         : variant === "home"
-          ? "We respect your privacy. Unsubscribe anytime."
+          ? "We respect your privacy. Read our Privacy Policy. Unsubscribe anytime."
           : null;
 
   return (

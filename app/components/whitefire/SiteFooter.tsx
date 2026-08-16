@@ -6,6 +6,12 @@ export function SiteFooter() {
         <p className="mt-2 text-[9px] uppercase tracking-[0.2em] text-white/45">
           Interior Design Studio
         </p>
+        <a
+          href="/privacy"
+          className="mt-5 inline-block text-[10px] uppercase tracking-[0.16em] text-white/40 transition-colors hover:text-white/70"
+        >
+          Privacy Policy
+        </a>
       </div>
     </footer>
   );
