@@ -34,7 +34,7 @@ export default function ClientTestimonials({
         {clientsTitle}
       </h2>
 
-      <div className="mt-9 flex items-start gap-5">
+      <div className="mt-6 flex items-start gap-5">
         <span className="font-serif text-5xl leading-none text-[#5B554B]">
           “
         </span>
@@ -55,7 +55,7 @@ export default function ClientTestimonials({
             className="w-full"
           >
             {items.map((testimonial) => (
-              <SwiperSlide key={testimonial.id} className="!h-[260px]">
+              <SwiperSlide key={testimonial.id} className="!h-[170px]">
                 <div className="flex h-full flex-col overflow-hidden">
                   <p className="line-clamp-4 text-sm leading-6 text-[#37332E]">
                     {testimonial.quote}
@@ -73,7 +73,7 @@ export default function ClientTestimonials({
         </div>
       </div>
 
-      <div className="mt-8 flex gap-3">
+      <div className="mt-6 flex gap-3">
         <button
           type="button"
           aria-label="Previous testimonial"

@@ -341,7 +341,7 @@ function TestimonialsTrustSection({
   return (
     <section className="bg-[#F7F4EE]">
       <div className="mx-auto grid max-w-[1280px] lg:grid-cols-[0.9fr_1.5fr]">
-        <div className="min-w-0 px-8 py-16 lg:border-r lg:border-[#25221E]/15 lg:px-12 lg:py-20">
+        <div className="min-w-0 px-8 py-12 lg:border-r lg:border-[#25221E]/15 lg:px-12 lg:py-20">
           <Suspense fallback={null}>
             <ClientTestimonials
               testimonials={testimonials}
@@ -351,23 +351,23 @@ function TestimonialsTrustSection({
           </Suspense>
         </div>
 
-        <div className="min-w-0 px-8 py-16 lg:px-12 lg:py-20">
+        <div className="min-w-0 px-8 py-12 lg:px-12 lg:py-20">
           <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#9A7A4A]">
             {brandsEyebrow}
           </p>
 
-          <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
             {(logos.length > 0 ? logos : []).map((logo) => (
               <div
                 key={logo.id}
-                className="flex min-h-[42px] items-center justify-center"
+                className="flex min-h-[52px] items-center justify-center sm:min-h-[42px]"
               >
                 {hasLogos ? (
                   <ResponsiveImage
                     src={logo.src}
                     alt={logo.alt}
                     loading="lazy"
-                    className="max-h-8 max-w-[110px] object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
+                    className="w-full max-h-10 max-w-[128px] object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0 sm:w-auto sm:max-h-8 sm:max-w-[110px]"
                   />
                 ) : (
                   <span className="text-[13px] font-medium uppercase tracking-[0.18em] text-[#5B554B]/80">
