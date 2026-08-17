@@ -21,11 +21,9 @@ export const meta: MetaFunction = () => {
   return [
     { title: 'Whitefire Interior — Amsterdam Interior Design Studio' },
     { name: 'description', content: 'Whitefire Interior — an Amsterdam interior design studio creating beautiful, functional spaces for homes and businesses.' },
-    { name: 'author', content: CREATOR.name },
     { property: 'og:type', content: 'website' },
     { property: 'og:site_name', content: 'Whitefire Interior' },
     { property: 'og:url', content: SITE_URL },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
   ];
 };
 
@@ -126,6 +124,8 @@ export default function Root() {
     <html lang="en" className="h-full">
       <head>
         <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="author" content={CREATOR.name} />
         <Meta />
         <Links />
         <JsonLd data={organizationJsonLd} />
