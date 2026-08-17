@@ -43,7 +43,9 @@ export default function ClientTestimonials({
           <Swiper
             modules={[Autoplay]}
             loop={swipable}
+            slidesPerView={1}
             speed={500}
+            resizeObserver
             autoplay={
               swipable
                 ? { delay: 6000, disableOnInteraction: false, pauseOnMouseEnter: true }
