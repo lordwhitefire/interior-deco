@@ -7,3 +7,6 @@ node_modules
 
 # stray transcripts
 /videoplayback*.txt
+
+# local design docs & repomix dumps (never committed)
+/docs/
