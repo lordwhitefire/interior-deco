@@ -341,7 +341,7 @@ function TestimonialsTrustSection({
   return (
     <section className="bg-[#F7F4EE]">
       <div className="mx-auto grid max-w-[1280px] lg:grid-cols-[0.9fr_1.5fr]">
-        <div className="px-8 py-16 lg:border-r lg:border-[#25221E]/15 lg:px-12 lg:py-20">
+        <div className="min-w-0 px-8 py-16 lg:border-r lg:border-[#25221E]/15 lg:px-12 lg:py-20">
           <Suspense fallback={null}>
             <ClientTestimonials
               testimonials={testimonials}
@@ -351,7 +351,7 @@ function TestimonialsTrustSection({
           </Suspense>
         </div>
 
-        <div className="px-8 py-16 lg:px-12 lg:py-20">
+        <div className="min-w-0 px-8 py-16 lg:px-12 lg:py-20">
           <p className="text-[10px] font-medium uppercase tracking-[0.24em] text-[#9A7A4A]">
             {brandsEyebrow}
           </p>
