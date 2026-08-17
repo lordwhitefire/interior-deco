@@ -30,7 +30,7 @@ export default function ClientTestimonials({
         {clientsEyebrow}
       </p>
 
-      <h2 className="mt-4 max-w-[300px] font-serif text-[36px] leading-[1.02] text-[#211F1B]">
+      <h2 className="mt-4 max-w-[300px] font-serif text-[28px] leading-[1.05] text-[#211F1B] sm:text-[36px] sm:leading-[1.02]">
         {clientsTitle}
       </h2>
 
@@ -39,7 +39,7 @@ export default function ClientTestimonials({
           “
         </span>
 
-        <div className="w-full max-w-[330px]">
+        <div className="w-full min-w-0 max-w-[330px]">
           <Swiper
             modules={[Autoplay]}
             loop={swipable}
@@ -55,7 +55,7 @@ export default function ClientTestimonials({
             {items.map((testimonial) => (
               <SwiperSlide key={testimonial.id} className="!h-[260px]">
                 <div className="flex h-full flex-col overflow-hidden">
-                  <p className="text-sm leading-6 text-[#37332E]">
+                  <p className="line-clamp-4 text-sm leading-6 text-[#37332E]">
                     {testimonial.quote}
                   </p>
                   <p className="mt-5 text-xs font-semibold text-[#2C2925]">
